@@ -6,75 +6,62 @@ const baseUrl = import.meta.env.VITE_BASE_URL;
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: fetchBaseQuery({ baseUrl }),
-  tagTypes: [
-    "chapterNumber",
-    "surahNumber",
-    "surahName",
-    "verseNumber",
-    "arabicText",
-    "translations",
-    "transliteration",
-  ],
+  tagTypes: ["Surah", "Verse"],
   endpoints: (builder) => ({
+    // Add a new verse to a Surah
     addVerse: builder.mutation({
       query: (formData) => ({
-        url: "admin/quran/chapter/surah/verse",
+        url: "/surah/add-verse",
         method: "POST",
         body: formData,
         headers: {
           "Content-Type": "application/json",
         },
       }),
-      invalidatesTags: [
-        "chapterNumber",
-        "surahNumber",
-        "surahName",
-        "verseNumber",
-        "arabicText",
-        "translations",
-        "transliteration",
-      ],
-    }),
-    // Edit Verse
-    editVerse: builder.mutation({
-      query: ({ chapterNumber, surahNumber, verseNumber, formData }) => ({
-        url: `admin/quran/chapter/surah/verse/edit`,
-        method: "POST",
-        body: { chapterNumber, surahNumber, verseNumber, ...formData },
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }),
-      invalidatesTags: [
-        "chapterNumber",
-        "surahNumber",
-        "surahName",
-        "verseNumber",
-        "arabicText",
-        "translations",
-        "transliteration",
-      ],
+      invalidatesTags: ["Surah", "Verse"],
     }),
 
-    // Delete Verse
-    deleteVerse: builder.mutation({
-      query: ({ chapterNumber, surahNumber, verseNumber }) => ({
-        url: `admin/quran/chapter/surah/verse/delete`,
-        method: "DELETE",
-        body: { chapterNumber, surahNumber, verseNumber },
+    // Edit a specific verse in a Surah
+    editVerse: builder.mutation({
+      query: ({ surahNumber, verseNumber, formData }) => ({
+        url: `/surah/${surahNumber}/verse/${verseNumber}`,
+        method: "PUT",
+        body: formData,
         headers: {
           "Content-Type": "application/json",
         },
       }),
-      invalidatesTags: [
-        "chapterNumber",
-        "surahNumber",
-        "surahName",
-        "verseNumber",
-        "arabicText",
-        "translations",
-        "transliteration",
-      ],
+      invalidatesTags: ["Surah", "Verse"],
+    }),
+
+    // Delete a specific verse from a Surah
+    deleteVerse: builder.mutation({
+      query: ({ surahNumber, verseNumber }) => ({
+        url: `/surah/${surahNumber}/verse/${verseNumber}`,
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["Surah", "Verse"],
+    }),
+
+    // Fetch all Surahs
+    getAllSurahs: builder.query({
+      query: () => ({
+        url: "/surah/all",
+        method: "GET",
+      }),
+      providesTags: ["Surah"],
+    }),
+
+    // Fetch Surahs with pagination
+    getAllSurahsPaginated: builder.query({
+      query: ({ page = 1, limit = 10 }) => ({
+        url: `/surah/paginated?page=${page}&limit=${limit}`,
+        method: "GET",
+      }),
+      providesTags: ["Surah"],
     }),
   }),
 });
@@ -84,4 +71,6 @@ export const {
   useAddVerseMutation,
   useEditVerseMutation,
   useDeleteVerseMutation,
+  useGetAllSurahsQuery,
+  useGetAllSurahsPaginatedQuery,
 } = adminApi;
