@@ -6,7 +6,7 @@ const connectDB = require("./lib/db");
 
 // import router here
 const authRouter = require("./routes/auth/auth.route");
-const quranRouter = require("./routes/quran/quran.route");
+const surahRouter = require("./routes/surah/surah.route");
 
 dotenv.config();
 
@@ -47,7 +47,7 @@ app.get("/", (req, res) => res.send("server is running ..."));
 app.use("/api/v1/auth", authRouter);
 
 // quran route
-app.use("/api/v1/admin/quran", quranRouter);
+app.use("/api/v1/admin", surahRouter);
 
 
 app.listen(PORT, () => {

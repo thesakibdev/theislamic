@@ -249,8 +249,6 @@ export default function CommonForm({
                 .filter((controlItem) =>
                   [
                     "arabicText",
-                    "verseTranslationEnglish",
-                    "verseTranslationBangla",
                   ].includes(controlItem.name)
                 )
                 .map((controlItem) => (
@@ -291,6 +289,25 @@ export default function CommonForm({
                 className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Translations (eng)"
                 value={formData.translations.eng || ""}
+                onChange={(event) =>
+                  setFormData({
+                    ...formData,
+                    translations: {
+                      ...formData.translations,
+                      eng: event.target.value,
+                    },
+                  })
+                }
+              ></Textarea>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="...">Translations (urdu)</label>
+              <Textarea
+                rows={4}
+                name="translations-eng"
+                className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Translations (eng)"
+                value={formData.translations.urdu || ""}
                 onChange={(event) =>
                   setFormData({
                     ...formData,

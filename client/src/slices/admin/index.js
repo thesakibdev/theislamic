@@ -35,8 +35,53 @@ export const adminApi = createApi({
         "transliteration",
       ],
     }),
+    // Edit Verse
+    editVerse: builder.mutation({
+      query: ({ chapterNumber, surahNumber, verseNumber, formData }) => ({
+        url: `admin/quran/chapter/surah/verse/edit`,
+        method: "POST",
+        body: { chapterNumber, surahNumber, verseNumber, ...formData },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: [
+        "chapterNumber",
+        "surahNumber",
+        "surahName",
+        "verseNumber",
+        "arabicText",
+        "translations",
+        "transliteration",
+      ],
+    }),
+
+    // Delete Verse
+    deleteVerse: builder.mutation({
+      query: ({ chapterNumber, surahNumber, verseNumber }) => ({
+        url: `admin/quran/chapter/surah/verse/delete`,
+        method: "DELETE",
+        body: { chapterNumber, surahNumber, verseNumber },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: [
+        "chapterNumber",
+        "surahNumber",
+        "surahName",
+        "verseNumber",
+        "arabicText",
+        "translations",
+        "transliteration",
+      ],
+    }),
   }),
 });
 
 // Export hooks for usage in functional components
-export const { useAddVerseMutation } = adminApi;
+export const {
+  useAddVerseMutation,
+  useEditVerseMutation,
+  useDeleteVerseMutation,
+} = adminApi;
