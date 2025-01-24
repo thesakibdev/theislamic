@@ -41,14 +41,22 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // route list
-app.get("/", (req, res) => res.send("server is running ..."));
+// Robots.txt route
+app.get("/", (req, res, next) => {
+  res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  next();
+});
 
-// auth route 
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+  res.send("User-agent: *\nDisallow: /");
+});
+
+// auth route
 app.use("/api/v1/auth", authRouter);
 
 // quran route
 app.use("/api/v1/admin", surahRouter);
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
