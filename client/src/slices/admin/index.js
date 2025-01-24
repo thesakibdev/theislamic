@@ -24,7 +24,7 @@ export const adminApi = createApi({
     // Edit a specific verse in a Surah
     editVerse: builder.mutation({
       query: ({ surahNumber, verseNumber, formData }) => ({
-        url: `/surah/${surahNumber}/verse/${verseNumber}`,
+        url: `/admin/surah/${surahNumber}/verse/${verseNumber}`,
         method: "PUT",
         body: formData,
         headers: {
@@ -37,7 +37,7 @@ export const adminApi = createApi({
     // Delete a specific verse from a Surah
     deleteVerse: builder.mutation({
       query: ({ surahNumber, verseNumber }) => ({
-        url: `/surah/${surahNumber}/verse/${verseNumber}`,
+        url: `/admin/surah/${surahNumber}/verse/${verseNumber}`,
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -49,7 +49,7 @@ export const adminApi = createApi({
     // Fetch all Surahs
     getAllSurahs: builder.query({
       query: () => ({
-        url: "/surah/all",
+        url: "/admin/surah/all",
         method: "GET",
       }),
       providesTags: ["Surah"],
@@ -58,7 +58,7 @@ export const adminApi = createApi({
     // Fetch Surahs with pagination
     getAllSurahsPaginated: builder.query({
       query: ({ page = 1, limit = 10 }) => ({
-        url: `/surah/paginated?page=${page}&limit=${limit}`,
+        url: `/admin/surah/paginated?page=${page}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["Surah"],

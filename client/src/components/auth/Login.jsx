@@ -33,6 +33,10 @@ export default function Login() {
       <div className="flex flex-col gap-4 items-center justify-center mb-10">
         <FaUser className="w-[80px] h-[80px] bg-primary text-white p-[6.5px] rounded-full" />
         <h1 className="text-5xl font-semibold">Login</h1>
+        <p>
+          {`Don't have an account?`}{" "}
+          <span className="text-blue-500 cursor-pointer" onClick={() => navigate("/signup")}>Register</span>
+        </p>
       </div>
       <form className="w-[350px] flex flex-col gap-4" onSubmit={handleLogin}>
         <Input

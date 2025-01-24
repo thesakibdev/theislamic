@@ -3,7 +3,6 @@ const Surah = require("../../models/surah.model");
 const addVerseToSurah = async (req, res) => {
   const { surahNumber, name, juzNumber, verse } = req.body;
 
-  console.log(req.body);
 
   try {
     // Validate input
@@ -59,7 +58,7 @@ const addVerseToSurah = async (req, res) => {
 
 const editVerse = async (req, res) => {
   const { surahNumber, verseNumber } = req.params;
-  const updates = req.body; // Contains fields to update
+  const updates = req.body; // Contains fields to update\\
 
   try {
     // Find the specific Surah

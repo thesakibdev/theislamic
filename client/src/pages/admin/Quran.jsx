@@ -11,13 +11,21 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
-import { useAddVerseMutation, useEditVerseMutation } from "@/slices/admin";
+import {
+  useAddVerseMutation,
+  useEditVerseMutation,
+  useGetAllSurahsQuery,
+} from "@/slices/admin";
 
 const initialFormData = {
   name: "",
   surahNumber: "",
   juzNumber: [],
-  verse: [],
+  verseNumber: "",
+  arabicText: "",
+  keywords: [],
+  translations: [],
+  transliteration: [],
 };
 
 export default function Quran() {
@@ -25,13 +33,15 @@ export default function Quran() {
   const [openAddVerseForm, setOpenAddVerseForm] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
 
-  const editVerse = useEditVerseMutation();
-  const [addVerse, { isLoading }] = useAddVerseMutation();
+  const [addVerse] = useAddVerseMutation();
+  const [editVerse] = useEditVerseMutation();
+  const { data } = useGetAllSurahsQuery();
+  const surahs = data?.surahs;
 
   const onSubmit = async (event) => {
     event.preventDefault();
 
-    const updatedFromData = {
+    const updatedFormData = {
       name: formData.surahName,
       surahNumber: formData.surahNumber,
       juzNumber: formData.juzNumber,
@@ -45,19 +55,27 @@ export default function Quran() {
     };
 
     try {
-      currentEditedId !== null
-        ? await editVerse({
-            surahNumber: currentEditedId,
-            ...updatedFromData,
-          }).unwrap()
-        : await addVerse(updatedFromData).unwrap();
-      console.log("Success!");
+      if (currentEditedId !== null) {
+        // Edit existing verse
+        await editVerse({
+          surahNumber: formData.surahNumber,
+          verseNumber: formData.verseNumber,
+          ...updatedFormData,
+        }).unwrap();
+        toast.success("Verse updated successfully!");
+      } else {
+        // Add new verse
+        await addVerse(updatedFormData).unwrap();
+        toast.success("New verse added successfully!");
+      }
     } catch (error) {
       console.error("Error submitting data:", error);
+      toast.error("Error submitting data!");
     }
 
     setFormData(initialFormData);
-    // setOpenAddVerseForm(false);
+    setOpenAddVerseForm(false);
+    setCurrentEditedId(null);
   };
 
   const addVerseFormElements = [
@@ -87,14 +105,14 @@ export default function Quran() {
       name: "verseNumber",
       componentType: "input",
       type: "text",
-      placeholder: "Enter Surah Number",
+      placeholder: "Enter Verse Number",
     },
     {
       label: "Keywords",
       name: "keywords",
       componentType: "multiInput",
       type: "text",
-      placeholder: "Enter Keyword",
+      placeholder: "Enter Keywords",
     },
     {
       label: "Arabic Text",
@@ -105,76 +123,17 @@ export default function Quran() {
     },
   ];
 
-  const allQuran = [
-    {
-      No: 1,
-      Name: "Al-Fatihah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      No: 2,
-      Name: "Al-Baqarah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      No: 3,
-      Name: "Al-Imran",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      No: 4,
-      Name: "An-Nisa",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      No: 5,
-      Name: "Al-Maidah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      No: 6,
-      Name: "Al-Maidah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      No: 7,
-      Name: "Al-Maidah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      No: 8,
-      Name: "An-Nisa",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      No: 9,
-      Name: "Al-Maidah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      No: 10,
-      Name: "Al-Maidah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-  ];
-
   return (
     <>
       <div className="mt-12">
         <div className="flex justify-end">
           <Button
             className="bg-primary text-white mr-10"
-            onClick={() => setOpenAddVerseForm(true)}
+            onClick={() => {
+              setOpenAddVerseForm(true);
+              setCurrentEditedId(null); // Ensure we're in "Add" mode
+              setFormData(initialFormData);
+            }}
           >
             Add New Verse
           </Button>
@@ -199,39 +158,48 @@ export default function Quran() {
 
           {/* content */}
           <div className="pb-10">
-            {allQuran.map((quran, index) => (
+            {surahs?.map((quran, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between py-2"
               >
+                {/* Surah Details */}
                 <div className="flex items-center">
                   <div className="font-semibold text-2xl w-36 font-sans">
-                    {quran.No}
+                    {quran.surahNumber}
                   </div>
                   <div className="font-semibold text-2xl font-sans">
-                    {quran.Name}
+                    {quran.name}
                   </div>
                 </div>
+
                 {/* Action Buttons */}
                 <div className="flex gap-12">
+                  {/* Edit Button */}
                   <button
                     className="px-6 py-2 flex items-center gap-2 text-xl font-semibold text-white bg-primary rounded-md hover:bg-primary-foreground hover:text-black transition duration-200"
                     onClick={() => {
                       setOpenAddVerseForm(true);
-                      setCurrentEditedId(quran?._id);
+                      setCurrentEditedId(quran?.surahNumber); // Set current Surah Number for editing
                       setFormData({
-                        surahNumber: quran?.surahNumber,
-                        name: quran?.surahName,
-                        juzNumber: quran?.juzNumber,
-                        verse: quran?.verse,
+                        surahName: quran.name,
+                        surahNumber: quran.surahNumber,
+                        juzNumber: quran.juzNumber,
+                        verseNumber: quran.verses[0].verseNumber,
+                        arabicText: quran.verses[0].arabicText,
+                        keywords: quran.verses[0].keywords,
+                        translations: quran.verses[0].translations,
+                        transliteration: quran.verses[0].transliteration,
                       });
                     }}
                   >
-                    {quran.btn}
+                    Edit
                     <FaEdit className="text-xl font-semibold" />
                   </button>
+
+                  {/* Delete Button */}
                   <button className="px-6 py-2 font-semibold text-xl flex items-center gap-2 text-white bg-deleteRed rounded-md hover:bg-red-600 transition duration-200">
-                    {quran.delete} <RiDeleteBinLine />
+                    Delete <RiDeleteBinLine />
                   </button>
                 </div>
               </div>
@@ -245,7 +213,9 @@ export default function Quran() {
       >
         <SheetContent side="right" className="overflow-auto w-[90%]">
           <SheetHeader>
-            <SheetTitle>{"Add Verse "}</SheetTitle>
+            <SheetTitle>
+              {currentEditedId ? "Edit Verse" : "Add Verse"}
+            </SheetTitle>
           </SheetHeader>
           <CommonForm
             layout={2}
@@ -258,7 +228,7 @@ export default function Quran() {
             onSubmit={onSubmit}
             formData={formData}
             setFormData={setFormData}
-            buttonText={"Add Verse"}
+            buttonText={currentEditedId ? "Save Changes" : "Add Verse"}
             formControls={addVerseFormElements}
           />
         </SheetContent>

@@ -71,7 +71,7 @@ export default function AdminSidebar() {
                 >
                   <div
                     className={`w-6 h-6 ${
-                      activeLink === "quran" ? "bg-black" : "bg-white"
+                      activeLink === item.link ? "bg-black" : "bg-white"
                     } rounded-full`}
                   ></div>
                   <span>{item.name}</span>
