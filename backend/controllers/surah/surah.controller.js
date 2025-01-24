@@ -3,6 +3,8 @@ const Surah = require("../../models/surah.model");
 const addVerseToSurah = async (req, res) => {
   const { surahNumber, name, juzNumber, verse } = req.body;
 
+  console.log(req.body);
+
   try {
     // Validate input
     if (!surahNumber || !verse || !verse.verseNumber || !verse.arabicText) {
@@ -39,7 +41,7 @@ const addVerseToSurah = async (req, res) => {
     const newSurah = new Surah({
       surahNumber,
       name: name || `Surah ${surahNumber}`, // Default name if not provided
-      juzNumber: juzNumber || [1], // Default to Juz 1 if not provided
+      juzNumber: juzNumber, // Default to Juz 1 if not provided
       verses: [verse], // Add the first verse
     });
 
@@ -68,7 +70,9 @@ const editVerse = async (req, res) => {
     }
 
     // Find the specific Verse in the Surah
-    const verse = surah.verses.find((v) => v.verseNumber === parseInt(verseNumber));
+    const verse = surah.verses.find(
+      (v) => v.verseNumber === parseInt(verseNumber)
+    );
 
     if (!verse) {
       return res.status(404).json({ error: "Verse not found in the Surah." });
@@ -76,7 +80,11 @@ const editVerse = async (req, res) => {
 
     // Update fields dynamically in the specific verse
     for (const key in updates) {
-      if (key === "translations" || key === "transliteration" || key === "keywords") {
+      if (
+        key === "translations" ||
+        key === "transliteration" ||
+        key === "keywords"
+      ) {
         // Handle arrays and nested objects
         if (Array.isArray(updates[key])) {
           verse[key] = updates[key]; // Replace with the new array
@@ -100,7 +108,6 @@ const editVerse = async (req, res) => {
     res.status(500).json({ error: "Server error while updating the verse." });
   }
 };
-
 
 const getAllSurahs = async (req, res) => {
   try {

@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const baseUrl = import.meta.env.VITE_BASE_URL;
+const baseUrl = import.meta.env.VITE_BASE_URL; // Example: "http://localhost:5000/api/v1"
 
 // Define a service using a base URL and expected endpoints
 export const adminApi = createApi({
@@ -11,7 +11,7 @@ export const adminApi = createApi({
     // Add a new verse to a Surah
     addVerse: builder.mutation({
       query: (formData) => ({
-        url: "/surah/add-verse",
+        url: "/admin/surah/add-verse",
         method: "POST",
         body: formData,
         headers: {

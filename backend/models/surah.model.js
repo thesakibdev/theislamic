@@ -6,14 +6,14 @@ const VerseSchema = new mongoose.Schema({
   arabicText: { type: String, required: true },
   translations: [
     {
-      ban: { type: String },
-      eng: { type: String },
+      type: Object, // Allow objects with dynamic keys
+      default: {}, // Default to an empty object
     },
   ],
   transliteration: [
     {
-      eng: { type: String },
-      ban: { type: String },
+      type: Object, // Allow objects with dynamic keys
+      default: {}, // Default to an empty object
     },
   ],
   keywords: { type: [String], default: [] },

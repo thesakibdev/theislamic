@@ -11,55 +11,54 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
-import { useAddVerseMutation } from "@/slices/admin";
+import { useAddVerseMutation, useEditVerseMutation } from "@/slices/admin";
 
 const initialFormData = {
-  surahNumber: "",
   name: "",
+  surahNumber: "",
   juzNumber: [],
-  verse: [
-    {
-      verseNumber: "",
-      keywords: [],
-      arabicText: "",
-      translations: [
-        {
-          ban: "",
-          eng: "",
-        },
-      ],
-      transliteration: [
-        {
-          ban: "",
-          eng: "",
-        },
-      ],
-    },
-  ],
+  verse: [],
 };
 
 export default function Quran() {
   const [formData, setFormData] = useState(initialFormData);
   const [openAddVerseForm, setOpenAddVerseForm] = useState(false);
-  // const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [currentEditedId, setCurrentEditedId] = useState(null);
 
-  const onSubmit = async (formData) => {
-    // if (currentEditedId) {
-    //   await dispatch(editVerse({ surahNumber: currentEditedId, formData }));
-    // } else {
-    //   await dispatch(addVerse(formData));
-    // }
-    console.log(formData);
+  const editVerse = useEditVerseMutation();
+  const [addVerse, { isLoading }] = useAddVerseMutation();
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+
+    const updatedFromData = {
+      name: formData.surahName,
+      surahNumber: formData.surahNumber,
+      juzNumber: formData.juzNumber,
+      verse: {
+        verseNumber: formData.verseNumber,
+        arabicText: formData.arabicText,
+        keywords: formData.keywords,
+        translations: formData.translations || [],
+        transliteration: formData.transliteration || [],
+      },
+    };
+
+    try {
+      currentEditedId !== null
+        ? await editVerse({
+            surahNumber: currentEditedId,
+            ...updatedFromData,
+          }).unwrap()
+        : await addVerse(updatedFromData).unwrap();
+      console.log("Success!");
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+
     setFormData(initialFormData);
-    setOpenAddVerseForm(false);
+    // setOpenAddVerseForm(false);
   };
-
-  function isFormValid() {
-    return Object.keys(formData)
-      .filter((currentKey) => currentKey !== "averageReview")
-      .map((key) => formData[key] !== "")
-      .every((item) => item);
-  }
 
   const addVerseFormElements = [
     {
@@ -219,8 +218,13 @@ export default function Quran() {
                     className="px-6 py-2 flex items-center gap-2 text-xl font-semibold text-white bg-primary rounded-md hover:bg-primary-foreground hover:text-black transition duration-200"
                     onClick={() => {
                       setOpenAddVerseForm(true);
-                      // setCurrentEditedId(product?._id);
-                      // setFormData(product);
+                      setCurrentEditedId(quran?._id);
+                      setFormData({
+                        surahNumber: quran?.surahNumber,
+                        name: quran?.surahName,
+                        juzNumber: quran?.juzNumber,
+                        verse: quran?.verse,
+                      });
                     }}
                   >
                     {quran.btn}
@@ -256,7 +260,6 @@ export default function Quran() {
             setFormData={setFormData}
             buttonText={"Add Verse"}
             formControls={addVerseFormElements}
-            isBtnDisabled={!isFormValid()}
           />
         </SheetContent>
       </Sheet>

@@ -156,10 +156,11 @@ export default function CommonForm({
           </div>
         );
         break;
+
       case "multiObjectTextarea":
         element = (
           <div className="flex flex-col gap-2">
-            {getControlItem.fields.map((field) => (
+            {getControlItem.fields.map((field, index) => (
               <div key={field} className="flex flex-col gap-1">
                 <Label className={allClasses.labelClass}>
                   {`${getControlItem.label} (${field})`}
@@ -168,16 +169,23 @@ export default function CommonForm({
                   name={`${getControlItem.name}-${field}`}
                   className={allClasses.textareaClass}
                   placeholder={`${getControlItem.label} (${field})`}
-                  value={formData[getControlItem.name]?.[field] || ""}
-                  onChange={(event) =>
+                  value={formData[getControlItem.name]?.[index]?.[field] || ""}
+                  onChange={(event) => {
+                    const updatedTranslations = [
+                      ...(formData[getControlItem.name] || []),
+                    ];
+
+                    // Update or initialize the object for the specific field
+                    updatedTranslations[index] = {
+                      ...updatedTranslations[index],
+                      [field]: event.target.value,
+                    };
+
                     setFormData({
                       ...formData,
-                      [getControlItem.name]: {
-                        ...value,
-                        [field]: event.target.value,
-                      },
-                    })
-                  }
+                      [getControlItem.name]: updatedTranslations,
+                    });
+                  }}
                 />
               </div>
             ))}
@@ -253,46 +261,72 @@ export default function CommonForm({
             </div>
           </div>
 
+          {/* translation  */}
           <div className="grid grid-cols-2 gap-4 bg-primary-foreground rounded-lg shadow-lg p-6">
-            <div className="flex flex-col gap-1">
-              <label className="...">Translations (ban)</label>
-              <Textarea
-                rows={4}
-                name="translations-ban"
-                className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Translations (ban)"
-                value={formData.translations?.ban || ""}
-                onChange={(event) =>
-                  setFormData({
-                    ...formData,
-                    translations: {
-                      ...(formData.translations || {}),
-                      ban: event.target.value,
-                    },
-                  })
-                }
-              ></Textarea>
-            </div>
+            {["ban", "eng"].map((field, index) => (
+              <div key={field} className="flex flex-col gap-1">
+                <label className="...">Translations ({field})</label>
+                <Textarea
+                  rows={4}
+                  name={`translations-${field}`}
+                  className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                  placeholder={`Translations (${field})`}
+                  value={formData.translations?.[index]?.[field] || ""}
+                  onChange={(event) => {
+                    // Ensure translations is an array
+                    const updatedTranslations = [
+                      ...(formData.translations || []),
+                    ];
 
-            <div className="flex flex-col gap-1">
-              <label className="...">Translations (eng)</label>
-              <Textarea
-                rows={4}
-                name="translations-eng"
-                className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Translations (eng)"
-                value={formData.translations?.eng || ""}
-                onChange={(event) =>
-                  setFormData({
-                    ...formData,
-                    translations: {
-                      ...(formData.translations || {}),
-                      eng: event.target.value,
-                    },
-                  })
-                }
-              ></Textarea>
-            </div>
+                    // Update the specific field in the array
+                    updatedTranslations[index] = {
+                      ...updatedTranslations[index],
+                      [field]: event.target.value,
+                    };
+
+                    // Update the formData state
+                    setFormData({
+                      ...formData,
+                      translations: updatedTranslations,
+                    });
+                  }}
+                ></Textarea>
+              </div>
+            ))}
+          </div>
+
+          {/* transliteration */}
+          <div className="grid grid-cols-2 gap-4 bg-primary-foreground rounded-lg shadow-lg p-6">
+            {["ban", "eng"].map((field, index) => (
+              <div key={field} className="flex flex-col gap-1">
+                <label className="...">Transliteration ({field})</label>
+                <Textarea
+                  rows={4}
+                  name={`transliteration-${field}`}
+                  className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                  placeholder={`Transliteration (${field})`}
+                  value={formData.transliteration?.[index]?.[field] || ""}
+                  onChange={(event) => {
+                    // Ensure translations is an array
+                    const updatedTransliteration = [
+                      ...(formData.transliteration || []),
+                    ];
+
+                    // Update the specific field in the array
+                    updatedTransliteration[index] = {
+                      ...updatedTransliteration[index],
+                      [field]: event.target.value,
+                    };
+
+                    // Update the formData state
+                    setFormData({
+                      ...formData,
+                      transliteration: updatedTransliteration,
+                    });
+                  }}
+                ></Textarea>
+              </div>
+            ))}
           </div>
 
           {/* Buttons */}
