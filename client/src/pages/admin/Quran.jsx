@@ -1,9 +1,8 @@
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBinLine } from "react-icons/ri";
-
 import { useState } from "react";
 import CommonForm from "@/components/common/Form";
-// import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   Sheet,
   SheetContent,
@@ -12,20 +11,48 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
+import { useAddVerseMutation } from "@/slices/admin";
+
 const initialFormData = {
-  chapterNumber: "",
   surahNumber: "",
-  surahName: "",
-  verseNumber: "",
-  arabicText: "",
-  translations: [],
-  transliteration: [],
-  keywords: [],
+  name: "",
+  juzNumber: [],
+  verse: [
+    {
+      verseNumber: "",
+      keywords: [],
+      arabicText: "",
+      translations: [
+        {
+          ban: "",
+          eng: "",
+        },
+      ],
+      transliteration: [
+        {
+          ban: "",
+          eng: "",
+        },
+      ],
+    },
+  ],
 };
 
 export default function Quran() {
   const [formData, setFormData] = useState(initialFormData);
   const [openAddVerseForm, setOpenAddVerseForm] = useState(false);
+  // const [currentEditedId, setCurrentEditedId] = useState(null);
+
+  const onSubmit = async (formData) => {
+    // if (currentEditedId) {
+    //   await dispatch(editVerse({ surahNumber: currentEditedId, formData }));
+    // } else {
+    //   await dispatch(addVerse(formData));
+    // }
+    console.log(formData);
+    setFormData(initialFormData);
+    setOpenAddVerseForm(false);
+  };
 
   function isFormValid() {
     return Object.keys(formData)
@@ -37,9 +64,9 @@ export default function Quran() {
   const addVerseFormElements = [
     {
       label: "Juz Number",
-      name: "chapterNumber",
-      componentType: "input",
-      type: "text",
+      name: "juzNumber",
+      componentType: "multiInput",
+      type: "number",
       placeholder: "Enter Juz Number",
     },
     {
@@ -64,7 +91,7 @@ export default function Quran() {
       placeholder: "Enter Surah Number",
     },
     {
-      label: "Keyword",
+      label: "Keywords",
       name: "keywords",
       componentType: "multiInput",
       type: "text",
@@ -76,18 +103,6 @@ export default function Quran() {
       componentType: "input",
       type: "text",
       placeholder: "Enter Arabic Text",
-    },
-    {
-      name: "translations",
-      label: "Translations",
-      componentType: "multiObjectTextarea",
-      fields: ["ban", "eng", "urdu"],
-    },
-    {
-      name: "transliteration",
-      label: "Transliteration",
-      componentType: "multiObjectTextarea",
-      fields: ["ban", "eng", "urdu"],
     },
   ];
 
@@ -236,10 +251,7 @@ export default function Quran() {
               inputClass:
                 "w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary",
             }}
-            onSubmit={() => {
-              // handleAddVerse();
-              setOpenAddVerseForm(false);
-            }}
+            onSubmit={onSubmit}
             formData={formData}
             setFormData={setFormData}
             buttonText={"Add Verse"}

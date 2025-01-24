@@ -111,15 +111,12 @@ export default function CommonForm({
               className={allClasses.inputClass}
               placeholder={getControlItem.placeholder}
               id={getControlItem.name}
-              type="text"
+              type={getControlItem.type}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   event.preventDefault();
                   const newValue = event.target.value.trim();
-                  if (
-                    newValue &&
-                    !formData[getControlItem.name].includes(newValue)
-                  ) {
+                  if (newValue) {
                     setFormData({
                       ...formData,
                       [getControlItem.name]: [
@@ -133,7 +130,7 @@ export default function CommonForm({
               }}
             />
             <div className="flex flex-wrap gap-2">
-              {formData[getControlItem.name]?.map((item, index) => (
+              {(formData[getControlItem.name] || []).map((item, index) => (
                 <span
                   key={index}
                   className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md"
@@ -159,7 +156,6 @@ export default function CommonForm({
           </div>
         );
         break;
-
       case "multiObjectTextarea":
         element = (
           <div className="flex flex-col gap-2">
@@ -172,7 +168,7 @@ export default function CommonForm({
                   name={`${getControlItem.name}-${field}`}
                   className={allClasses.textareaClass}
                   placeholder={`${getControlItem.label} (${field})`}
-                  value={value[field] || ""}
+                  value={formData[getControlItem.name]?.[field] || ""}
                   onChange={(event) =>
                     setFormData({
                       ...formData,
@@ -224,13 +220,12 @@ export default function CommonForm({
               {formControls
                 .filter((controlItem) =>
                   [
-                    "chapterNumber",
+                    "keywords",
+                    "juzNumber",
                     "surahName",
                     "surahNumber",
                     "verseNumber",
-                    "juzNumber",
-                    "keywords",
-                  ].includes(controlItem.name)
+                  ]?.includes(controlItem.name)
                 )
                 .map((controlItem) => (
                   <div key={controlItem.name}>
@@ -247,9 +242,7 @@ export default function CommonForm({
             <div className="grid grid-cols-2 gap-4">
               {formControls
                 .filter((controlItem) =>
-                  [
-                    "arabicText",
-                  ].includes(controlItem.name)
+                  ["arabicText"].includes(controlItem.name)
                 )
                 .map((controlItem) => (
                   <div key={controlItem.name} className="col-span-2">
@@ -268,12 +261,12 @@ export default function CommonForm({
                 name="translations-ban"
                 className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Translations (ban)"
-                value={formData.translations.ban || ""}
+                value={formData.translations?.ban || ""}
                 onChange={(event) =>
                   setFormData({
                     ...formData,
                     translations: {
-                      ...formData.translations,
+                      ...(formData.translations || {}),
                       ban: event.target.value,
                     },
                   })
@@ -288,31 +281,12 @@ export default function CommonForm({
                 name="translations-eng"
                 className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Translations (eng)"
-                value={formData.translations.eng || ""}
+                value={formData.translations?.eng || ""}
                 onChange={(event) =>
                   setFormData({
                     ...formData,
                     translations: {
-                      ...formData.translations,
-                      eng: event.target.value,
-                    },
-                  })
-                }
-              ></Textarea>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="...">Translations (urdu)</label>
-              <Textarea
-                rows={4}
-                name="translations-eng"
-                className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Translations (eng)"
-                value={formData.translations.urdu || ""}
-                onChange={(event) =>
-                  setFormData({
-                    ...formData,
-                    translations: {
-                      ...formData.translations,
+                      ...(formData.translations || {}),
                       eng: event.target.value,
                     },
                   })
