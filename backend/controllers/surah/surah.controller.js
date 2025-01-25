@@ -3,27 +3,59 @@ const Surah = require("../../models/surah.model");
 const addVerseToSurah = async (req, res) => {
   const { surahNumber, name, juzNumber, verse } = req.body;
 
-
   try {
     // Validate input
-    if (!surahNumber || !verse || !verse.verseNumber || !verse.arabicText) {
+    if (!surahNumber) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Missing required field: surahNumber." });
+    }
+    if (!name) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Missing required field: name." });
+    }
+    if (!juzNumber || !Array.isArray(juzNumber) || juzNumber.length === 0) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Missing or invalid field: juzNumber." });
+    }
+    if (!verse) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Missing required field: verse." });
+    }
+    if (!verse.verseNumber) {
       return res.status(400).json({
-        error:
-          "Missing required fields: surahNumber, verseNumber, or arabicText.",
+        error: true,
+        message: "Missing required field: verseNumber in verse object.",
       });
     }
+    if (!verse.arabicText) {
+      return res
+        .status(400)
+        .json({
+          error: true,
+          message: "Missing required field: arabicText in verse object.",
+        });
+    }
 
-    // Check if the Surah already exists
-    let surah = await Surah.findOne({ surahNumber });
+    // Check if the Surah exists with matching surahNumber, name, and juzNumber
+    let surah = await Surah.findOne({
+      surahNumber,
+      name,
+      juzNumber: { $all: juzNumber }, // Ensure all provided Juz numbers are matched
+    });
 
     if (surah) {
       // If Surah exists, check if the verse already exists
       const existingVerse = surah.verses.find(
-        (v) => v.verseNumber === verse.verseNumber
+        (v) => Number(v.verseNumber) === Number(verse.verseNumber)
       );
       if (existingVerse) {
         return res.status(400).json({
-          error: `Verse ${verse.verseNumber} already exists in Surah ${surahNumber}.`,
+          message: `Verse ${verse.verseNumber} already exists in Surah ${surahNumber}.`,
+          error: true,
         });
       }
 
@@ -36,11 +68,11 @@ const addVerseToSurah = async (req, res) => {
         .json({ message: "Verse added successfully to Surah.", surah });
     }
 
-    // If Surah doesn't exist, create a new Surah with the first verse
+    // If no matching Surah is found, create a new Surah with the first verse
     const newSurah = new Surah({
       surahNumber,
-      name: name || `Surah ${surahNumber}`, // Default name if not provided
-      juzNumber: juzNumber, // Default to Juz 1 if not provided
+      name,
+      juzNumber,
       verses: [verse], // Add the first verse
     });
 
@@ -52,59 +84,67 @@ const addVerseToSurah = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error." });
+    res.status(500).json({ error: true, message: "Server error." });
   }
 };
 
 const editVerse = async (req, res) => {
-  const { surahNumber, verseNumber } = req.params;
-  const updates = req.body; // Contains fields to update\\
-
   try {
-    // Find the specific Surah
-    const surah = await Surah.findOne({ surahNumber });
-
-    if (!surah) {
-      return res.status(404).json({ error: "Surah not found." });
-    }
-
-    // Find the specific Verse in the Surah
-    const verse = surah.verses.find(
-      (v) => v.verseNumber === parseInt(verseNumber)
-    );
+    const { surahNumber, verseNumber } = req.params;
+    const { verse } = req.body;
 
     if (!verse) {
-      return res.status(404).json({ error: "Verse not found in the Surah." });
+      return res.status(400).json({ message: "Verse data is required" });
     }
 
-    // Update fields dynamically in the specific verse
-    for (const key in updates) {
-      if (
-        key === "translations" ||
-        key === "transliteration" ||
-        key === "keywords"
-      ) {
-        // Handle arrays and nested objects
-        if (Array.isArray(updates[key])) {
-          verse[key] = updates[key]; // Replace with the new array
-        } else {
-          return res.status(400).json({ error: `${key} must be an array.` });
-        }
-      } else {
-        verse[key] = updates[key]; // Directly update simple fields
-      }
+    const { arabicText, translations, transliteration, keywords } = verse;
+
+    // Validate the required fields
+    if (
+      !(
+        (arabicText && typeof arabicText === "string") ||
+        (translations && Array.isArray(translations)) ||
+        (transliteration && Array.isArray(transliteration)) ||
+        (keywords && Array.isArray(keywords))
+      )
+    ) {
+      return res.status(400).json({
+        message: "At least one valid field must be provided for update",
+      });
     }
 
-    // Save the updated Surah
+    // Find the Surah by surahNumber
+    const surah = await Surah.findOne({ surahNumber });
+    if (!surah) {
+      return res.status(404).json({ message: "Surah not found" });
+    }
+
+    // Find the specific verse by verseNumber
+    const verseToUpdate = surah.verses.find(
+      (v) => v.verseNumber === parseInt(verseNumber)
+    );
+    if (!verseToUpdate) {
+      return res.status(404).json({ message: "Verse not found" });
+    }
+
+    // Update the fields only if provided in the request body
+    if (arabicText) verseToUpdate.arabicText = arabicText;
+    if (translations && Array.isArray(translations))
+      verseToUpdate.translations = translations;
+    if (transliteration && Array.isArray(transliteration))
+      verseToUpdate.transliteration = transliteration;
+    if (keywords && Array.isArray(keywords)) verseToUpdate.keywords = keywords;
+
+    // Save the updated Surah document
     await surah.save();
 
     res.status(200).json({
-      message: "Verse updated successfully.",
-      updatedVerse: verse,
+      message: "Verse updated successfully",
+      surah,
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error while updating the verse." });
+  } catch (error) {
+    console.error("Error updating verse:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
