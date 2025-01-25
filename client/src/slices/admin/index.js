@@ -23,7 +23,7 @@ export const adminApi = createApi({
 
     // Edit a specific verse in a Surah
     editVerse: builder.mutation({
-      query: ({ surahNumber, verseNumber, formData }) => ({
+      query: ({ surahNumber, verseNumber, ...formData }) => ({
         url: `/admin/surah/${surahNumber}/verse/${verseNumber}`,
         method: "PUT",
         body: formData,

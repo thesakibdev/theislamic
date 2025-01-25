@@ -56,21 +56,27 @@ export default function Quran() {
 
     try {
       if (currentEditedId !== null) {
-        // Edit existing verse
-        await editVerse({
+        const editResponse = await editVerse({
           surahNumber: formData.surahNumber,
           verseNumber: formData.verseNumber,
           ...updatedFormData,
         }).unwrap();
-        toast.success("Verse updated successfully!");
+        // Show success message from server
+        toast.success(editResponse.message || "Verse updated successfully!");
       } else {
-        // Add new verse
-        await addVerse(updatedFormData).unwrap();
-        toast.success("New verse added successfully!");
+        const addResponse = await addVerse(updatedFormData).unwrap();
+        // Show success or error messages based on the response
+        if (addResponse.error) {
+          toast.error(addResponse.error.message);
+        } else {
+          toast.success(addResponse.message || "Verse added successfully!");
+        }
       }
     } catch (error) {
+      // Extract and display server error message or default message
+      const errorMessage = error.data?.message || "Error submitting data!";
       console.error("Error submitting data:", error);
-      toast.error("Error submitting data!");
+      toast.error(errorMessage);
     }
 
     setFormData(initialFormData);
