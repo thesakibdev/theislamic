@@ -12,7 +12,7 @@ const initialFormData = {
 };
 
 export default function Login() {
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [login] = useLoginMutation();
   const [formData, setFormData] = useState(initialFormData);
   const navigate = useNavigate();
 
@@ -35,7 +35,12 @@ export default function Login() {
         <h1 className="text-5xl font-semibold">Login</h1>
         <p>
           {`Don't have an account?`}{" "}
-          <span className="text-blue-500 cursor-pointer" onClick={() => navigate("/signup")}>Register</span>
+          <span
+            className="text-blue-500 cursor-pointer"
+            onClick={() => navigate("/signup")}
+          >
+            Register
+          </span>
         </p>
       </div>
       <form className="w-[350px] flex flex-col gap-4" onSubmit={handleLogin}>
