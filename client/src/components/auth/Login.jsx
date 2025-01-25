@@ -5,6 +5,8 @@ import { useLoginMutation } from "@/slices/authslice";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/slices/authslice/userSlice";
 
 const initialFormData = {
   email: "",
@@ -15,15 +17,18 @@ export default function Login() {
   const [login] = useLoginMutation();
   const [formData, setFormData] = useState(initialFormData);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
       const loginResponse = await login(formData).unwrap();
-      toast.success(loginResponse.message);
+      dispatch(setUser(loginResponse.user));
+      console.log(loginResponse.user);
       setFormData(initialFormData);
       navigate("/");
+      toast.success(loginResponse.message);
     } catch (error) {
       toast.error(error?.data?.message);
     }

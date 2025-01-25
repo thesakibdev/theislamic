@@ -9,8 +9,12 @@ import NotFound from "./pages/404";
 import Tafsir from "./pages/admin/Tafsir";
 import Hadith from "./pages/admin/Hadith";
 import Donors from "./pages/admin/Donors";
+import CheckAuth from "./middleware/CheckAuth";
+import { useSelector } from "react-redux";
 
 export default function App() {
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+
   return (
     <Routes>
       <Route path="/" element={<Home />}>
@@ -23,7 +27,14 @@ export default function App() {
         <Route path="/login" element={<Login />} />
       </Route>
 
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route
+        path="/admin"
+        element={
+          <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <AdminLayout />
+          </CheckAuth>
+        }
+      >
         <Route path="dashboard" />
         <Route path="quran" element={<Quran />} />
         <Route path="hadith" element={<Hadith />} />

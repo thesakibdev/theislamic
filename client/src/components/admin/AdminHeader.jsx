@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { FaBell, FaSearch } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
+import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 export default function AdminHeader() {
+  const { user } = useSelector((state) => state.user);
   const [isProfileOpen, setisProfileOpen] = useState(false);
   const [isNotificationOpen, setisNotificationOpen] = useState(false);
   const toggleProfile = () => {
@@ -22,6 +24,14 @@ export default function AdminHeader() {
   ];
   const location = useLocation();
   const breadcrumb = location.pathname.split("/").filter(Boolean);
+
+  const initialAvatar = user?.name
+    .split(" ")
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+
   return (
     <header className="bg-primary flex justify-between items-center px-12 py-6 text-white">
       {/* Left Section */}
@@ -74,12 +84,18 @@ export default function AdminHeader() {
             onClick={toggleProfile}
             className="flex transition-all items-center cursor-pointer space-x-2"
           >
-            <img
-              src="https://images.unsplash.com/photo-1612766959025-ac18e2b3bb96?crop=entropy&cs=srgb&fm=jpg&ixid=M3w2NjMyNTh8MHwxfHNlYXJjaHw5fHxmb3JtYWx8ZW58MHx8fHwxNzM3MjI5NzMyfDA&ixlib=rb-4.0.3&q=85"
-              alt="User Avatar"
-              className="w-8 h-8 rounded-full"
-            />
-            <span>Rohan Ahmed</span>
+            {user?.avatar ? (
+              <img
+                src="https://images.unsplash.com/photo-1612766959025-ac18e2b3bb96?crop=entropy&cs=srgb&fm=jpg&ixid=M3w2NjMyNTh8MHwxfHNlYXJjaHw5fHxmb3JtYWx8ZW58MHx8fHwxNzM3MjI5NzMyfDA&ixlib=rb-4.0.3&q=85"
+                alt="User Avatar"
+                className="w-8 h-8 rounded-full"
+              />
+            ) : (
+              <div className="w-8 h-8 bg-gray-300 rounded-full text-sm text-primary flex items-center justify-center">
+                {initialAvatar}
+              </div>
+            )}
+            <span>{user.name}</span>
             <IoMdArrowDropdown className="text-2xl" />
           </div>
           {isProfileOpen && (

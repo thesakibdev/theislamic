@@ -5,7 +5,7 @@ const baseUrl = import.meta.env.VITE_BASE_URL; // Example: "http://localhost:500
 // Define a service using a base URL and expected endpoints
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl, credentials: "include" }),
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (formData) => ({
@@ -19,6 +19,12 @@ export const authApi = createApi({
         url: "auth/login",
         method: "POST",
         body: credentials,
+      }),
+    }),
+    logout: builder.mutation({
+      query: () => ({
+        url: "auth/logout",
+        method: "POST",
       }),
     }),
   }),

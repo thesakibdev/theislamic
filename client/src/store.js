@@ -3,9 +3,11 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import { pokemonApi } from "./slices/pokemon";
 import { authApi } from "./slices/authslice";
 import { adminApi } from "./slices/admin";
+import userReducer from "./slices/authslice/userSlice";
 
 export const store = configureStore({
   reducer: {
+    user: userReducer,
     [pokemonApi.reducerPath]: pokemonApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
