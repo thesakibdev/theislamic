@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import Home from "./pages/Home";
+import Home from "./pages/client/Home";
 import AuthLayout from "./layout/auth/AuthLayout";
 import Registration from "./components/auth/Registration";
 import Login from "./components/auth/Login";
@@ -11,13 +11,14 @@ import Hadith from "./pages/admin/Hadith";
 import Donors from "./pages/admin/Donors";
 import CheckAuth from "./middleware/CheckAuth";
 import { useSelector } from "react-redux";
+import ClientLayout from "./layout/client/ClientLayout";
 
 export default function App() {
   const { user, isAuthenticated } = useSelector((state) => state.user);
 
   return (
     <Routes>
-      <Route path="/" element={<Home />}>
+      <Route path="/" element={<ClientLayout />}>
         <Route path="/" element={<Home />} />
       </Route>
 
