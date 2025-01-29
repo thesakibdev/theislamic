@@ -12,8 +12,7 @@ export default function Home() {
       >
         <div className="max-w-3xl mx-auto">
           <h1 className="text-white font-bold text-4xl text-center">
-            Explore a comprehensive collection of the Quran, Tafsir, and Hadith
-            !
+            This Website is Under Construction
           </h1>
           <div className="mt-[70px] relative">
             <Input
