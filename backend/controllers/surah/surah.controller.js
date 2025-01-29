@@ -94,10 +94,10 @@ const editVerse = async (req, res) => {
       translations,
       transliteration,
       keywords,
-      globalJuzNumber,
+      globalVerseNumber,
     } = verse;
 
-    const normalizedGlobalJuzNumber = parseInt(globalJuzNumber, 10); // স্ট্রিং → নাম্বার
+    const normalizedGlobalJuzNumber = parseInt(globalVerseNumber, 10); // স্ট্রিং → নাম্বার
 
     // ভ্যালিডেশন: কমপক্ষে একটি ফিল্ড প্রোভাইড করা হয়েছে কিনা
     const isValidUpdate =
@@ -133,7 +133,7 @@ const editVerse = async (req, res) => {
     if (transliteration) verseToUpdate.transliteration = transliteration;
     if (keywords) verseToUpdate.keywords = keywords;
     if (!isNaN(normalizedGlobalJuzNumber)) {
-      verseToUpdate.globalJuzNumber = normalizedGlobalJuzNumber;
+      verseToUpdate.globalVerseNumber = normalizedGlobalJuzNumber;
     }
 
     await surah.save();

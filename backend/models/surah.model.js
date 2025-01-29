@@ -17,7 +17,7 @@ const VerseSchema = new mongoose.Schema({
     },
   ],
   keywords: { type: [String], default: [] },
-  globalJuzNumber: { type: Number, required: false, default: 0 },
+  globalVerseNumber: { type: Number, required: false, default: 0 },
 });
 
 // Surah Schema

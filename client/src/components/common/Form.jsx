@@ -224,7 +224,7 @@ export default function CommonForm({
           {/* Meta Data Section */}
           <div className="p-6 bg-primary-foreground rounded-lg shadow-lg">
             <h2 className="text-xl font-semibold mb-4">Meta Data</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               {formControls
                 .filter((controlItem) =>
                   [
@@ -233,6 +233,7 @@ export default function CommonForm({
                     "surahName",
                     "surahNumber",
                     "verseNumber",
+                    "globalVerseNumber",
                   ]?.includes(controlItem.name)
                 )
                 .map((controlItem) => (

@@ -14,8 +14,10 @@ import { Button } from "@/components/ui/button";
 import {
   useAddVerseMutation,
   useEditVerseMutation,
+  useDeleteVerseMutation,
   useGetAllSurahsQuery,
 } from "@/slices/admin";
+import ArrowDown from "../../assets/icon/arrow-down.png";
 
 const initialFormData = {
   name: "",
@@ -32,9 +34,11 @@ export default function Quran() {
   const [formData, setFormData] = useState(initialFormData);
   const [openAddVerseForm, setOpenAddVerseForm] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [openSurahs, setOpenSurahs] = useState({});
 
   const [addVerse] = useAddVerseMutation();
   const [editVerse] = useEditVerseMutation();
+  const [deleteVerse] = useDeleteVerseMutation();
   const { data } = useGetAllSurahsQuery();
   const surahs = data?.surahs;
 
@@ -51,6 +55,7 @@ export default function Quran() {
         keywords: formData.keywords,
         translations: formData.translations || [],
         transliteration: formData.transliteration || [],
+        globalVerseNumber: formData.globalVerseNumber,
       },
     };
 
@@ -114,6 +119,13 @@ export default function Quran() {
       placeholder: "Enter Verse Number",
     },
     {
+      label: "Global Verse Number",
+      name: "globalVerseNumber",
+      componentType: "input",
+      type: "number",
+      placeholder: "Enter Global Verse Number",
+    },
+    {
       label: "Keywords",
       name: "keywords",
       componentType: "multiInput",
@@ -123,11 +135,27 @@ export default function Quran() {
     {
       label: "Arabic Text",
       name: "arabicText",
-      componentType: "input",
+      componentType: "textarea",
       type: "text",
       placeholder: "Enter Arabic Text",
     },
   ];
+
+  const toggleSurah = (index) => {
+    setOpenSurahs((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const handleDeleteVerse = async (verseId) => {
+    try {
+      const deleteResponse = await deleteVerse(verseId).unwrap();
+      toast.success(deleteResponse.message || "Verse deleted successfully");
+    } catch (error) {
+      toast.error(error?.data?.message);
+    }
+  };
 
   return (
     <>
@@ -147,9 +175,11 @@ export default function Quran() {
         <div className="px-10">
           {/* heading */}
           <div className="flex items-center justify-between py-5">
-            <div className="flex items-center w-full">
+            <div className="grid grid-cols-3 items-center w-full">
               <p className="font-semibold text-2xl w-36 font-sans">No.</p>
-              <p className="font-semibold text-2xl font-sans">Name</p>
+              <p className="font-semibold text-2xl font-sans col-span-2">
+                Name
+              </p>
             </div>
             <select
               className="bg-none text-sm text-black font-semibold rounded-md max-w-32 px-5 py-3 bg-white border outline-none border-black block w-full shadow-sm cursor-pointer transition ease-in-out duration-300"
@@ -167,46 +197,81 @@ export default function Quran() {
             {surahs?.map((quran, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between py-2"
+                className="py-2 cursor-pointer"
+                onClick={() => toggleSurah(index)}
               >
-                {/* Surah Details */}
-                <div className="flex items-center">
+                {/* Surah হেডার */}
+                <div className="grid grid-cols-3 items-center gap-5">
                   <div className="font-semibold text-2xl w-36 font-sans">
                     {quran.surahNumber}
                   </div>
                   <div className="font-semibold text-2xl font-sans">
                     {quran.name}
                   </div>
+                  <img
+                    className={`transition-transform ${
+                      openSurahs[index] ? "rotate-180" : ""
+                    }`}
+                    src={ArrowDown}
+                    alt="Arrow Down"
+                  />
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-12">
-                  {/* Edit Button */}
-                  <button
-                    className="px-6 py-2 flex items-center gap-2 text-xl font-semibold text-white bg-primary rounded-md hover:bg-primary-foreground hover:text-black transition duration-200"
-                    onClick={() => {
-                      setOpenAddVerseForm(true);
-                      setCurrentEditedId(quran?.surahNumber); // Set current Surah Number for editing
-                      setFormData({
-                        surahName: quran.name,
-                        surahNumber: quran.surahNumber,
-                        juzNumber: quran.juzNumber,
-                        verseNumber: quran.verses[0].verseNumber,
-                        arabicText: quran.verses[0].arabicText,
-                        keywords: quran.verses[0].keywords,
-                        translations: quran.verses[0].translations,
-                        transliteration: quran.verses[0].transliteration,
-                      });
-                    }}
-                  >
-                    Edit
-                    <FaEdit className="text-xl font-semibold" />
-                  </button>
+                {/* ভার্স ড্রপডাউন */}
+                <div className={openSurahs[index] ? "block my-5" : "hidden"}>
+                  <ul>
+                    {quran?.verses.map((verse, verseIndex) => (
+                      <li
+                        key={verseIndex}
+                        className="px-4 py-4 hover:bg-gray-100 border-t-2 border-gray-400 last:border-b-2"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="flex gap-5 font-bold">
+                            <span>{verse.verseNumber}. </span>
+                            <span>{verse.arabicText}</span>
+                          </div>
 
-                  {/* Delete Button */}
-                  <button className="px-6 py-2 font-semibold text-xl flex items-center gap-2 text-white bg-deleteRed rounded-md hover:bg-red-600 transition duration-200">
-                    Delete <RiDeleteBinLine />
-                  </button>
+                          <div className="flex gap-4">
+                            <button
+                              className="px-6 py-2 flex items-center gap-2 text-white bg-primary rounded-md hover:bg-primary-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenAddVerseForm(true);
+                                setCurrentEditedId(quran.surahNumber);
+                                setFormData({
+                                  surahName: quran.name,
+                                  surahNumber: quran.surahNumber,
+                                  juzNumber: quran.juzNumber || [],
+                                  verseNumber: verse.verseNumber,
+                                  globalVerseNumber: verse.globalVerseNumber,
+                                  arabicText: verse.arabicText,
+                                  keywords: verse.keywords || [],
+                                  translations: verse.translations || [],
+                                  transliteration: verse.transliteration || [],
+                                });
+                              }}
+                            >
+                              Edit <FaEdit />
+                            </button>
+
+                            <button
+                              className="px-6 py-2 flex items-center gap-2 text-white bg-deleteRed rounded-md hover:bg-red-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteVerse(
+                                  quran.surahNumber,
+                                  verse.verseNumber
+                                );
+                              }}
+                            >
+                              Delete <RiDeleteBinLine />
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             ))}
@@ -230,6 +295,8 @@ export default function Quran() {
                 "grid grid-cols-2 gap-5 mt-10 py-10 px-16 bg-primary-foreground rounded-lg shadow-lg",
               inputClass:
                 "w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary",
+              textareaClass:
+                "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary",
             }}
             onSubmit={onSubmit}
             formData={formData}
