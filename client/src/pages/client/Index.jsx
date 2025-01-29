@@ -20,6 +20,8 @@ export default function IndexPage() {
                 the Kaaba is a testament to faith, devotion, and the unity of
                 the Muslim Ummah—a sanctuary where every soul finds solace and a
                 profound connection to the Divine.
+
+                <p>update</p>
               </p>
 
               <Button className="text-primary mt-40 flex items-center py-4 px-8 rounded-none"></Button>
