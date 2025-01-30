@@ -164,7 +164,7 @@ const getAllSurahs = async (req, res) => {
 };
 
 const getAllSurahsPaginated = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query; // Defaults to page 1, 10 results per page
+  const { page = 1, limit = 5 } = req.query; // Defaults to page 1, 5 results per page
 
   try {
     const surahs = await Surah.find()

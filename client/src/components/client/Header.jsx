@@ -296,7 +296,7 @@ export default function Header() {
                       Login
                     </DropdownMenuItem>
                   )}
-                  {isAuthenticated && roles && (
+                  {isAuthenticated && roles.includes(user?.role) && (
                     <DropdownMenuItem
                       className="bg-primary text-white hover:text-gray-900 justify-center hover:bg-primary-foreground duration-500 cursor-pointer mt-4"
                       onClick={() => navigate("/admin/dashboard")}

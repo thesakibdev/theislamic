@@ -1,6 +1,6 @@
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CommonForm from "@/components/common/Form";
 import { toast } from "react-toastify";
 import {
@@ -15,9 +15,18 @@ import {
   useAddVerseMutation,
   useEditVerseMutation,
   useDeleteVerseMutation,
-  useGetAllSurahsQuery,
+  useGetAllSurahsPaginatedQuery,
 } from "@/slices/admin";
 import ArrowDown from "../../assets/icon/arrow-down.png";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const initialFormData = {
   name: "",
@@ -39,8 +48,30 @@ export default function Quran() {
   const [addVerse] = useAddVerseMutation();
   const [editVerse] = useEditVerseMutation();
   const [deleteVerse] = useDeleteVerseMutation();
-  const { data } = useGetAllSurahsQuery();
-  const surahs = data?.surahs;
+  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    data: surahData,
+    isLoading,
+    isError,
+  } = useGetAllSurahsPaginatedQuery({
+    page: currentPage,
+    limit: 5,
+  });
+
+  useEffect(() => {
+    if (surahData) {
+      console.log("সূরাগুলো:", surahData.surahs);
+      console.log("সূরাগুলো:", surahData);
+    }
+  }, [surahData]);
+
+  if (isLoading)
+    return (
+      <div className="loader max-w-2xl mx-auto">
+        <p>Loading...</p>
+      </div>
+    );
+  if (isError) return <p>এরর হয়েছে!</p>;
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -148,9 +179,12 @@ export default function Quran() {
     }));
   };
 
-  const handleDeleteVerse = async (verseId) => {
+  const handleDeleteVerse = async (surahNumber, verseNumber) => {
     try {
-      const deleteResponse = await deleteVerse(verseId).unwrap();
+      const deleteResponse = await deleteVerse({
+        surahNumber,
+        verseNumber,
+      }).unwrap();
       toast.success(deleteResponse.message || "Verse deleted successfully");
     } catch (error) {
       toast.error(error?.data?.message);
@@ -192,15 +226,13 @@ export default function Quran() {
             </select>
           </div>
 
-          {/* content */}
           <div className="pb-10">
-            {surahs?.map((quran, index) => (
+            {surahData.surahs?.map((quran, index) => (
               <div
                 key={index}
                 className="py-2 cursor-pointer"
                 onClick={() => toggleSurah(index)}
               >
-                {/* Surah হেডার */}
                 <div className="grid grid-cols-3 items-center gap-5">
                   <div className="font-semibold text-2xl w-36 font-sans">
                     {quran.surahNumber}
@@ -217,7 +249,6 @@ export default function Quran() {
                   />
                 </div>
 
-                {/* ভার্স ড্রপডাউন */}
                 <div className={openSurahs[index] ? "block my-5" : "hidden"}>
                   <ul>
                     {quran?.verses.map((verse, verseIndex) => (
@@ -275,6 +306,55 @@ export default function Quran() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className=" container mx-auto p-4 flex justify-center">
+            <Pagination className="px-4">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    aria-label="Go to previous page"
+                    onClick={() =>
+                      setCurrentPage(() =>
+                        currentPage == 1 ? 1 : currentPage - 1
+                      )
+                    }
+                    className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                    disabled={currentPage == 1}
+                  />
+                </PaginationItem>
+                <PaginationItem className="flex">
+                  <PaginationLink
+                    className="hover:bg-green-400 cursor-pointer"
+                    href="/quran?page=1"
+                  >
+                    1
+                  </PaginationLink>
+                  <PaginationLink
+                    className="hover:bg-green-400 cursor-pointer"
+                    href="/quran?page=2"
+                  >
+                    2
+                  </PaginationLink>
+                  <PaginationLink
+                    className="hover:bg-green-400 cursor-pointer"
+                    href="/quran?page=3"
+                  >
+                    3
+                  </PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext
+                    aria-label="Go to next page"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         </div>
       </div>
