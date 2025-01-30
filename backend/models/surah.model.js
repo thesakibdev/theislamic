@@ -6,27 +6,29 @@ const VerseSchema = new mongoose.Schema({
   arabicText: { type: String, required: true },
   translations: [
     {
-      type: Object, // Allow objects with dynamic keys
-      default: {}, // Default to an empty object
+      type: Object,
+      default: {},
     },
   ],
   transliteration: [
     {
-      type: Object, // Allow objects with dynamic keys
-      default: {}, // Default to an empty object
+      type: Object,
+      default: {},
     },
   ],
   keywords: { type: [String], default: [] },
+  globalVerseNumber: { type: Number, required: false, default: 0 },
 });
 
 // Surah Schema
 const SurahSchema = new mongoose.Schema({
   surahNumber: { type: Number, required: true, unique: true },
   name: { type: String, required: true },
-  juzNumber: { type: [Number], required: true }, // Reference to the Juz
-  verses: [VerseSchema], // Array of verses
+  juzNumber: { type: [Number], required: true },
+  verses: [VerseSchema],
 });
 
-const Surah = mongoose.model("Surah", SurahSchema);
+SurahSchema.index({ surahNumber: 1, name: 1 }, { unique: true });
 
+const Surah = mongoose.model("Surah", SurahSchema);
 module.exports = Surah;

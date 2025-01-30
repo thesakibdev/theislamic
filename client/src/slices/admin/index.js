@@ -52,16 +52,16 @@ export const adminApi = createApi({
         url: "/admin/surah/all",
         method: "GET",
       }),
-      providesTags: ["Surah"],
+      providesTags: ["Surah", "Verse"],
     }),
 
     // Fetch Surahs with pagination
     getAllSurahsPaginated: builder.query({
-      query: ({ page = 1, limit = 10 }) => ({
+      query: ({ page = 1, limit = 5 }) => ({
         url: `/admin/surah/paginated?page=${page}&limit=${limit}`,
         method: "GET",
       }),
-      providesTags: ["Surah"],
+      providesTags: ["Surah", "Verse"],
     }),
   }),
 });
