@@ -1,4 +1,6 @@
 const Surah = require("../../models/surah.model");
+const NodeCache = require("node-cache");
+const cache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
 
 // Add a verse to a surah
 const addVerseToSurah = async (req, res) => {
@@ -150,11 +152,21 @@ const editVerse = async (req, res) => {
 
 const getAllSurahs = async (req, res) => {
   try {
+    const cachedSurahs = cache.get("allSurahs"); // Check if data is cached
+
+    if (cachedSurahs) {
+      console.log("Serving from cache");
+      return res.status(200).json({ surahs: cachedSurahs });
+    }
+
     const surahs = await Surah.find(); // Get all Surahs
 
     if (!surahs.length) {
       return res.status(404).json({ error: "No Surahs found." });
     }
+
+    // Cache the surahs data
+    cache.set("allSurahs", surahs);
 
     res.status(200).json({ surahs });
   } catch (err) {
@@ -167,6 +179,14 @@ const getAllSurahsPaginated = async (req, res) => {
   const { page = 1, limit = 5 } = req.query; // Defaults to page 1, 5 results per page
 
   try {
+    const cacheKey = `surahsPage_${page}_limit_${limit}`;
+    const cachedSurahs = cache.get(cacheKey); // Check if this page's data is cached
+
+    if (cachedSurahs) {
+      console.log("Serving from cache");
+      return res.status(200).json(cachedSurahs);
+    }
+
     const surahs = await Surah.find()
       .limit(limit * 1) // Convert limit to number
       .skip((page - 1) * limit)
@@ -174,12 +194,17 @@ const getAllSurahsPaginated = async (req, res) => {
 
     const count = await Surah.countDocuments();
 
-    res.status(200).json({
+    const paginatedData = {
       surahs,
       totalSurahs: count,
       totalPages: Math.ceil(count / limit),
       currentPage: page,
-    });
+    };
+
+    // Cache the paginated data
+    cache.set(cacheKey, paginatedData);
+
+    res.status(200).json(paginatedData);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error." });
