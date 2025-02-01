@@ -1,24 +1,27 @@
 const mongoose = require("mongoose");
 
 // Verse Schema
-const VerseSchema = new mongoose.Schema({
-  verseNumber: { type: Number, required: true },
-  arabicText: { type: String, required: true },
-  translations: [
-    {
-      type: Object,
-      default: {},
-    },
-  ],
-  transliteration: [
-    {
-      type: Object,
-      default: {},
-    },
-  ],
-  keywords: { type: [String], default: [] },
-  globalVerseNumber: { type: Number, required: false, default: 0 },
-});
+const VerseSchema = new mongoose.Schema(
+  {
+    verseNumber: { type: Number, required: true },
+    arabicText: { type: String, required: true },
+    translations: [
+      {
+        type: Object,
+        default: {},
+      },
+    ],
+    transliteration: [
+      {
+        type: Object,
+        default: {},
+      },
+    ],
+    keywords: { type: [String], default: [] },
+    globalVerseNumber: { type: Number, required: false, default: 0 },
+  },
+  { strict: true }
+);
 
 // Surah Schema
 const SurahSchema = new mongoose.Schema({

@@ -5,19 +5,27 @@ const baseUrl = import.meta.env.VITE_BASE_URL; // Example: "http://localhost:500
 // Define a service using a base URL and expected endpoints
 export const adminApi = createApi({
   reducerPath: "adminApi",
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl, credentials: "include" }),
   tagTypes: ["Surah", "Verse"],
   endpoints: (builder) => ({
     // Add a new verse to a Surah
     addVerse: builder.mutation({
-      query: (formData) => ({
-        url: "/admin/surah/add-verse",
-        method: "POST",
-        body: formData,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }),
+      query: (formData) => {
+        console.log("Sending data:", formData);
+        console.log("Request payload:", JSON.stringify(formData, null, 2));
+        return {
+          url: "/admin/surah/add-verse",
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        };
+      },
+      transformResponse: (response) => {
+        console.log("Response:", response);
+        return response;
+      },
       invalidatesTags: ["Surah", "Verse"],
     }),
 

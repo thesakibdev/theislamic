@@ -37,6 +37,7 @@ const initialFormData = {
   keywords: [],
   translations: [],
   transliteration: [],
+  globalVerseNumber: "",
 };
 
 export default function Quran() {

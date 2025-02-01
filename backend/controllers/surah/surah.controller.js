@@ -107,7 +107,7 @@ const editVerse = async (req, res) => {
       (translations && Array.isArray(translations)) ||
       (transliteration && Array.isArray(transliteration)) ||
       (keywords && Array.isArray(keywords)) ||
-      !isNaN(normalizedGlobalJuzNumber); // নর্মালাইজড ভ্যালু দিয়ে চেক
+      !isNaN(normalizedGlobalJuzNumber);
 
     if (!isValidUpdate) {
       return res.status(400).json({
