@@ -1,9 +1,12 @@
 const Surah = require("../../models/surah.model");
+const verseOtherData = require("../../models/verseOther.model");
 const NodeCache = require("node-cache");
 const cache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
 
 // Add a verse to a surah
-const addVerseToSurah = async (req, res) => {
+
+// new
+const addVerse = async (req, res) => {
   const { surahNumber, name, juzNumber, verse } = req.body;
 
   try {
@@ -73,6 +76,173 @@ const addVerseToSurah = async (req, res) => {
   } catch (err) {
     console.error("Error:", err);
     res.status(500).json({ error: true, message: "সার্ভার এরর।" });
+  }
+};
+
+const addVerseOtherData = async (req, res) => {
+  const {
+    surahNumber,
+    verseNumber,
+    language,
+    translation,
+    transliteration,
+    note,
+    keywords,
+  } = req.body;
+
+  try {
+    const normalSurahNumber = Number(surahNumber);
+    const normalVerseNumber = Number(verseNumber);
+
+    const normalLanguage = language?.trim().toLowerCase();
+    const normalTranslation = translation?.trim();
+    const normalTransliteration = transliteration?.trim();
+
+    const normalNote = note ? note.trim() : "";
+    const normalKeywords = Array.isArray(keywords)
+      ? keywords.map((k) => k.trim())
+      : [];
+
+    if (!normalSurahNumber || isNaN(normalSurahNumber)) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Invalid normalSurahNumber." });
+    }
+    if (!normalVerseNumber || isNaN(normalVerseNumber)) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Invalid verseNumber." });
+    }
+    if (!normalLanguage || !normalTranslation || !normalTransliteration) {
+      return res.status(400).json({ error: true, message: "Invalid data." });
+    }
+
+    const existingVerse = await verseOtherData.findOne({
+      surahNumber: normalSurahNumber,
+      verseNumber: normalVerseNumber,
+      language: normalLanguage,
+    });
+
+    if (existingVerse) {
+      return res.status(400).json({
+        error: true,
+        message: `আয়াত ${normalVerseNumber} ইতিমধ্যে ${normalLanguage} ভাষায় আছে।`,
+      });
+    }
+
+    const newVerse = new verseOtherData({
+      surahNumber: normalSurahNumber,
+      verseNumber: normalVerseNumber,
+      language: normalLanguage,
+      translation: normalTranslation,
+      transliteration: normalTransliteration,
+      note: normalNote,
+      keywords: normalKeywords,
+    });
+
+    await newVerse.save();
+    return res.status(201).json({
+      message: "নতুন ভাষায় আয়াত সংরক্ষণ করা হয়েছে।",
+      verseOtherData: newVerse,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: true, message: "সার্ভার এরর।" });
+  }
+};
+
+const getAllSurahs = async (req, res) => {
+  try {
+    const surahs = await Surah.find().lean(); // Fetch Surahs with verses
+    const VerseOtherData = await verseOtherData.find().lean(); // Fetch additional verse data
+
+    // Map Surahs to include verseOtherData without redundant fields
+    const formattedSurahs = surahs.map((surah) => {
+      return {
+        _id: surah._id,
+        surahName: surah.name,
+        surahNumber: surah.surahNumber,
+        juzNumber: surah.juzNumber,
+        verses: surah.verses.map((verse) => {
+          return {
+            _id: verse._id,
+            verseNumber: verse.verseNumber,
+            arabicAyah: verse.arabicAyah,
+            verseOtherData: VerseOtherData.filter(
+              (data) =>
+                data.surahNumber === surah.surahNumber &&
+                data.verseNumber === verse.verseNumber
+            ).map(({ surahNumber, verseNumber, ...rest }) => rest), // Remove redundant fields
+          };
+        }),
+      };
+    });
+
+    return res.status(200).json({ surahs: formattedSurahs });
+  } catch (error) {
+    console.error("Error fetching surahs:", error);
+    return res.status(500).json({ error: true, message: "Server error." });
+  }
+};
+
+const getAllSurahsPaginated = async (req, res) => {
+  const { page = 1, limit = 1 } = req.query; // Defaults to page 1, 5 results per page
+
+  try {
+    const cacheKey = `surahsPage_${page}_limit_${limit}`;
+    const cachedSurahs = cache.get(cacheKey); // Check if this page's data is cached
+
+    if (cachedSurahs) {
+      console.log("Serving from cache");
+      return res.status(200).json(cachedSurahs);
+    }
+
+    const surahs = await Surah.find()
+      .limit(limit * 1) // Convert limit to number
+      .skip((page - 1) * limit)
+      .lean()
+      .exec();
+
+    const VerseOtherData = await verseOtherData.find().lean(); // Fetch additional verse data
+
+    // Map Surahs to include verseOtherData without redundant fields
+    const formattedSurahs = surahs.map((surah) => {
+      return {
+        _id: surah._id,
+        surahName: surah.name,
+        surahNumber: surah.surahNumber,
+        juzNumber: surah.juzNumber,
+        verses: surah.verses.map((verse) => {
+          return {
+            _id: verse._id,
+            verseNumber: verse.verseNumber,
+            arabicAyah: verse.arabicAyah,
+            verseOtherData: VerseOtherData.filter(
+              (data) =>
+                data.surahNumber === surah.surahNumber &&
+                data.verseNumber === verse.verseNumber
+            ).map(({ surahNumber, verseNumber, ...rest }) => rest), // Remove redundant fields
+          };
+        }),
+      };
+    });
+
+    const count = await Surah.countDocuments();
+
+    const paginatedData = {
+      surahs: formattedSurahs,
+      totalSurahs: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    };
+
+    // Cache the paginated data
+    cache.set(cacheKey, paginatedData);
+
+    res.status(200).json(paginatedData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
   }
 };
 
@@ -150,67 +320,6 @@ const editVerse = async (req, res) => {
   }
 };
 
-const getAllSurahs = async (req, res) => {
-  try {
-    const cachedSurahs = cache.get("allSurahs"); // Check if data is cached
-
-    if (cachedSurahs) {
-      console.log("Serving from cache");
-      return res.status(200).json({ surahs: cachedSurahs });
-    }
-
-    const surahs = await Surah.find(); // Get all Surahs
-
-    if (!surahs.length) {
-      return res.status(404).json({ error: "No Surahs found." });
-    }
-
-    // Cache the surahs data
-    cache.set("allSurahs", surahs);
-
-    res.status(200).json({ surahs });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error." });
-  }
-};
-
-const getAllSurahsPaginated = async (req, res) => {
-  const { page = 1, limit = 5 } = req.query; // Defaults to page 1, 5 results per page
-
-  try {
-    const cacheKey = `surahsPage_${page}_limit_${limit}`;
-    const cachedSurahs = cache.get(cacheKey); // Check if this page's data is cached
-
-    if (cachedSurahs) {
-      console.log("Serving from cache");
-      return res.status(200).json(cachedSurahs);
-    }
-
-    const surahs = await Surah.find()
-      .limit(limit * 1) // Convert limit to number
-      .skip((page - 1) * limit)
-      .exec();
-
-    const count = await Surah.countDocuments();
-
-    const paginatedData = {
-      surahs,
-      totalSurahs: count,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-    };
-
-    // Cache the paginated data
-    cache.set(cacheKey, paginatedData);
-
-    res.status(200).json(paginatedData);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error." });
-  }
-};
-
 const deleteVerse = async (req, res) => {
   const { surahNumber, verseNumber } = req.params;
 
@@ -248,7 +357,8 @@ const deleteVerse = async (req, res) => {
 };
 
 module.exports = {
-  addVerseToSurah,
+  addVerse,
+  addVerseOtherData,
   editVerse,
   getAllSurahs,
   deleteVerse,
