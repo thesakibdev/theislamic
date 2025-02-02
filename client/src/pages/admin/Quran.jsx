@@ -13,10 +13,11 @@ import { Button } from "@/components/ui/button";
 
 import {
   useAddVerseMutation,
-  useEditVerseMutation,
+  useEditArabicVerseMutation,
   useDeleteVerseMutation,
   useGetAllSurahsPaginatedQuery,
-} from "@/slices/admin";
+} from "../../slices/admin/surah";
+
 import ArrowDown from "../../assets/icon/arrow-down.png";
 import {
   Pagination,
@@ -29,15 +30,12 @@ import {
 } from "@/components/ui/pagination";
 
 const initialFormData = {
-  name: "",
+  surahName: "",
   surahNumber: "",
   juzNumber: [],
   verseNumber: "",
-  arabicText: "",
-  keywords: [],
-  translations: [],
-  transliteration: [],
-  globalVerseNumber: "",
+  arabicAyah: "",
+  totalVerseNumber: null,
 };
 
 export default function Quran() {
@@ -47,22 +45,23 @@ export default function Quran() {
   const [openSurahs, setOpenSurahs] = useState({});
 
   const [addVerse] = useAddVerseMutation();
-  const [editVerse] = useEditVerseMutation();
+  const [editVerse] = useEditArabicVerseMutation();
   const [deleteVerse] = useDeleteVerseMutation();
+
   const [currentPage, setCurrentPage] = useState(1);
   const {
     data: surahData,
     isLoading,
     isError,
+    refetch,
   } = useGetAllSurahsPaginatedQuery({
     page: currentPage,
-    limit: 5,
+    limit: 1,
   });
 
   useEffect(() => {
     if (surahData) {
-      console.log("সূরাগুলো:", surahData.surahs);
-      console.log("সূরাগুলো:", surahData);
+      return;
     }
   }, [surahData]);
 
@@ -83,11 +82,8 @@ export default function Quran() {
       juzNumber: formData.juzNumber,
       verse: {
         verseNumber: formData.verseNumber,
-        arabicText: formData.arabicText,
-        keywords: formData.keywords,
-        translations: formData.translations || [],
-        transliteration: formData.transliteration || [],
-        globalVerseNumber: formData.globalVerseNumber,
+        arabicAyah: formData.arabicAyah,
+        totalVerseNumber: formData.totalVerseNumber,
       },
     };
 
@@ -151,25 +147,18 @@ export default function Quran() {
       placeholder: "Enter Verse Number",
     },
     {
-      label: "Global Verse Number",
-      name: "globalVerseNumber",
+      label: "Total Verse Number",
+      name: "totalVerseNumber",
       componentType: "input",
-      type: "number",
-      placeholder: "Enter Global Verse Number",
-    },
-    {
-      label: "Keywords",
-      name: "keywords",
-      componentType: "multiInput",
       type: "text",
-      placeholder: "Enter Keywords",
+      placeholder: "Enter Total Verse Number",
     },
     {
-      label: "Arabic Text",
-      name: "arabicText",
+      label: "Arabic Ayah",
+      name: "arabicAyah",
       componentType: "textarea",
       type: "text",
-      placeholder: "Enter Arabic Text",
+      placeholder: "Enter Arabic Ayah ( أدخل أبي العربي )",
     },
   ];
 
@@ -186,6 +175,7 @@ export default function Quran() {
         surahNumber,
         verseNumber,
       }).unwrap();
+      refetch();
       toast.success(deleteResponse.message || "Verse deleted successfully");
     } catch (error) {
       toast.error(error?.data?.message);
@@ -227,19 +217,19 @@ export default function Quran() {
             </select>
           </div>
 
-          <div className="pb-10">
+          <div className="mt-10">
             {surahData.surahs?.map((quran, index) => (
               <div
                 key={index}
                 className="py-2 cursor-pointer"
                 onClick={() => toggleSurah(index)}
               >
-                <div className="grid grid-cols-3 items-center gap-5">
+                <div className="grid grid-cols-3 justify-between items-center">
                   <div className="font-semibold text-2xl w-36 font-sans">
                     {quran.surahNumber}
                   </div>
                   <div className="font-semibold text-2xl font-sans">
-                    {quran.name}
+                    {quran.surahName}
                   </div>
                   <img
                     className={`transition-transform ${
@@ -261,7 +251,7 @@ export default function Quran() {
                         <div className="flex justify-between items-center">
                           <div className="flex gap-5 font-bold">
                             <span>{verse.verseNumber}. </span>
-                            <span>{verse.arabicText}</span>
+                            <span>{verse.arabicAyah}</span>
                           </div>
 
                           <div className="flex gap-4">
@@ -272,15 +262,12 @@ export default function Quran() {
                                 setOpenAddVerseForm(true);
                                 setCurrentEditedId(quran.surahNumber);
                                 setFormData({
-                                  surahName: quran.name,
+                                  surahName: quran.surahName,
                                   surahNumber: quran.surahNumber,
                                   juzNumber: quran.juzNumber || [],
                                   verseNumber: verse.verseNumber,
-                                  globalVerseNumber: verse.globalVerseNumber,
-                                  arabicText: verse.arabicText,
-                                  keywords: verse.keywords || [],
-                                  translations: verse.translations || [],
-                                  transliteration: verse.transliteration || [],
+                                  totalVerseNumber: verse.totalVerseNumber,
+                                  arabicAyah: verse.arabicAyah,
                                 });
                               }}
                             >
@@ -307,6 +294,12 @@ export default function Quran() {
                 </div>
               </div>
             ))}
+
+            {surahData.surahs?.length === 0 && (
+              <div className="flex justify-center items-center">
+                <h1 className="text-2xl font-semibold">No data found</h1>
+              </div>
+            )}
           </div>
 
           <div className=" container mx-auto p-4 flex justify-center">

@@ -157,42 +157,6 @@ const CommonForm = memo(function CommonForm({
         );
         break;
 
-      case "multiObjectTextarea":
-        element = (
-          <div className="flex flex-col gap-2">
-            {getControlItem.fields.map((field, index) => (
-              <div key={field} className="flex flex-col gap-1">
-                <Label className={allClasses.labelClass}>
-                  {`${getControlItem.label} (${field})`}
-                </Label>
-                <Textarea
-                  name={`${getControlItem.name}-${field}`}
-                  className={allClasses.textareaClass}
-                  placeholder={`${getControlItem.label} (${field})`}
-                  value={formData[getControlItem.name]?.[index]?.[field] || ""}
-                  onChange={(event) => {
-                    const updatedData = [
-                      ...(formData[getControlItem.name] || []),
-                    ];
-
-                    // Update or initialize the object for the specific field
-                    updatedData[index] = {
-                      ...updatedData[index],
-                      [field]: event.target.value,
-                    };
-
-                    setFormData({
-                      ...formData,
-                      [getControlItem.name]: updatedData,
-                    });
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        );
-        break;
-
       default:
         element = (
           <Input
@@ -227,14 +191,9 @@ const CommonForm = memo(function CommonForm({
             <div className="grid grid-cols-3 gap-4">
               {formControls
                 .filter((controlItem) =>
-                  [
-                    "keywords",
-                    "juzNumber",
-                    "surahName",
-                    "surahNumber",
-                    "verseNumber",
-                    "globalVerseNumber",
-                  ]?.includes(controlItem.name)
+                  ["surahNumber", "surahName", "juzNumber"]?.includes(
+                    controlItem.name
+                  )
                 )
                 .map((controlItem) => (
                   <div key={controlItem.name}>
@@ -251,7 +210,7 @@ const CommonForm = memo(function CommonForm({
             <div className="grid grid-cols-2 gap-4">
               {formControls
                 .filter((controlItem) =>
-                  ["arabicText"].includes(controlItem.name)
+                  ["arabicAyah", "verseNumber", "totalVerseNumber"].includes(controlItem.name)
                 )
                 .map((controlItem) => (
                   <div key={controlItem.name} className="col-span-2">
@@ -260,74 +219,6 @@ const CommonForm = memo(function CommonForm({
                   </div>
                 ))}
             </div>
-          </div>
-
-          {/* translation  */}
-          <div className="grid grid-cols-2 gap-4 bg-primary-foreground rounded-lg shadow-lg p-6">
-            {["ban", "eng"].map((field, index) => (
-              <div key={field} className="flex flex-col gap-1">
-                <label className="...">Translations ({field})</label>
-                <Textarea
-                  rows={4}
-                  name={`translations-${field}`}
-                  className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
-                  placeholder={`Translations (${field})`}
-                  value={formData.translations?.[index]?.[field] || ""}
-                  onChange={(event) => {
-                    // Ensure translations is an array
-                    const updatedTranslations = [
-                      ...(formData.translations || []),
-                    ];
-
-                    // Update the specific field in the array
-                    updatedTranslations[index] = {
-                      ...updatedTranslations[index],
-                      [field]: event.target.value,
-                    };
-
-                    // Update the formData state
-                    setFormData({
-                      ...formData,
-                      translations: updatedTranslations,
-                    });
-                  }}
-                ></Textarea>
-              </div>
-            ))}
-          </div>
-
-          {/* transliteration */}
-          <div className="grid grid-cols-2 gap-4 bg-primary-foreground rounded-lg shadow-lg p-6">
-            {["ban", "eng"].map((field, index) => (
-              <div key={field} className="flex flex-col gap-1">
-                <label className="...">Transliteration ({field})</label>
-                <Textarea
-                  rows={4}
-                  name={`transliteration-${field}`}
-                  className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
-                  placeholder={`Transliteration (${field})`}
-                  value={formData.transliteration?.[index]?.[field] || ""}
-                  onChange={(event) => {
-                    // Ensure translations is an array
-                    const updatedTransliteration = [
-                      ...(formData.transliteration || []),
-                    ];
-
-                    // Update the specific field in the array
-                    updatedTransliteration[index] = {
-                      ...updatedTransliteration[index],
-                      [field]: event.target.value,
-                    };
-
-                    // Update the formData state
-                    setFormData({
-                      ...formData,
-                      transliteration: updatedTransliteration,
-                    });
-                  }}
-                ></Textarea>
-              </div>
-            ))}
           </div>
 
           {/* Buttons */}
