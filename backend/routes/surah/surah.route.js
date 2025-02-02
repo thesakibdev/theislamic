@@ -1,14 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const {
-  addVerseToSurah,
+  addVerse,
+  addVerseOtherData,
   getAllSurahs,
   getAllSurahsPaginated,
   deleteVerse,
   editVerse,
 } = require("../../controllers/surah/surah.controller");
 
-router.post("/surah/add-verse", addVerseToSurah);
+router.post("/surah/add/verse", addVerse);
+router.post("/surah/add/verse-other", addVerseOtherData);
 
 router.put("/surah/:surahNumber/verse/:verseNumber", editVerse);
 
