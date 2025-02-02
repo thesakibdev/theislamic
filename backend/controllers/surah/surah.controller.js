@@ -186,6 +186,13 @@ const deleteArabicAyah = async (req, res) => {
       });
     }
 
+    //  Delete all paginated cache entries
+    cache.keys().forEach((key) => {
+      if (key.startsWith("surahsPage_")) {
+        cache.del(key);
+      }
+    });
+
     res.status(200).json({
       success: true,
       message: "আয়াত সফলভাবে ডিলিট করা হয়েছে।",
@@ -496,6 +503,7 @@ const getAllSurahsPaginated = async (req, res) => {
             _id: verse._id,
             verseNumber: verse.verseNumber,
             arabicAyah: verse.arabicAyah,
+            totalVerseNumber: verse.totalVerseNumber,
             verseOtherData: VerseOtherData.filter(
               (data) =>
                 data.surahNumber === surah.surahNumber &&
@@ -522,7 +530,6 @@ const getAllSurahsPaginated = async (req, res) => {
     res.status(500).json({ error: "Server error." });
   }
 };
-
 
 module.exports = {
   // main verses

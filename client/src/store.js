@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { pokemonApi } from "./slices/pokemon";
 import { authApi } from "./slices/authslice";
-import { adminApi } from "./slices/admin";
+import { adminApi } from "./slices/admin/surah";
 import userReducer from "./slices/authslice/userSlice";
 
 export const store = configureStore({
