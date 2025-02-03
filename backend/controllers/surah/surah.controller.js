@@ -81,7 +81,7 @@ const addVerse = async (req, res) => {
 
 const editArabicAyah = async (req, res) => {
   const { surahNumber, verseNumber } = req.params;
-  const { arabicAyah } = req.body;
+  const { verse } = req.body;
 
   try {
     // Validate inputs
@@ -102,13 +102,6 @@ const editArabicAyah = async (req, res) => {
       });
     }
 
-    if (!arabicAyah || typeof arabicAyah !== "string") {
-      return res.status(400).json({
-        error: true,
-        message: "আরবি আয়াত প্রদান করুন।",
-      });
-    }
-
     // Find the Surah and update the specific verse's arabicAyah
     const updatedSurah = await Surah.findOneAndUpdate(
       {
@@ -117,7 +110,7 @@ const editArabicAyah = async (req, res) => {
       },
       {
         $set: {
-          "verses.$.arabicAyah": arabicAyah.trim(),
+          "verses.$.arabicAyah": verse.arabicAyah,
         },
       },
       {
@@ -455,7 +448,6 @@ const getAllSurahsPaginated = async (req, res) => {
     const cachedSurahs = cache.get(cacheKey);
 
     if (cachedSurahs) {
-      console.log("Serving from cache");
       return res.status(200).json(cachedSurahs);
     }
 

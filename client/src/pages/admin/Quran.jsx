@@ -95,6 +95,7 @@ export default function Quran() {
           ...updatedFormData,
         }).unwrap();
         // Show success message from server
+        console.log(editResponse);
         toast.success(editResponse.message || "Verse updated successfully!");
       } else {
         const addResponse = await addVerse(updatedFormData).unwrap();
