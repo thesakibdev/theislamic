@@ -210,7 +210,64 @@ const CommonForm = memo(function CommonForm({
             <div className="grid grid-cols-2 gap-4">
               {formControls
                 .filter((controlItem) =>
-                  ["arabicAyah", "verseNumber", "totalVerseNumber"].includes(controlItem.name)
+                  ["arabicAyah", "verseNumber", "totalVerseNumber"].includes(
+                    controlItem.name
+                  )
+                )
+                .map((controlItem) => (
+                  <div key={controlItem.name} className="col-span-2">
+                    <Label className="mb-1">{controlItem.label}</Label>
+                    {renderInputsByComponentType(controlItem)}
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end">
+            <Button
+              disabled={isBtnDisabled}
+              type="submit"
+              className={`px-4 py-2 ${allClasses.btnClass}`}
+            >
+              {buttonText || "Submit"}
+            </Button>
+          </div>
+        </div>
+      ) : layout === 3 ? (
+        // Layout 3 Design
+        <div className="space-y-8 py-10">
+          {/* Meta Data Section */}
+          <div className="p-6 bg-primary-foreground rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Meta Data</h2>
+            <div className="grid grid-cols-3 gap-4">
+              {formControls
+                .filter((controlItem) =>
+                  ["surahNumber", "verseNumber", "language"]?.includes(
+                    controlItem.name
+                  )
+                )
+                .map((controlItem) => (
+                  <div key={controlItem.name}>
+                    <Label className="mb-1">{controlItem.label}</Label>
+                    {renderInputsByComponentType(controlItem)}
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Verse Section */}
+          <div className="p-6 bg-primary-foreground rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Verse</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {formControls
+                .filter((controlItem) =>
+                  [
+                    "translation",
+                    "transliteration",
+                    "note",
+                    "keywords",
+                  ].includes(controlItem.name)
                 )
                 .map((controlItem) => (
                   <div key={controlItem.name} className="col-span-2">

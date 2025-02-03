@@ -11,6 +11,10 @@ export default function AdminSidebar() {
       link: "quran",
     },
     {
+      name: "Verses Other Data",
+      link: "verses-other-data",
+    },
+    {
       name: "Hadith",
       link: "hadith",
     },
@@ -36,7 +40,7 @@ export default function AdminSidebar() {
     },
   ];
 
-  const [activeLink, setActiveLink] = useState(null);
+  const [activeLink, setActiveLink] = useState("quran");
 
   const handleClick = (link) => {
     setActiveLink(link);

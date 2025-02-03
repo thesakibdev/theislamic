@@ -339,7 +339,7 @@ const editVerseOtherData = async (req, res) => {
     await existingVerse.save();
 
     return res.status(200).json({
-      message: "আয়াত আপডেট করা হয়েছে।",
+      message: `আয়াত ${normalVerseNumber} এর ${normalLanguage} ভাষায় সংরক্ষণ করা হয়েছে।`,
       verseOtherData: existingVerse,
     });
   } catch (error) {
@@ -393,7 +393,7 @@ const deleteVerseOtherData = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "আয়াত ডিলিট করা হয়েছে।",
+      message: `আয়াত ${normalVerseNumber} এর (${normalLanguage}) ডিলিট করা হয়েছে।`,
       deletedData: deletedVerse,
     });
   } catch (error) {
