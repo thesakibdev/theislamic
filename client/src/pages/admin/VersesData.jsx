@@ -196,7 +196,7 @@ export default function VersesOtherData() {
       <h1 className="text-4xl font-semibold text-center">
         Verses Language Base Data
       </h1>
-      <div className="mt-10">
+      <div className="mt-10 h-full">
         <div className="flex justify-between px-10">
           <select
             value={selectedLanguage}
@@ -240,7 +240,7 @@ export default function VersesOtherData() {
                   </div>
                 </div>
 
-                <div>
+                <div className="h-[calc(100vh-320px)] overflow-y-auto">
                   <ul>
                     {quran?.verses.map((verse, verseIndex) => {
                       const selectedVerseData = verse.verseOtherData.find(
@@ -347,6 +347,54 @@ export default function VersesOtherData() {
                 </div>
               </div>
             ))}
+            <div className="p-4 flex justify-center">
+              <Pagination className="px-4">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      aria-label="Go to previous page"
+                      onClick={() =>
+                        setCurrentPage(() =>
+                          currentPage == 1 ? 1 : currentPage - 1
+                        )
+                      }
+                      className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                      disabled={currentPage == 1}
+                    />
+                  </PaginationItem>
+                  <PaginationItem className="flex">
+                    <PaginationLink
+                      className="hover:bg-green-400 cursor-pointer"
+                      href="/quran?page=1"
+                    >
+                      1
+                    </PaginationLink>
+                    <PaginationLink
+                      className="hover:bg-green-400 cursor-pointer"
+                      href="/quran?page=2"
+                    >
+                      2
+                    </PaginationLink>
+                    <PaginationLink
+                      className="hover:bg-green-400 cursor-pointer"
+                      href="/quran?page=3"
+                    >
+                      3
+                    </PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext
+                      aria-label="Go to next page"
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
           </>
         ) : null}
 
