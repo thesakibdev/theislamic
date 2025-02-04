@@ -129,9 +129,76 @@ const logoutUser = (req, res) => {
     });
 };
 
+// update user profile
+const updateUserProfile = async (req, res) => {
+  const { userId } = req.params; // Extract user ID from route params
+  const { name, email, phone, companyName, designation, country, address } =
+    req.body; // Extract fields from request body
+
+  try {
+    // **Step 1: Check if all required fields are provided**
+    if (
+      !name ||
+      !email ||
+      !phone ||
+      !companyName ||
+      !designation ||
+      !country ||
+      !address
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields in request body",
+      });
+    }
+
+    // **Step 2: Normalize input values**
+    const normalizedData = {
+      name: name.toLowerCase().trim(),
+      email: email.toLowerCase().trim(),
+      phone: phone.trim(),
+      companyName: companyName.trim(),
+      designation: designation.trim(),
+      country: country.trim(),
+      address: address.trim(),
+    };
+
+    // **Step 3: Find the user by ID**
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // **Step 4: Update user fields**
+    Object.keys(normalizedData).forEach((key) => {
+      user[key] = normalizedData[key]; // Dynamically update fields
+    });
+
+    // **Step 5: Save updated user to the database**
+    const updatedUser = await user.save();
+
+    // **Step 6: Respond with the updated user data**
+    res.status(200).json({
+      success: true,
+      message: "User profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Some error occurred",
+    });
+  }
+};
+
 //auth middleware
 const authMiddleware = async (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req.cookies.token; fffdsg
 
   if (!token) {
     return res.status(401).json({
@@ -158,9 +225,52 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
+//update user role
+const updateUserRole = async (req, res) => {
+  const { userId } = req.params;
+  const { userRole } = req.body;
+
+  console.log("User ID:", userId);
+  console.log("User Role:", userRole);
+
+  try {
+    const normalizedUserRole = userRole.toLowerCase().trim();
+
+    if (normalizedUserRole !== "editor") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user role. It should be 'editor'.",
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { role: normalizedUserRole },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User role updated successfully.",
+    });
+  } catch (error) {
+    console.error("Error during registration:", error);
+    res.status(500).json({ success: false, message: "Some error occurred" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   authMiddleware,
+  updateUserRole,
+  updateUserProfile,
 };
