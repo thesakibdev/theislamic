@@ -339,7 +339,7 @@ const editVerseOtherData = async (req, res) => {
     await existingVerse.save();
 
     return res.status(200).json({
-      message: "আয়াত আপডেট করা হয়েছে।",
+      message: `আয়াত ${normalVerseNumber} এর ${normalLanguage} ভাষায় সংরক্ষণ করা হয়েছে।`,
       verseOtherData: existingVerse,
     });
   } catch (error) {
@@ -393,7 +393,7 @@ const deleteVerseOtherData = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "আয়াত ডিলিট করা হয়েছে।",
+      message: `আয়াত ${normalVerseNumber} এর (${normalLanguage}) ডিলিট করা হয়েছে।`,
       deletedData: deletedVerse,
     });
   } catch (error) {
@@ -444,34 +444,34 @@ const getAllSurahsPaginated = async (req, res) => {
   const { page = 1, limit = 1 } = req.query;
 
   try {
-    const cacheKey = `surahsPage_${page}_limit_${limit}`;
+    const currentPage = parseInt(page, 10) || 1; // Ensure page is a valid integer
+    const pageLimit = parseInt(limit, 10) || 1; // Ensure limit is a valid integer
+
+    const cacheKey = `surahsPage_${currentPage}_limit_${pageLimit}`;
     const cachedSurahs = cache.get(cacheKey);
 
     if (cachedSurahs) {
       return res.status(200).json(cachedSurahs);
     }
 
-    // Using aggregation pipeline to sort verses
+    // Fetch and sort Surahs and their verses
     const surahs = await Surah.aggregate([
       {
-        $skip: (page - 1) * limit,
+        $sort: { surahNumber: 1 }, // Sort Surahs by surahNumber
       },
       {
-        $limit: limit * 1,
+        $skip: (currentPage - 1) * pageLimit, // Skip documents for pagination
       },
       {
-        // Unwind verses array to sort them
-        $unwind: "$verses",
+        $limit: pageLimit, // Limit documents for pagination
       },
       {
-        // Sort verses by verseNumber
-        $sort: {
-          surahNumber: 1,
-          "verses.verseNumber": 1,
-        },
+        $unwind: "$verses", // Unwind verses array for sorting
       },
       {
-        // Group back the verses for each surah
+        $sort: { "verses.verseNumber": 1 }, // Sort verses by verseNumber
+      },
+      {
         $group: {
           _id: "$_id",
           name: { $first: "$name" },
@@ -484,37 +484,39 @@ const getAllSurahsPaginated = async (req, res) => {
 
     const VerseOtherData = await verseOtherData.find().lean();
 
+    // Format the response
     const formattedSurahs = surahs.map((surah) => {
       return {
         _id: surah._id,
         surahName: surah.name,
         surahNumber: surah.surahNumber,
         juzNumber: surah.juzNumber,
-        verses: surah.verses.map((verse) => {
-          return {
-            _id: verse._id,
-            verseNumber: verse.verseNumber,
-            arabicAyah: verse.arabicAyah,
-            totalVerseNumber: verse.totalVerseNumber,
-            verseOtherData: VerseOtherData.filter(
-              (data) =>
-                data.surahNumber === surah.surahNumber &&
-                data.verseNumber === verse.verseNumber
-            ).map(({ surahNumber, verseNumber, ...rest }) => rest),
-          };
-        }),
+        verses: surah.verses.map((verse) => ({
+          _id: verse._id,
+          verseNumber: verse.verseNumber,
+          arabicAyah: verse.arabicAyah,
+          totalVerseNumber: verse.totalVerseNumber,
+          verseOtherData: VerseOtherData.filter(
+            (data) =>
+              data.surahNumber === surah.surahNumber &&
+              data.verseNumber === verse.verseNumber
+          ).map(({ surahNumber, verseNumber, ...rest }) => rest),
+        })),
       };
     });
 
+    // Count total Surahs
     const count = await Surah.countDocuments();
 
+    // Prepare paginated response
     const paginatedData = {
       surahs: formattedSurahs,
       totalSurahs: count,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
+      totalPages: Math.ceil(count / pageLimit),
+      currentPage,
     };
 
+    // Cache and respond
     cache.set(cacheKey, paginatedData);
     res.status(200).json(paginatedData);
   } catch (err) {

@@ -10,7 +10,7 @@ export default function AdminLayout() {
       <div className="flex flex-1 flex-col">
         {/* admin header */}
         <AdminHeader />
-        <main className="">
+        <main>
           <Outlet />
         </main>
       </div>

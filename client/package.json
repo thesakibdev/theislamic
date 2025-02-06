@@ -29,7 +29,8 @@
     "react-router-dom": "^7.1.2",
     "react-toastify": "^11.0.3",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "tinymce": "^7.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -47,4 +48,3 @@
     "vite": "^6.0.5"
   }
 }
-

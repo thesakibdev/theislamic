@@ -12,6 +12,7 @@ import Donors from "./pages/admin/Donors";
 import CheckAuth from "./middleware/CheckAuth";
 import { useSelector } from "react-redux";
 import ClientLayout from "./layout/client/ClientLayout";
+import VersesOtherData from "./pages/admin/VersesData";
 
 export default function App() {
   const { user, isAuthenticated } = useSelector((state) => state.user);
@@ -38,6 +39,7 @@ export default function App() {
       >
         <Route path="dashboard" />
         <Route path="quran" element={<Quran />} />
+        <Route path="verses-other-data" element={<VersesOtherData />} />
         <Route path="hadith" element={<Hadith />} />
         <Route path="tafsir" element={<Tafsir />} />
         <Route path="donors" element={<Donors />} />

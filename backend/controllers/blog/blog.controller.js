@@ -25,22 +25,20 @@ const addBlog = async (req, res) => {
     const {
       title,
       description,
-      image,
+      thumbnail,
       shortDesc,
       metaTitle,
       metaDesc,
       metaKeyword,
-      metaUrl,
     } = req.body;
     const newBlog = new Blog({
       title,
       description,
-      image,
+      thumbnail,
       shortDesc,
       metaTitle,
       metaDesc,
       metaKeyword,
-      metaUrl,
     });
 
     await newBlog.save();

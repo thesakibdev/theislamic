@@ -4,18 +4,30 @@ const {
   loginUser,
   logoutUser,
   authMiddleware,
+  updateUserRole,
+  updateUserProfile,
+  verifyEmail,
 } = require("../../controllers/auth/auth.controller");
+const checkUserRole = require("../../middleware/authCheck.middleware");
 
 const router = express.Router();
 
 router.post("/register", registerUser);
+router.get('/verify-email', verifyEmail);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
+router.put("/update-profile", authMiddleware, updateUserProfile);
 router.get("/check-auth", authMiddleware, (req, res) => {
   const user = req.user;
   res
     .status(200)
     .json({ success: true, user, message: "User authenticated successfully!" });
 });
+
+router.put(
+  "/update-role/:userId",
+  checkUserRole(["admin", "creator"]),
+  updateUserRole
+);
 
 module.exports = router;
