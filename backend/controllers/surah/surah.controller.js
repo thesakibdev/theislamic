@@ -81,28 +81,21 @@ const addVerse = async (req, res) => {
 
 const editArabicAyah = async (req, res) => {
   const { surahNumber, verseNumber } = req.params;
-  const { verse } = req.body;
+  const { verse, juzNumber } = req.body;
+ 
 
   try {
-    // Validate inputs
     const normalizedSurahNumber = Number(surahNumber);
     const normalizedVerseNumber = Number(verseNumber);
+    const normalizedTotalVerseNumber = verse?.totalVerseNumber;
 
     if (!normalizedSurahNumber || isNaN(normalizedSurahNumber)) {
-      return res.status(400).json({
-        error: true,
-        message: "অবৈধ সূরা নম্বর।",
-      });
+      return res.status(400).json({ error: true, message: "অবৈধ সূরা নম্বর।" });
     }
-
     if (!normalizedVerseNumber || isNaN(normalizedVerseNumber)) {
-      return res.status(400).json({
-        error: true,
-        message: "অবৈধ আয়াত নম্বর।",
-      });
+      return res.status(400).json({ error: true, message: "অবৈধ আয়াত নম্বর।" });
     }
 
-    // Find the Surah and update the specific verse's arabicAyah
     const updatedSurah = await Surah.findOneAndUpdate(
       {
         surahNumber: normalizedSurahNumber,
@@ -110,11 +103,13 @@ const editArabicAyah = async (req, res) => {
       },
       {
         $set: {
-          "verses.$.arabicAyah": verse.arabicAyah,
+          "verses.$.arabicAyah": verse?.arabicAyah || null,
+          "verses.$.totalVerseNumber": normalizedTotalVerseNumber, // Add this line
+          ...(juzNumber && { juzNumber }), // Optional update for juzNumber
         },
       },
       {
-        new: true, // Return the updated document
+        new: true,
       }
     );
 
@@ -127,7 +122,7 @@ const editArabicAyah = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "আরবি আয়াত সফলভাবে আপডেট করা হয়েছে।",
+      message: "সফলভাবে আপডেট করা হয়েছে।",
       updatedSurah,
     });
   } catch (error) {
