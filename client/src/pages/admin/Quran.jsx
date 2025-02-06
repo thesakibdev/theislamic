@@ -35,7 +35,7 @@ const initialFormData = {
   juzNumber: [],
   verseNumber: "",
   arabicAyah: "",
-  totalVerseNumber: null,
+  totalVerseNumber: "",
 };
 
 export default function Quran() {
@@ -77,6 +77,9 @@ export default function Quran() {
   const onSubmit = async (event) => {
     event.preventDefault();
 
+    const normalTotalVerseNumber = Number(formData.totalVerseNumber);
+    console.log(normalTotalVerseNumber);
+
     const updatedFormData = {
       name: formData.surahName,
       surahNumber: formData.surahNumber,
@@ -84,7 +87,7 @@ export default function Quran() {
       verse: {
         verseNumber: formData.verseNumber,
         arabicAyah: formData.arabicAyah,
-        totalVerseNumber: formData.totalVerseNumber,
+        totalVerseNumber: normalTotalVerseNumber,
       },
     };
 

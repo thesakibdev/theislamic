@@ -16,7 +16,7 @@ export default function Home() {
           </h1>
           <div className="mt-[70px] relative">
             <Input
-              placeholder="what do you want to read?"
+              placeholder="What you want to know from Quran & Hadith?"
               className="w-full py-5 pl-16 rounded-full"
             />
             <img
