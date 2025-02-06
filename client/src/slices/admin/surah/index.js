@@ -83,7 +83,7 @@ export const adminApi = createApi({
 
     // Fetch paginated Surahs
     getAllSurahsPaginated: builder.query({
-      query: ({ page = 1, limit = 1 }) => ({
+      query: ({ page, limit }) => ({
         url: `/admin/surah/paginated?page=${page}&limit=${limit}`,
         method: "GET",
       }),

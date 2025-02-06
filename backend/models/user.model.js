@@ -12,6 +12,9 @@ const userSchema = new mongoose.Schema({
   address: { type: String },
   totalDonation: { type: Number, default: 0 },
   role: { type: String, required: true, default: "reader" },
+  isVerified: { type: Boolean, default: false },
+  verificationToken: String,
+  verificationTokenExpires: Date,
 });
 
 module.exports = mongoose.model("User", userSchema);

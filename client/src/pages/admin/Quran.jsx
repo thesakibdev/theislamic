@@ -61,6 +61,7 @@ export default function Quran() {
 
   useEffect(() => {
     if (surahData) {
+      console.log(surahData);
       return;
     }
   }, [surahData]);
@@ -172,12 +173,23 @@ export default function Quran() {
 
   const handleDeleteVerse = async (surahNumber, verseNumber) => {
     try {
-      const deleteResponse = await deleteVerse({
-        surahNumber,
-        verseNumber,
-      }).unwrap();
-      refetch();
-      toast.success(deleteResponse.message || "Verse deleted successfully");
+      // Show a confirmation dialog
+      const userConfirmed = window.confirm(
+        "Are you sure you want to delete this verse? This action cannot be undone."
+      );
+
+      // If the user clicks "OK", proceed with the delete API call
+      if (userConfirmed) {
+        const deleteResponse = await deleteVerse({
+          surahNumber,
+          verseNumber,
+        }).unwrap();
+        refetch();
+        toast.success(deleteResponse.message || "Verse deleted successfully");
+      } else {
+        // User canceled the action
+        toast.info("Delete action canceled");
+      }
     } catch (error) {
       toast.error(error?.data?.message);
     }

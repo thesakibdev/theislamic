@@ -49,7 +49,7 @@ export default function AdminSidebar() {
 
   return (
     <div>
-      <aside className="bg-primary text-white w-64 h-screen flex flex-col">
+      <aside className="bg-primary text-white w-64 h-full flex flex-col">
         {/* Logo Section */}
         <div className="flex items-center space-x-2 mb-6">
           <img

@@ -6,12 +6,14 @@ const {
   authMiddleware,
   updateUserRole,
   updateUserProfile,
+  verifyEmail,
 } = require("../../controllers/auth/auth.controller");
 const checkUserRole = require("../../middleware/authCheck.middleware");
 
 const router = express.Router();
 
 router.post("/register", registerUser);
+router.get('/verify-email', verifyEmail);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.put("/update-profile", authMiddleware, updateUserProfile);
