@@ -9,6 +9,7 @@ const trackVisits = require("./middleware/visitor.middleware");
 const authRouter = require("./routes/auth/auth.route");
 const surahRouter = require("./routes/surah/surah.route");
 const visitorRouter = require("./routes/visit/visitor.route");
+const blogRouter = require("./routes/blog/blog.route");
 
 dotenv.config();
 
@@ -65,6 +66,8 @@ app.use("/api/v1/auth", authRouter);
 
 // quran route
 app.use("/api/v1/admin", surahRouter);
+app.use("/api/v1/admin/blog", blogRouter);
+
 // visitor route
 app.use("/api/v1/admin/analytics", visitorRouter);
 

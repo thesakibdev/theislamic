@@ -1,21 +1,32 @@
 const Blog = require("../../models/blog.model");
-const imageUploadUtil = require("../../utils/imageUpload.util");
+const { imageUploadUtil } = require("../../lib/cloudinary");
 
 const handleImageUpload = async (req, res) => {
   try {
-    const b64 = Buffer.from(req.file.buffer).toString("base64");
-    const url = "data:" + req.file.mimetype + ";base64," + b64;
-    const result = await imageUploadUtil(url);
+    const fileBuffer = req.file.buffer; // File buffer from multer
+    const public_id = `image_${Date.now()}`; // Generate unique public_id
+    const folder = "my_images"; // Specify Cloudinary folder
 
+    // Upload the image and get optimized URL and public_id
+    const { optimizedUrl, public_id: uploadedPublicId } = await imageUploadUtil(
+      fileBuffer,
+      public_id,
+      folder
+    );
+
+    // Respond with the optimized URL and public_id
     res.json({
       success: true,
-      result,
+      data: {
+        optimizedUrl,
+        public_id: uploadedPublicId,
+      },
     });
   } catch (error) {
-    console.log(error);
-    res.json({
+    console.error(error);
+    res.status(500).json({
       success: false,
-      message: "Error occured",
+      message: "Image upload failed",
     });
   }
 };
@@ -26,19 +37,23 @@ const addBlog = async (req, res) => {
       title,
       description,
       thumbnail,
+      thumbnailId,
       shortDesc,
       metaTitle,
       metaDesc,
       metaKeyword,
+      author,
     } = req.body;
     const newBlog = new Blog({
       title,
       description,
       thumbnail,
+      thumbnailId,
       shortDesc,
       metaTitle,
       metaDesc,
       metaKeyword,
+      author,
     });
 
     await newBlog.save();
@@ -77,7 +92,7 @@ const editBlog = async (req, res) => {
     const {
       title,
       description,
-      image,
+      thumbnail,
       shortDesc,
       metaTitle,
       metaDesc,
@@ -95,7 +110,7 @@ const editBlog = async (req, res) => {
 
     findBlog.title = title || findBlog.title;
     findBlog.description = description || findBlog.description;
-    findBlog.image = image || findBlog.image;
+    findBlog.thumbnail = image || findBlog.image;
     findBlog.shortDesc = shortDesc || findBlog.shortDesc;
     findBlog.metaTitle = metaTitle || findBlog.metaTitle;
     findBlog.metaDesc = metaDesc || findBlog.metaDesc;
