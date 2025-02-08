@@ -3,17 +3,23 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const connectDB = require("./lib/db");
+const trackVisits = require("./middleware/visitor.middleware");
 
 // import router here
 const authRouter = require("./routes/auth/auth.route");
 const surahRouter = require("./routes/surah/surah.route");
+const visitorRouter = require("./routes/visit/visitor.route");
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = ["http://localhost:5173", "https://theislamics.com", "https://www.theislamics.com"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://theislamics.com",
+  "https://www.theislamics.com",
+];
 
 app.use(
   cors({
@@ -52,11 +58,16 @@ app.get("/robots.txt", (req, res) => {
   res.send("User-agent: *\nDisallow: /");
 });
 
+app.use(trackVisits);
+
 // auth route
 app.use("/api/v1/auth", authRouter);
 
 // quran route
 app.use("/api/v1/admin", surahRouter);
+// visitor route
+app.use("/api/v1/admin/analytics", visitorRouter);
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
