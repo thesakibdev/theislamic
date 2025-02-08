@@ -15,7 +15,7 @@ const addHadith = async (req, res) => {
     note,
   } = req.body;
   try {
-    const savedHadith = await hadith.save();
+    const savedHadith = await Hadith.save();
     res.status(200).json(savedHadith);
   } catch (err) {
     res.status(500).json(err);
@@ -23,3 +23,6 @@ const addHadith = async (req, res) => {
 };
 
 module.exports = { addHadith };
+
+
+// bookName = []
