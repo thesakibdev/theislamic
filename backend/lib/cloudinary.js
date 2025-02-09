@@ -14,11 +14,6 @@ const upload = multer({ storage }); // Middleware to handle file uploads
 // Utility for uploading image and generating optimized URL
 const imageUploadUtil = async (fileBuffer, public_id, folder) => {
   try {
-    // Log the input
-    console.log("fileBuffer:", fileBuffer);
-    console.log("public_id:", public_id);
-    console.log("folder:", folder);
-
     // Use a Promise wrapper to handle the async nature of upload_stream
     const result = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(

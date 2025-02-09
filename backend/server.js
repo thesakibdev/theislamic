@@ -10,6 +10,7 @@ const authRouter = require("./routes/auth/auth.route");
 const surahRouter = require("./routes/surah/surah.route");
 const visitorRouter = require("./routes/visit/visitor.route");
 const blogRouter = require("./routes/blog/blog.route");
+const hadithRouter = require("./routes/hadith/hadith.route");
 
 dotenv.config();
 
@@ -66,7 +67,12 @@ app.use("/api/v1/auth", authRouter);
 
 // quran route
 app.use("/api/v1/admin", surahRouter);
+
+// blog route
 app.use("/api/v1/admin/blog", blogRouter);
+
+// hadith route
+app.use("/api/v1/admin/hadith", hadithRouter);
 
 // visitor route
 app.use("/api/v1/admin/analytics", visitorRouter);

@@ -5,6 +5,18 @@ const hadithSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  bookName: {
+    type: String,
+    required: true,
+  },
+  partNumber: {
+    type: Number,
+    required: true,
+  },
+  chapterNumber: {
+    type: Number,
+    required: true,
+  },
   hadithNumber: {
     type: Number,
     required: true,
@@ -15,11 +27,9 @@ const hadithSchema = new mongoose.Schema({
   },
   referenceBook: {
     type: String,
-    required: true,
   },
   note: {
     type: String,
-    required: true,
   },
 });
 
