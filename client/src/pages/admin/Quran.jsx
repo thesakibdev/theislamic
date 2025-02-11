@@ -48,6 +48,7 @@ export default function Quran() {
   const [editVerse] = useEditArabicVerseMutation();
   const [deleteVerse] = useDeleteVerseMutation();
 
+
   const [currentPage, setCurrentPage] = useState(1);
   const {
     data: surahData,
