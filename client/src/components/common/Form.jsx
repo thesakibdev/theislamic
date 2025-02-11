@@ -66,7 +66,7 @@ const CommonForm = memo(function CommonForm({
             className={allClasses.selectClass}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={getControlItem.label} />
+              <SelectValue placeholder={getControlItem.label || getControlItem?.name} />
             </SelectTrigger>
             <SelectContent>
               {getControlItem.options && getControlItem.options.length > 0
@@ -74,9 +74,9 @@ const CommonForm = memo(function CommonForm({
                     <SelectItem
                       className="capitalize"
                       key={optionItem.id}
-                      value={optionItem.id}
+                      value={optionItem.id || optionItem?.code}
                     >
-                      {optionItem.label}
+                      {optionItem.label || optionItem?.name}
                     </SelectItem>
                   ))
                 : null}

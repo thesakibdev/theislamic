@@ -1,5 +1,5 @@
 const express = require("express");
-const upload = require("../../lib/cloudinary");
+const { upload } = require("../../lib/cloudinary");
 const {
   addBlog,
   deleteBlog,
@@ -16,4 +16,4 @@ router.put("/edit/:id", editBlog);
 router.delete("/delete/:id", deleteBlog);
 router.get("/get", fetchAllBlog);
 
-export default router;
+module.exports = router;

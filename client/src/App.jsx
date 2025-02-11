@@ -13,6 +13,7 @@ import CheckAuth from "./middleware/CheckAuth";
 import { useSelector } from "react-redux";
 import ClientLayout from "./layout/client/ClientLayout";
 import VersesOtherData from "./pages/admin/VersesData";
+import Blog from "./pages/admin/Blog";
 
 export default function App() {
   const { user, isAuthenticated } = useSelector((state) => state.user);
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="hadith" element={<Hadith />} />
         <Route path="tafsir" element={<Tafsir />} />
         <Route path="donors" element={<Donors />} />
+        <Route path="i-wall" element={<Blog/>} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

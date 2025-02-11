@@ -11,10 +11,13 @@ const BlogSchema = new mongoose.Schema(
     thumbnail: {
       type: String,
     },
+    thumbnailId: {
+      type: String,
+    },
     shortDesc: {
       type: String,
     },
-    metaTitle: {
+    slug: {
       type: String,
     },
     metaDesc: {

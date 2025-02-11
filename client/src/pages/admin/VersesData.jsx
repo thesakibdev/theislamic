@@ -18,6 +18,8 @@ import {
   useGetAllSurahsPaginatedQuery,
 } from "../../slices/admin/surah";
 
+import { useGetAllLanguagesQuery } from "../../slices/utils";
+
 import ArrowDown from "../../assets/icon/arrow-down.png";
 import {
   Pagination,
@@ -45,7 +47,9 @@ export default function VersesOtherData() {
   const [openAddVerseDataForm, setOpenAddVerseDataForm] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [openVerseData, setOpenVerseDate] = useState({});
-  const [selectedLanguage, setSelectedLanguage] = useState("eng");
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
+
+  const { data: languages } = useGetAllLanguagesQuery();
 
   const [addVerseOtherData] = useAddVerseOtherDataMutation();
   const [editVerseOtherData] = useEditVerseOtherDataMutation();
@@ -87,11 +91,16 @@ export default function VersesOtherData() {
       placeholder: "Enter Verse Number",
     },
     {
-      label: "Language",
+      label: "Languages",
       name: "language",
-      componentType: "input",
-      type: "text",
-      placeholder: "Enter Language Name",
+      componentType: "select",
+      options:
+        languages &&
+        languages.data?.map((language) => ({
+          id: language?.code,
+          label: language?.name,
+        })),
+      allClasses: { selectClass: "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary" },  
     },
     {
       label: "Translation",
@@ -201,14 +210,18 @@ export default function VersesOtherData() {
           <select
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
-            className="border p-2 rounded border-primary"
+            className="px-4 py-2 rounded-md border bg-adminInput focus:ring-2 focus:ring-primary"
           >
-            <option className="bg-primary text-white" value="eng">
-              English
-            </option>
-            <option className="bg-primary text-white" value="বাংলা">
-              বাংলা
-            </option>
+            {languages?.data &&
+              languages.data?.map((language) => (
+                <option
+                  className="bg-primary/50 text-white"
+                  key={language?.code}
+                  value={language?.code}
+                >
+                  {language?.name}
+                </option>
+              ))}
           </select>
 
           <Button

@@ -3,6 +3,8 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 
+import { useGetAllBookListQuery } from "../../slices/utils";
+
 export default function Hadith() {
   const {
     register,
@@ -10,6 +12,9 @@ export default function Hadith() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  const { data: allBookList } = useGetAllBookListQuery();
+  console.log(allBookList);
 
   const addTafsir = (data) => {
     console.log("Form data", data);
@@ -133,6 +138,16 @@ export default function Hadith() {
                 </button>
               </div>
             </form>
+
+            <div className="mt-10">
+              {allBookList?.data &&
+                allBookList?.data?.map((book, index) => (
+                  <div className="flex gap-5" key={index}>
+                    <p>{book.nameEn}</p>
+                    <p className="font-bangla">{book.nameBn}</p>
+                  </div>
+                ))}
+            </div>
           </div>
         </main>
       </TabsContent>

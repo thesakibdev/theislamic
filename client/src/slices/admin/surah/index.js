@@ -21,7 +21,6 @@ export const adminApi = createApi({
     // Edit Arabic text of a specific verse
     editArabicVerse: builder.mutation({
       query: ({ surahNumber, verseNumber, ...formData }) => (
-        console.log(formData),
         {
           url: `/admin/surahs/${surahNumber}/verses/${verseNumber}/edit-arabic`,
           method: "PUT",
