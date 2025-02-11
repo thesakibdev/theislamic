@@ -4,6 +4,7 @@ import { pokemonApi } from "./slices/pokemon";
 import { authApi } from "./slices/authslice";
 import { adminApi } from "./slices/admin/surah";
 import { blogApi } from "./slices/admin/blog";
+import { utilsApi } from "./slices/utils";
 import userReducer from "./slices/authslice/userSlice";
 
 export const store = configureStore({
@@ -13,13 +14,15 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
     [blogApi.reducerPath]: blogApi.reducer,
+    [utilsApi.reducerPath]: utilsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(pokemonApi.middleware)
       .concat(authApi.middleware)
       .concat(adminApi.middleware)
-      .concat(blogApi.middleware),
+      .concat(blogApi.middleware)
+      .concat(utilsApi.middleware),
 });
 
 // Optional for better query features like refetchOnFocus/refetchOnReconnect

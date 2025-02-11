@@ -48,6 +48,7 @@ export default function Quran() {
   const [editVerse] = useEditArabicVerseMutation();
   const [deleteVerse] = useDeleteVerseMutation();
 
+
   const [currentPage, setCurrentPage] = useState(1);
   const {
     data: surahData,
@@ -78,7 +79,6 @@ export default function Quran() {
     event.preventDefault();
 
     const normalTotalVerseNumber = Number(formData.totalVerseNumber);
-    console.log(normalTotalVerseNumber);
 
     const updatedFormData = {
       name: formData.surahName,
@@ -99,7 +99,6 @@ export default function Quran() {
           ...updatedFormData,
         }).unwrap();
         // Show success message from server
-        console.log(editResponse);
         toast.success(editResponse.message || "Verse updated successfully!");
       } else {
         const addResponse = await addVerse(updatedFormData).unwrap();

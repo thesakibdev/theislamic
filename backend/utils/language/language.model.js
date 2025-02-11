@@ -35,31 +35,38 @@ const languages = [
 ];
 
 // MongoDB connection string
-const mongoURI = "mongodb+srv://thesakibdev:thesakibdev@working.quc5u.mongodb.net/theislamic_db?retryWrites=true&w=majority&appName=working"; // Replace with your actual database name
+const mongoURI =
+  "mongodb+srv://thesakibdev:thesakibdev@working.quc5u.mongodb.net/theislamic_db?retryWrites=true&w=majority&appName=working"; // Replace with your actual database name
 
-// // Connect to MongoDB
-// mongoose.connect(mongoURI, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// })
-// .then(() => {
-//   console.log("MongoDB connected successfully!");
-//   // Insert languages into database
-//   insertLanguages();
-// })
-// .catch((err) => {
-//   console.error("MongoDB connection error:", err);
-// });
+// Connect to MongoDB
+// mongoose
+//   .connect(mongoURI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   })
+//   .then(() => {
+//     console.log("MongoDB connected successfully!");
+//     // Insert languages into database
+//     insertLanguages();
+//   })
+//   .catch((err) => {
+//     console.error("MongoDB connection error:", err);
+//   });
 
-// // insert languages into database
+// insert languages into database
 // const insertLanguages = async () => {
 //   try {
-//     await Language.insertMany(languages);
-//     console.log("Languages inserted successfully!");
+//     for (const lang of languages) {
+//       await Language.updateOne(
+//         { code: lang.code }, // Check if language with this code exists
+//         { $setOnInsert: lang }, // Insert only if it doesn't exist
+//         { upsert: true } // Prevent duplicate inserts
+//       );
+//     }
+//     console.log("Languages inserted/updated successfully!");
 //   } catch (error) {
 //     console.error("Error inserting languages:", error);
 //   } finally {
-//     // Close the connection after insertion
 //     mongoose.connection.close();
 //   }
 // };
