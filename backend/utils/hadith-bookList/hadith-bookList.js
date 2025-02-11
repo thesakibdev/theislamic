@@ -15,67 +15,67 @@ const Books = [
     nameBn: "সহীহ আল-বুখারী",
     code: "(d. 256 AH) C",
   },
-  { nameEn: "Sahih Muslim", nameBn: "঴঵ী঵ মু঴চ঱ম", code: "(d. 261 AH) C" },
+  { nameEn: "Sahih Muslim", nameBn: "সহীহ মুসলিম", code: "(d. 261 AH) C" },
   {
     nameEn: "Sunan Ibn Mājah",
-    nameBn: "঴ুনাব্দন ইবব্দন মাজা঵",
+    nameBn: "সুনান ইবনে মাজাহ",
     code: "(d. 273 AH) C",
   },
-  { nameEn: "Sunan Abi Dawud", nameBn: "঴঴ুনান আবূ দাউদ", code: "(d. 275 AH)" },
+  { nameEn: "Sunan Abi Dawud", nameBn: "সুনান আবু দাউদ", code: "(d. 275 AH)" },
   {
     nameEn: "Sunan At-Tirmidhi",
-    nameBn: "঴ুনান আত চতরচমচয",
+    nameBn: "সুনান আত তিরমিযি",
     code: "(d. 279 AH) C",
   },
   {
     nameEn: "Sunan Al-Nasa'I",
-    nameBn: "঴ুনান আন না঴াঈ",
+    nameBn: "সুনান আন নাসাঈ",
     code: "(d. 303 AH) C",
   },
   {
     nameEn: "Muwatta Imam Malik",
-    nameBn: "মুয়ািা ইমাম মাব্দ঱ক",
+    nameBn: "মুআত্তা ইমাম মালেক",
     code: "(d. 179 AH)",
   },
-  { nameEn: "Musnad Ahmad", nameBn: "মু঴নাব্দদ আ঵মাদ", code: "(d. 241 AH)" },
+  { nameEn: "Musnad Ahmad", nameBn: "মুসনাদ আহমাদ", code: "(d. 241 AH)" },
   {
     nameEn: "Sunan Ad-Darimi",
-    nameBn: "঴ুনান আদ্দাব্দরমী",
+    nameBn: "সুনান আদ দারেমী",
     code: "(d. 255 AH)",
   },
   {
     nameEn: "Al-Adab Al-Mufrad",
-    nameBn: "আ঱-আদাবু঱ মুফরাদ",
+    nameBn: "আল-আদাবুল মুফরাদ",
     code: "(d. 256 AH)",
   },
-  { nameEn: "An-Nawawi’s Forty", nameBn: "আন নওয়াবীর িচিল", code: "" },
+  { nameEn: "An-Nawawi’s Forty", nameBn: "আন নওয়াবীর চল্লিশ", code: "" },
   {
     nameEn: "Mishkat Al-Masabih",
-    nameBn: "চমলকাতু ঱ মা঴াচব঵",
+    nameBn: "মিশকাতুল মাসাবিহ",
     code: "(d. 1248)",
   },
   {
     nameEn: "Riyad As-Salihin",
-    nameBn: "চরয়াদু঴ ঴াব্দ঱঵ীন",
+    nameBn: "রিয়াদুস সালেহীন",
     code: "(1233–1277)",
   },
   {
     nameEn: "Bulūgh Al-Marām",
-    nameBn: "বু঱ুগ আ঱ মারাম",
+    nameBn: "বুলূগ আল মারাম",
     code: "(1372 – 1448)",
   },
-  { nameEn: "Hisn Al-Muslim", nameBn: "চ঵঴নু঱ মু঴চ঱ম", code: "" },
+  { nameEn: "Hisn Al-Muslim", nameBn: "হিসনুল মুসলিম", code: "" },
   {
     nameEn: "Ash-Shama'il Al-Muhammadiyah",
-    nameBn: "আল-লামাই঱ আ঱-মু঵াম্মাচদয",
+    nameBn: "আশ-শামাইল আল-মুহাম্মাদিয়া",
     code: "",
   },
-  { nameEn: "Thematic", nameBn: "চব঳য়চভচিক", code: "" },
+  { nameEn: "Thematic", nameBn: "বিষয়ভিত্তিক", code: "" },
 ];
 
 // MongoDB connection string
 const mongoURI =
-  "mongodb+srv://thesakibdev:thesakibdev@working.quc5u.mongodb.net/theislamic_db?retryWrites=true&w=majority&appName=working"; // Replace with your actual database name
+  "mongodb+srv://mahbub:mahbub@theislamicdb.2g6v7.mongodb.net/theislamicdb?retryWrites=true&w=majority&appName=theislamicdb"; // Replace with your actual database name
 
 // Connect to MongoDB
 // mongoose
@@ -93,21 +93,21 @@ const mongoURI =
 //   });
 
 // // insert languages into database
-// const insertLanguages = async () => {
-//   try {
-//     for (const book of Books) {
-//       await BookList.updateOne(
-//         { nameEn: book.nameEn }, // Check if book already exists by name
-//         { $setOnInsert: book }, // Insert only if it doesn't exist
-//         { upsert: true } // Prevent duplicate inserts
-//       );
-//     }
-//     console.log("BookList inserted/updated successfully!");
-//   } catch (error) {
-//     console.error("Error inserting books:", error);
-//   } finally {
-//     mongoose.connection.close();
-//   }
-// };
+const insertLanguages = async () => {
+  try {
+    for (const book of Books) {
+      await BookList.updateOne(
+        { nameEn: book.nameEn }, // Check if book already exists by name
+        { $setOnInsert: book }, // Insert only if it doesn't exist
+        { upsert: true } // Prevent duplicate inserts
+      );
+    }
+    console.log("BookList inserted/updated successfully!");
+  } catch (error) {
+    console.error("Error inserting books:", error);
+  } finally {
+    mongoose.connection.close();
+  }
+};
 
 module.exports = BookList;

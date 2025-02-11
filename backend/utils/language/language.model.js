@@ -36,7 +36,7 @@ const languages = [
 
 // MongoDB connection string
 const mongoURI =
-  "mongodb+srv://thesakibdev:thesakibdev@working.quc5u.mongodb.net/theislamic_db?retryWrites=true&w=majority&appName=working"; // Replace with your actual database name
+  "mongodb+srv://mahbub:mahbub@theislamicdb.2g6v7.mongodb.net/theislamicdb?retryWrites=true&w=majority&appName=theislamicdb";  // Replace with your actual database name
 
 // Connect to MongoDB
 // mongoose
