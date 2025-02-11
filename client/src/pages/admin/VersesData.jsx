@@ -47,7 +47,7 @@ export default function VersesOtherData() {
   const [openAddVerseDataForm, setOpenAddVerseDataForm] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [openVerseData, setOpenVerseDate] = useState({});
-  const [selectedLanguage, setSelectedLanguage] = useState("eng");
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
 
   const { data: languages } = useGetAllLanguagesQuery();
 
@@ -212,7 +212,7 @@ export default function VersesOtherData() {
             onChange={(e) => setSelectedLanguage(e.target.value)}
             className="px-4 py-2 rounded-md border bg-adminInput focus:ring-2 focus:ring-primary"
           >
-            {languages.data &&
+            {languages?.data &&
               languages.data?.map((language) => (
                 <option
                   className="bg-primary/50 text-white"

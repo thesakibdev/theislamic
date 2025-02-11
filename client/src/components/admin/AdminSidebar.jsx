@@ -14,30 +14,30 @@ export default function AdminSidebar() {
       name: "Verses Other Data",
       link: "verses-other-data",
     },
-    {
-      name: "Hadith",
-      link: "hadith",
-    },
-    {
-      name: "Tafsir",
-      link: "tafsir",
-    },
-    {
-      name: "Salat",
-      link: "salat",
-    },
-    {
-      name: "I-Wall",
-      link: "i-wall",
-    },
-    {
-      name: "Donors",
-      link: "donors",
-    },
-    {
-      name: "About Us",
-      link: "about-us",
-    },
+    // {
+    //   name: "Hadith",
+    //   link: "hadith",
+    // },
+    // {
+    //   name: "Tafsir",
+    //   link: "tafsir",
+    // },
+    // {
+    //   name: "Salat",
+    //   link: "salat",
+    // },
+    // {
+    //   name: "I-Wall",
+    //   link: "i-wall",
+    // },
+    // {
+    //   name: "Donors",
+    //   link: "donors",
+    // },
+    // {
+    //   name: "About Us",
+    //   link: "about-us",
+    // },
   ];
 
   const [activeLink, setActiveLink] = useState("quran");

@@ -3,7 +3,6 @@ const cache = new NodeCache({ stdTTL: 600 }); // Cache for 10 minutes
 
 // Function to invalidate the entire cache
 const invalidateCache = () => {
-  console.log("🛑 Cache invalidated!");
   cache.flushAll();
 };
 

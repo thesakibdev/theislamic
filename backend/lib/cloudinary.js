@@ -50,4 +50,14 @@ const imageUploadUtil = async (fileBuffer, public_id, folder) => {
   }
 };
 
-module.exports = { upload, imageUploadUtil };
+const cloudinaryDelete = async (public_id) => {
+  try {
+    await cloudinary.uploader.destroy(public_id, {
+      invalidate: true,
+    });
+  } catch (error) {
+    console.error("Error deleting image from Cloudinary:", error);
+  }
+};
+
+module.exports = { upload, imageUploadUtil, cloudinaryDelete };

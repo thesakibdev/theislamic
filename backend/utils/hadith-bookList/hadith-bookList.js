@@ -73,9 +73,6 @@ const Books = [
   { nameEn: "Thematic", nameBn: "বিষয়ভিত্তিক", code: "" },
 ];
 
-// MongoDB connection string
-const mongoURI =
-  "mongodb+srv://mahbub:mahbub@theislamicdb.2g6v7.mongodb.net/theislamicdb?retryWrites=true&w=majority&appName=theislamicdb"; // Replace with your actual database name
 
 // Connect to MongoDB
 // mongoose

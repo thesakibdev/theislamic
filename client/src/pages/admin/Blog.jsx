@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import {
   useAddBlogMutation,
   useEditBlogMutation,
+  useDeleteBlogMutation,
+  useGetAllBlogsQuery,
 } from "../../slices/admin/blog";
 import { useSelector } from "react-redux";
 
@@ -20,10 +22,9 @@ const initialFormData = {
   thumbnail: null,
   thumbnailId: "",
   shortDesc: "",
-  metaTitle: "",
+  slug: "",
   metaDesc: "",
   metaKeyword: "",
-  metaUrl: "",
   author: "",
 };
 
@@ -34,19 +35,28 @@ export default function Blog() {
   const [imagePublicId, setImagePublicId] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { user } = useSelector((state) => state.user);
-  console.log(user);
-  console.log(user.id);
 
   const [addBlog] = useAddBlogMutation();
   const [editBlog] = useEditBlogMutation();
+  const [deleteBlog] = useDeleteBlogMutation();
+  const {
+    data: blogs,
+    isLoading,
+    error,
+  } = useGetAllBlogsQuery({
+    page: currentPage,
+    limit: 6,
+  });
 
   const RTERef = useRef(null);
 
   const resetForm = () => {
     setFormData(initialFormData);
     setUploadedImageUrl("");
+    setImageLoadingState(false);
     setCurrentEditedId(null);
   };
 
@@ -93,12 +103,10 @@ export default function Blog() {
     return (
       formData.title.trim() !== "" &&
       formData.shortDesc.trim() !== "" &&
-      formData.metaTitle.trim() !== "" &&
+      formData.slug.trim() !== "" &&
       formData.metaDesc.trim() !== "" &&
       formData.metaKeyword.trim() !== "" &&
-      formData.metaUrl.trim() !== "" &&
-      RTEContent !== "" &&
-      uploadedImageUrl !== ""
+      RTEContent !== ""
     );
   };
 
@@ -112,9 +120,74 @@ export default function Blog() {
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
+  const handleDeleteBlog = async (id) => {
+    try {
+      // Show a confirmation dialog
+      const userConfirmed = window.confirm(
+        "Are you sure you want to delete this verse? This action cannot be undone."
+      );
+
+      // If the user clicks "OK", proceed with the delete API call
+      if (userConfirmed) {
+        const deleteResponse = await deleteBlog({
+          id,
+        }).unwrap();
+        toast.success(deleteResponse.message || "Blog deleted successfully");
+      } else {
+        // User canceled the action
+        toast.info("Delete action canceled");
+      }
+    } catch (error) {
+      toast.error(error?.data?.message);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Blogs Data:", blogs);
+  }, [blogs]);
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Failed to load blogs.</p>;
+
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl font-semibold text-center my-5">Blog</h1>
+
+      <div className="my-10 flex gap-3">
+        {blogs?.map((blog) => (
+          <div className="border rounded-md p-6" key={blog._id}>
+            <h1>{blog.title}</h1>
+            <h2>{blog.shortDesc}</h2>
+            <h3>{blog.slug}</h3>
+            <h4>{blog.metaDesc}</h4>
+
+            <div className="flex justify-between">
+              <Button
+                onClick={() => {
+                  setCurrentEditedId(blog._id);
+                  setFormData({
+                    title: blog.title || "",
+                    shortDesc: blog.shortDesc || "",
+                    slug: blog.slug || "",
+                    metaDesc: blog.metaDesc || "",
+                    metaKeyword: blog.metaKeyword || "",
+                    metaUrl: blog.metaUrl || "",
+                    description: blog.description || "",
+                  });
+                }}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => handleDeleteBlog(blog._id)}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <ImageUploader
         uploadEndpoint={`${baseUrl}/admin/blog/upload-image`}
@@ -172,16 +245,16 @@ export default function Blog() {
             </div>
 
             <div className="">
-              <label htmlFor="metaTitle" className="text-lg text-semibold">
-                Meta Title
+              <label htmlFor="slug" className="text-lg text-semibold">
+                Slug
               </label>
               <Input
                 className="w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary"
                 type="text"
-                name="metaTitle"
-                placeholder="Meta Title"
-                id="metaTitle"
-                value={formData.metaTitle}
+                name="slug"
+                placeholder="Slug"
+                id="slug"
+                value={formData.slug}
                 onChange={(event) =>
                   setFormData({
                     ...formData,
@@ -222,26 +295,6 @@ export default function Blog() {
                 placeholder="Meta Keyword"
                 id="metaKeyword"
                 value={formData.metaKeyword}
-                onChange={(event) =>
-                  setFormData({
-                    ...formData,
-                    [event.target.name]: event.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <div className="">
-              <label htmlFor="metaUrl" className="text-lg text-semibold">
-                Meta Url
-              </label>
-              <Input
-                className="w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary"
-                type="text"
-                name="metaUrl"
-                placeholder="Meta Url"
-                id="metaUrl"
-                value={formData.metaUrl}
                 onChange={(event) =>
                   setFormData({
                     ...formData,
