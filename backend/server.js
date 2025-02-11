@@ -11,6 +11,8 @@ const surahRouter = require("./routes/surah/surah.route");
 const visitorRouter = require("./routes/visit/visitor.route");
 const blogRouter = require("./routes/blog/blog.route");
 const hadithRouter = require("./routes/hadith/hadith.route");
+const languageRouter = require("./routes/utils/language.route");
+const bookListRouter = require("./routes/utils/bookList.route");
 
 dotenv.config();
 
@@ -76,6 +78,10 @@ app.use("/api/v1/admin/hadith", hadithRouter);
 
 // visitor route
 app.use("/api/v1/admin/analytics", visitorRouter);
+
+// utilities route
+app.use("/api/v1/utils", languageRouter);
+app.use("/api/v1/utils", bookListRouter);
 
 
 app.listen(PORT, () => {

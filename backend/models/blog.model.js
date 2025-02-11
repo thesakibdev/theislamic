@@ -17,7 +17,7 @@ const BlogSchema = new mongoose.Schema(
     shortDesc: {
       type: String,
     },
-    metaTitle: {
+    slug: {
       type: String,
     },
     metaDesc: {
