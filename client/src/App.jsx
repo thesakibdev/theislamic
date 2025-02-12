@@ -15,6 +15,7 @@ import ClientLayout from "./layout/client/ClientLayout";
 import VersesOtherData from "./pages/admin/VersesData";
 import Blog from "./pages/admin/Blog";
 import IndexPage from "./pages/client/Index";
+import RecitePage from "./pages/client/Recite";
 
 export default function App() {
   const { user, isAuthenticated } = useSelector((state) => state.user);
@@ -24,6 +25,7 @@ export default function App() {
       <Route path="/" element={<ClientLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/index" element={<IndexPage />} />
+        <Route path="/recite" element={<RecitePage />} />
       </Route>
 
       {/* auth Register and Login route */}

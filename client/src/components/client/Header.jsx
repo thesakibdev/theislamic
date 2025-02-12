@@ -88,7 +88,7 @@ export default function Header() {
     },
     {
       text: "Recite",
-      path: "/",
+      path: "/recite",
     },
     {
       text: "Translation",

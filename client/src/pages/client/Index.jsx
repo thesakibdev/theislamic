@@ -1,5 +1,14 @@
 import { Button } from "@/components/ui/button";
 import IndexPageBanner from "../../assets/index-page-banner.png";
+
+import { useGetAllSurahsNameQuery } from "@/slices/admin/surah";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
+
 export default function IndexPage() {
   const arabicSurahName = [
     { id: 1, name: "الفاتحة" },
@@ -118,6 +127,9 @@ export default function IndexPage() {
     { id: 114, name: "الناس" },
   ];
 
+  const { data: surahs, isLoading } = useGetAllSurahsNameQuery();
+  console.log(surahs);
+
   return (
     <main>
       <section className="pt-[4.5rem] md:pt-40 pb-[50px]">
@@ -149,8 +161,76 @@ export default function IndexPage() {
       </section>
 
       {/* surah list */}
-      <section className="my-10 bg-[#f5f5f5]">
-        surah
+      <section className="my-10 py-10 bg-[#f5f5f5]">
+        <div className="container mx-auto px-4">
+          <Tabs defaultValue="recent" className="w-[400px] my-5">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger
+                className="p-0 data-[state=active]:rounded-none"
+                value="recent"
+              >
+                Recent Read
+              </TabsTrigger>
+              <TabsTrigger
+                className="p-0 data-[state=active]:rounded-none"
+                value="bookmark"
+              >
+                Bookmarks
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="recent">No Recent Read</TabsContent>
+            <TabsContent value="bookmark">
+              You do not have any bookmarks yet ?
+            </TabsContent>
+          </Tabs>
+          <Tabs defaultValue="surah" className="w-full my-5">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger
+                className="p-0 data-[state=active]:rounded-none"
+                value="surah"
+              >
+                Surah
+              </TabsTrigger>
+              <TabsTrigger
+                className="p-0 data-[state=active]:rounded-none"
+                value="juz"
+              >
+                Juz
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="surah">
+              <div className="grid sm:grid-cols-2 md:grid-cols-4 justify-between gap-10">
+                {surahs?.map((surah) => (
+                  <div
+                    className="flex justify-between items-center border border-gray-200 p-5 rounded-lg hover:border-primary"
+                    key={surah.id}
+                  >
+                    <p>{surah.surahNumber}</p>
+                    <div className="">
+                      <div className="flex gap-5">
+                        <p>{surah.surahName}</p>
+                        <p>
+                          {
+                            arabicSurahName.find(
+                              (name) => name.id === surah.surahNumber
+                            )?.name
+                          }
+                        </p>
+                      </div>
+
+                      <div className="flex justify-end gap-5">
+                        <p>Ayah: {surah.totalAyah}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="juz">
+              You do not have any bookmarks yet ?
+            </TabsContent>
+          </Tabs>
+        </div>
       </section>
     </main>
   );

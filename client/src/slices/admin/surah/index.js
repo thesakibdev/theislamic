@@ -79,6 +79,14 @@ export const adminApi = createApi({
       }),
       providesTags: ["Surah", "Verse"],
     }),
+    // Fetch all Surahs name
+    getAllSurahsName: builder.query({
+      query: () => ({
+        url: "/admin/surah/all-name",
+        method: "GET",
+      }),
+      providesTags: ["Surah", "Verse"],
+    }),
 
     // Fetch paginated Surahs
     getAllSurahsPaginated: builder.query({
@@ -99,5 +107,6 @@ export const {
   useEditVerseOtherDataMutation,
   useDeleteVerseOtherDataMutation,
   useGetAllSurahsQuery,
+  useGetAllSurahsNameQuery,
   useGetAllSurahsPaginatedQuery,
 } = adminApi;
