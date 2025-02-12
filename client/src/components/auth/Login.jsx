@@ -77,7 +77,7 @@ export default function Login() {
           type="submit"
           className="text-white hover:bg-primary-foreground duration-500 hover:text-primary"
         >
-          Register
+          Login
         </Button>
       </form>
     </div>
