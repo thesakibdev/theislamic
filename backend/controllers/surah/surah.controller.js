@@ -235,8 +235,10 @@ const addVerseOtherData = async (req, res) => {
         .status(400)
         .json({ error: true, message: "Invalid verseNumber." });
     }
-    if (!normalLanguage || !normalTranslation || !normalTransliteration) {
-      return res.status(400).json({ error: true, message: "Invalid data." });
+    if (!normalLanguage) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Please provide a language." });
     }
 
     const existingVerse = await verseOtherData.findOne({
@@ -344,7 +346,6 @@ const editVerseOtherData = async (req, res) => {
 
     // invalidate cache
     invalidateCache();
-
 
     return res.status(200).json({
       message: `আয়াত ${normalVerseNumber} এর ${normalLanguage} ভাষায় সংরক্ষণ করা হয়েছে।`,
