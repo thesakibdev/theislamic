@@ -1,7 +1,17 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useGetAllSurahsNameQuery, useGetAllSurahsQuery } from "@/slices/admin/surah";
 import { CiSearch } from "react-icons/ci";
+import { useParams } from "react-router-dom";
 
 export default function RecitePage() {
+  const { number } = useParams();
+  const { data: allSurah } = useGetAllSurahsQuery();
+  const { data: allSurahName } = useGetAllSurahsNameQuery();
+  console.log(allSurahName);
+  const surah = allSurah.surahs.find(
+    (surah) => surah.surahNumber === Number(number)
+  );
+  console.log(surah.verses);
   return (
     <>
       <section className="pt-10">
@@ -10,7 +20,9 @@ export default function RecitePage() {
           <div className="flex ">
             <aside className=" w-1/4 min-h-screen h-full border-r-2">
               <div className="p-5">
-                <h3 className="text-2xl font-semibold underline">Quran</h3>
+                <h3 className="text-2xl font-semibold underline cursor-pointer">
+                  {surah.surahName}
+                </h3>
 
                 <Tabs defaultValue="surah" className="my-5">
                   <TabsList className="grid grid-cols-2 rounded-full">
@@ -35,18 +47,26 @@ export default function RecitePage() {
                           className="w-full border-2 border-none text-white placeholder:text-white bg-[#80BDA9] outline-none rounded-md p-3"
                           type="text"
                         />
-                        <CiSearch className="absolute right-3 top-3 text-white text-[27px]"/>
+                        <CiSearch className="absolute right-3 top-3 text-white text-[27px]" />
                       </div>
                       <div className="mt-5 bg-[#80BDA9] max-h-[800px] overflow-auto rounded-md">
                         <ul>
-                          {Array.from({ length: 114 }).map((_, index) => (
+                          {/* {Array.from({ length: 114 }).map((_, index) => (
                             <li
                               key={index}
-                              className="hover:bg-[#80BDA9] hover:text-white/80 border-b-2 text-white text-[27px]  text-center cursor-pointer p-3"
+                              className="hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-[27px]  text-center cursor-pointer p-3"
                             >
                               Surah {index + 1}
                             </li>
-                          ))}
+                          ))} */}
+                          {/* {allSurahName.surahs.map((surah, index) => (
+                            <li
+                              key={index}
+                              className="hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-[27px]  text-center cursor-pointer p-3"
+                            >
+                              {surah.surahName}
+                            </li>
+                          ))} */}
                         </ul>
                       </div>
                     </div>
@@ -78,14 +98,25 @@ export default function RecitePage() {
                 </TabsContent>
                 <TabsContent value="reading">
                   <div className="flex flex-col text-center justify-center w-full">
-                    <h2 className="text-3xl font-bold">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ</h2>
+                    <h2 className="text-3xl font-bold">
+                      بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ
+                    </h2>
                     <div className="mt-4 flex flex-col">
-                      {Array.from({ length: 10 }).map((_, index) => (
+                      {/* {Array.from({ length: 10 }).map((_, index) => (
                         <p
                           key={index}
                           className="text-2xl mt-2 text-black text-center"
-                        >بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ١ ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ ٢ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ٣ مَـٰلِكِ يَوْمِ ٱلدِّينِ ٤ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ٥ ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ ٦ صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ ٧
-                          
+                        >
+                          بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ١ ٱلْحَمْدُ
+                          لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ ٦
+                        </p>
+                      ))} */}
+                      {surah.verses.map((verse, index) => (
+                        <p
+                          key={index}
+                          className="text-2xl mt-2 text-black text-center"
+                        >
+                          {verse.arabicAyah}
                         </p>
                       ))}
                     </div>

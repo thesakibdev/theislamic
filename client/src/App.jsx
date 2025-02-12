@@ -25,7 +25,7 @@ export default function App() {
       <Route path="/" element={<ClientLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/index" element={<IndexPage />} />
-        <Route path="/recite" element={<RecitePage />} />
+        <Route path="/recite/:number" element={<RecitePage />} />
       </Route>
 
       {/* auth Register and Login route */}

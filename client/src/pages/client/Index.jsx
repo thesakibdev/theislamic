@@ -8,8 +8,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../components/ui/tabs";
+import { useNavigate } from "react-router-dom";
 
 export default function IndexPage() {
+  const navigate = useNavigate();
   const arabicSurahName = [
     { id: 1, name: "الفاتحة" },
     { id: 2, name: "البقرة" },
@@ -128,7 +130,6 @@ export default function IndexPage() {
   ];
 
   const { data: surahs, isLoading } = useGetAllSurahsNameQuery();
-  console.log(surahs);
 
   return (
     <main>
@@ -202,8 +203,9 @@ export default function IndexPage() {
               <div className="grid sm:grid-cols-2 md:grid-cols-4 justify-between gap-10">
                 {surahs?.map((surah) => (
                   <div
-                    className="flex justify-between items-center border border-gray-200 p-5 rounded-lg hover:border-primary"
+                    className="flex justify-between items-center border cursor-pointer border-gray-200 p-5 rounded-lg hover:border-primary"
                     key={surah.id}
+                    onClick={() => navigate(`/recite/${surah.surahNumber}`)}
                   >
                     <p>{surah.surahNumber}</p>
                     <div className="">
