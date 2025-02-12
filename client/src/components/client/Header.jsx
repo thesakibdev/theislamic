@@ -34,14 +34,17 @@ export default function Header() {
     {
       icon: HomeIcon,
       text: "Home",
+      path: "/",
     },
     {
       icon: WorldIcon,
       text: "Language",
+      path: "/",
     },
     {
       icon: SettingIcon,
       text: "Setting",
+      path: "/",
     },
   ];
 
@@ -80,6 +83,10 @@ export default function Header() {
 
   const subMenuOne = [
     {
+      text: "Index",
+      path: "/index",
+    },
+    {
       text: "Recite",
       path: "/",
     },
@@ -88,11 +95,15 @@ export default function Header() {
       path: "/",
     },
     {
-      text: "Index",
+      text: "Thematic",
       path: "/",
     },
     {
       text: "Exegesis",
+      path: "/",
+    },
+    {
+      text: "Word by Word",
       path: "/",
     },
   ];
@@ -182,12 +193,13 @@ export default function Header() {
                         <li
                           key={index}
                           className="flex items-center justify-center px-4 py-4 cursor-pointer hover:bg-gray-100 border-t-2 border-gray-400"
-                          onClick={() =>
+                          onClick={() => {
+                            navigate(item.path);
                             setOpenMenu(
                               !openMenu,
                               setOpenDropdownMenu(!openDropdownMenu)
-                            )
-                          }
+                            );
+                          }}
                         >
                           <span>{item.text}</span>
                         </li>
@@ -251,6 +263,7 @@ export default function Header() {
                 <li
                   key={index}
                   className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => navigate(item.path)}
                 >
                   <img src={item.icon} alt={item.text} />
                   <span className="hidden md:block">{item.text}</span>
