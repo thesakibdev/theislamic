@@ -1,17 +1,24 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGetAllSurahsNameQuery, useGetAllSurahsQuery } from "@/slices/admin/surah";
+import {
+  useGetAllSurahsNameQuery,
+  useGetAllSurahsQuery,
+} from "@/slices/admin/surah";
 import { CiSearch } from "react-icons/ci";
 import { useParams } from "react-router-dom";
 
 export default function RecitePage() {
+  
   const { number } = useParams();
+  // surah data
   const { data: allSurah } = useGetAllSurahsQuery();
-  const {data : allSurahName } = useGetAllSurahsNameQuery();
-  const allSurahs = allSurahName.map((surah) => surah.surahName);
-  console.log(allSurahs);
   const surah = allSurah.surahs.find(
     (surah) => surah.surahNumber === Number(number)
   );
+  // surah list
+  const { data: allSurahName } = useGetAllSurahsNameQuery();
+  const allSurahs = allSurahName.map((surah) => surah.surahName);
+
+  console.log(allSurahs);
   return (
     <>
       <section className="pt-10">
