@@ -16,6 +16,7 @@ import VersesOtherData from "./pages/admin/VersesData";
 import Blog from "./pages/admin/Blog";
 import IndexPage from "./pages/client/Index";
 import RecitePage from "./pages/client/Recite";
+import ReciteLayout from "./layout/client/ReciteLayout";
 
 export default function App() {
   const { user, isAuthenticated } = useSelector((state) => state.user);
@@ -25,7 +26,9 @@ export default function App() {
       <Route path="/" element={<ClientLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/index" element={<IndexPage />} />
-        <Route path="/recite/:number" element={<RecitePage />} />
+        <Route path="/" element={<ReciteLayout />}>
+          <Route path="/recite/:number" element={<RecitePage />} />
+        </Route>
       </Route>
 
       {/* auth Register and Login route */}
@@ -48,7 +51,7 @@ export default function App() {
         <Route path="hadith" element={<Hadith />} />
         <Route path="tafsir" element={<Tafsir />} />
         <Route path="donors" element={<Donors />} />
-        <Route path="i-wall" element={<Blog/>} />
+        <Route path="i-wall" element={<Blog />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

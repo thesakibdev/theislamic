@@ -59,6 +59,8 @@ export default {
       fontFamily: {
         sans: ['"Open Sans"', "sans-serif"],
         bangla: ['"Hind Siliguri"', '"Noto Sans Bengali"', "sans-serif"],
+        amiri: ['"Amiri"', "serif"],
+        hindi: ['"Hind Siliguri"', '"Noto Sans Bengali"', "sans-serif"],
       },
     },
   },
