@@ -7,16 +7,15 @@ import { CiSearch } from "react-icons/ci";
 import { useParams } from "react-router-dom";
 
 export default function RecitePage() {
-  
   const { number } = useParams();
   // surah data
   const { data: allSurah } = useGetAllSurahsQuery();
-  const surah = allSurah.surahs.find(
+  const surah = allSurah?.surahs?.find(
     (surah) => surah.surahNumber === Number(number)
   );
   // surah list
   const { data: allSurahName } = useGetAllSurahsNameQuery();
-  const allSurahs = allSurahName.map((surah) => surah.surahName);
+  const allSurahs = allSurahName?.map((surah) => surah.surahName);
 
   console.log(allSurahs);
   return (
@@ -28,7 +27,7 @@ export default function RecitePage() {
             <aside className=" w-1/4 min-h-screen h-full border-r-2">
               <div className="p-5">
                 <h3 className="text-2xl font-semibold underline cursor-pointer">
-                  {surah.surahName}
+                  {surah?.surahName}
                 </h3>
 
                 <Tabs defaultValue="surah" className="my-5">
@@ -100,15 +99,15 @@ export default function RecitePage() {
                     <h2 className="text-3xl font-bold">
                       بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ
                     </h2>
-                    <div className="mt-4 flex flex-col">
-                      {surah.verses.map((verse, index) => (
-                        <p
-                          key={index}
-                          className="text-2xl mt-2 text-black text-center"
-                        >
-                          {verse.arabicAyah}
-                        </p>
-                      ))}
+                    <div className="mt-4 text-center">
+                      <p className="text-2xl leading-relaxed rtl:mr-3 text-black break-words whitespace-normal tracking-wide">
+                        {surah?.verses
+                          ?.map(
+                            (verse, index) =>
+                              `${verse.arabicAyah} (${index + 1})`
+                          )
+                          .join(" ")}
+                      </p>
                     </div>
                   </div>
                 </TabsContent>
