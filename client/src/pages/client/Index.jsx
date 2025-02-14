@@ -203,11 +203,13 @@ export default function IndexPage() {
               <div className="grid sm:grid-cols-2 md:grid-cols-4 justify-between gap-10">
                 {surahs?.map((surah) => (
                   <div
-                    className="flex justify-between items-center border cursor-pointer border-gray-200 p-5 rounded-lg hover:border-primary"
+                    className="flex justify-between items-center border cursor-pointer border-gray-200 p-5 rounded-lg hover:border-primary group"
                     key={surah.id}
                     onClick={() => navigate(`/recite/${surah.surahNumber}`)}
                   >
-                    <p>{surah.surahNumber}</p>
+                    <div className="border rounded-sm bg-slate-400 group-hover:bg-primary text-white group-hover:text-wihite px-4 py-2  relative">
+                      <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm">{surah.surahNumber}</p>
+                    </div>
                     <div className="">
                       <div className="flex gap-5">
                         <p>{surah.surahName}</p>

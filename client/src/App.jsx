@@ -18,6 +18,7 @@ import IndexPage from "./pages/client/Index";
 import RecitePage from "./pages/client/Recite";
 import ReciteLayout from "./layout/client/ReciteLayout";
 import AuthProfile from "./components/client/AuthProfile";
+import DonorPage from "./pages/client/Donor";
 
 export default function App() {
   const { user, isAuthenticated } = useSelector((state) => state.user);
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/" element={<ReciteLayout />}>
           <Route path="/recite/:number" element={<RecitePage />} />
         </Route>
+        <Route path="/donor" element={<DonorPage />} />
       </Route>
 
       {/* auth Register and Login route */}
