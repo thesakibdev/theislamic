@@ -26,9 +26,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<ClientLayout />}>
-        <Route path="/accounts" element={<AuthProfile />} />
         <Route path="/" element={<Home />} />
         <Route path="/index" element={<IndexPage />} />
+        <Route path="/profile" element={<AuthProfile />} />
         <Route path="/" element={<ReciteLayout />}>
           <Route path="/recite/:number" element={<RecitePage />} />
         </Route>

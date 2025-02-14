@@ -6,10 +6,12 @@ import { adminApi } from "./slices/admin/surah";
 import { blogApi } from "./slices/admin/blog";
 import { utilsApi } from "./slices/utils";
 import userReducer from "./slices/authslice/userSlice";
+import utilityReducer from "./slices/utils/utilitySlice";
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    utility: utilityReducer,
     [pokemonApi.reducerPath]: pokemonApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,

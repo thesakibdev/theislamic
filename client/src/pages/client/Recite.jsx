@@ -11,10 +11,12 @@ import {
 import { useParams } from "react-router-dom";
 import Loading from "@/components/common/Loading";
 import { useGetAllLanguagesQuery } from "@/slices/utils";
+import { useSelector } from "react-redux";
 
 export default function RecitePage() {
   const { number } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
+  const isOpen = useSelector((state) => state.utility.isOpenSidebar);
 
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const { data: languages } = useGetAllLanguagesQuery();
@@ -36,18 +38,17 @@ export default function RecitePage() {
   const currentSurah = surahData?.surahs?.find(
     (surah) => surah.surahNumber === Number(number)
   );
-  console.log(currentSurah);
 
   if (isLoading) return <Loading />;
   if (isError) return <p>এরর হয়েছে!</p>;
 
   return (
     <>
-      <section className="pt-10">
+      <section className={`flex-1 p-4 pt-20  transition-all duration-300 ${isOpen ? "ml-0" : "-ml-64"}`}>
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row">
             <div className="p-5 flex justify-center w-full">
-              <Tabs defaultValue="reading" className="my-5">
+              <Tabs defaultValue="reading" className="m-0">
                 <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 justify-start">
                   <TabsTrigger
                     className="p-0 data-[state=active]:rounded-full"
@@ -147,7 +148,7 @@ export default function RecitePage() {
                 <SheetTitle>Translation</SheetTitle>
               </SheetHeader>
               <div className="flex flex-col ">
-                {languages.data?.map((lang) => (
+                {languages?.data?.map((lang) => (
                   <button
                     key={lang}
                     onClick={() => {

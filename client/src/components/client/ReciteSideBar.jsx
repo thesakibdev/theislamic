@@ -1,30 +1,32 @@
 import { useGetAllSurahsNameQuery } from "@/slices/admin/surah";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { CiSearch } from "react-icons/ci";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
-import { LuNotebookTabs } from "react-icons/lu";
-import { Button } from "../ui/button";
+;
+// import { LuNotebookTabs } from "react-icons/lu";
+// import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function ReciteSideBar() {
   const { data: allSurahs } = useGetAllSurahsNameQuery();
   console.log(allSurahs);
   const navigate = useNavigate();
+  const isOpen = useSelector((state) => state.utility.isOpenSidebar);
 
   const handleGoToRecitePage = (id) => {
     navigate(`/recite/${id}`);
   };
 
-  return (
-    <aside className="w-0 md:w-2/6 max-h-screen h-full">
-      {/* sidebar for desktop version */}
-      <div className="hidden border-r-2 md:block p-5">
-        <h3 className="text-2xl font-semibold underline cursor-pointer">
-          {/* {surah.surahName} */}
-          Al Fatiha
-        </h3>
 
-        <Tabs defaultValue="surah" className="my-5">
+  return (
+    <aside
+      className={`bg-gray-200 w-64 transition-transform duration-300 ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
+      {/* sidebar for desktop version */}
+      <div className="border-r-2">
+        <Tabs defaultValue="surah" className="m-0">
           <TabsList className="grid grid-cols-1 md:grid-cols-2 rounded-full">
             <TabsTrigger
               className="p-0 data-[state=active]:rounded-full"
@@ -35,11 +37,12 @@ export default function ReciteSideBar() {
             <TabsTrigger
               className="p-0 data-[state=active]:rounded-full"
               value="juz"
+              disabled
             >
               Juz
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="surah">
+          <TabsContent value="surah" className="m-0">
             <div className="md:p-2 lg:p-5">
               <div className="relative">
                 <input
@@ -69,7 +72,7 @@ export default function ReciteSideBar() {
       </div>
 
       {/* sidebar for mobile version */}
-      <div className="md:hidden pt-7 flex items-center ">
+      {/* <div className="md:hidden pt-7 flex items-center ">
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline">
@@ -77,10 +80,6 @@ export default function ReciteSideBar() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
-            <h3 className="text-2xl font-semibold underline cursor-pointer">
-              {/* {surah.surahName} */}
-              al Fatiha
-            </h3>
             <Tabs defaultValue="surah" className="my-5 w-full">
               <TabsList className="grid grid-cols-1 md:grid-cols-2 rounded-full">
                 <TabsTrigger
@@ -126,7 +125,7 @@ export default function ReciteSideBar() {
             </Tabs>
           </SheetContent>
         </Sheet>
-      </div>
+      </div> */}
     </aside>
   );
 }
