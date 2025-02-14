@@ -15,11 +15,9 @@ const verseOtherSchema = new mongoose.Schema({
   },
   translation: {
     type: String,
-    required: true,
   },
   transliteration: {
     type: String,
-    required: true,
   },
   note: {
     type: String,

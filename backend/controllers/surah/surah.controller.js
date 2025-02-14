@@ -235,8 +235,10 @@ const addVerseOtherData = async (req, res) => {
         .status(400)
         .json({ error: true, message: "Invalid verseNumber." });
     }
-    if (!normalLanguage || !normalTranslation || !normalTransliteration) {
-      return res.status(400).json({ error: true, message: "Invalid data." });
+    if (!normalLanguage) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Please provide a language." });
     }
 
     const existingVerse = await verseOtherData.findOne({

@@ -13,7 +13,7 @@ const initialFormData = {
 };
 
 export default function Registration() {
-  const [register, { isLoading, data, error }] = useRegisterMutation();
+  const [register] = useRegisterMutation();
   const [formData, setFormData] = useState(initialFormData);
   const navigate = useNavigate();
 
