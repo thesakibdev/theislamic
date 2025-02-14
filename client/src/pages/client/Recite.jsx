@@ -44,7 +44,7 @@ export default function RecitePage() {
 
   return (
     <>
-      <section className={`flex-1 p-4 pt-20  transition-all duration-300 ${isOpen ? "ml-0" : "-ml-64"}`}>
+      <section className={`flex-1 p-4 pt-20 transition-all duration-300 ${isOpen ? "ml-0" : "-ml-64"}`}>
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row">
             <div className="p-5 flex justify-center w-full">

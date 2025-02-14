@@ -20,7 +20,7 @@ export default function ReciteSideBar() {
 
   return (
     <aside
-      className={`bg-gray-200 w-64 transition-transform duration-300 ${
+      className={`bg-gray-200 w-64 pt-16 transition-transform duration-300 ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
