@@ -16,7 +16,7 @@ import ArrowDown from "../../assets/icon/arrow-down.png";
 
 // components and use state
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import {
   DropdownMenu,
@@ -150,31 +150,13 @@ export default function Header() {
   const [openDropdownMenu, setOpenDropdownMenu] = useState(false);
   const [openDropdownMenuTwo, setOpenDropdownMenuTwo] = useState(false);
 
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  useEffect(() => {
-    // Function to handle scroll event
-    const handleScroll = () => {
-      if (window.scrollY > 200) {
-        setIsHeaderVisible(false);
-      } else {
-        setIsHeaderVisible(true);
-      }
-    };
 
-    // Add scroll event listener
-    window.addEventListener("scroll", handleScroll);
-
-    // Cleanup the event listener
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
   // all function
   const handleLogout = () => {
     localStorage.removeItem("user");
   };
   return (
-    <header className={`bg-white shadow-md fixed w-full left-0 top-0 z-50 ${isHeaderVisible ? "translate-y-0" : "-translate-y-full"}`}>
+    <header className={`bg-white shadow-md fixed w-full left-0 top-0 z-50`}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center gap-4">

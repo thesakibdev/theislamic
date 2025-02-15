@@ -7,9 +7,9 @@ export default function ReciteLayout() {
   return (
     <div className="">
       <Header />
-      <div className="container mx-auto relative">
+      <div className="container mx-auto relative overflow-hidden">
         <ReciteHeader />
-        <main className="flex flex-1">
+        <main className="md:flex ">
           <ReciteSideBar />
           <Outlet />
         </main>

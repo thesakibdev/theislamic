@@ -45,11 +45,11 @@ export default function RecitePage() {
   return (
     <>
       <section className={`flex-1 p-4 pt-20 transition-all duration-300 ${isOpen ? "ml-0" : "-ml-64"}`}>
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto">
           <div className="flex flex-col md:flex-row">
             <div className="p-5 flex justify-center w-full">
               <Tabs defaultValue="reading" className="m-0">
-                <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 justify-start">
+                <TabsList className="grid w-full grid-cols-2 justify-start">
                   <TabsTrigger
                     className="p-0 data-[state=active]:rounded-full"
                     value="transliteration"
@@ -113,7 +113,7 @@ export default function RecitePage() {
                   </div>
                 </TabsContent>
                 <TabsContent value="reading">
-                  <div className="flex flex-col text-center justify-center w-full px-4">
+                  <div className="flex flex-col md:max-w-3xl mx-auto text-center justify-center w-full">
                     <h2 className="text-2xl md:text-3xl font-bold">
                       بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ
                     </h2>
@@ -123,7 +123,7 @@ export default function RecitePage() {
                       <Loading />
                     ) : (
                       <div className="mt-4 text-right">
-                        <p className="text-4xl leading-normal rtl:mr-3 text-black break-words whitespace-normal tracking-wide font-amiri font-medium">
+                        <p className="text-base md:text-4xl leading-normal rtl:mr-3 text-black break-words whitespace-normal md:tracking-wide font-amiri font-medium text-justify">
                           {currentSurah?.verses
                             ?.map(
                               (verse, index) =>
