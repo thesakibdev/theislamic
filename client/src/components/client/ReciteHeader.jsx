@@ -4,10 +4,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { CiSearch } from "react-icons/ci";
 import { Sheet, SheetContent } from "../ui/sheet";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetAllSurahsNameQuery } from "@/slices/admin/surah";
+import { IoIosArrowDown } from "react-icons/io";
 
 export default function ReciteHeader() {
+  const { number } = useParams();
   const { data: allSurahs } = useGetAllSurahsNameQuery();
   const [openMobileSidebar, setOpenMobileSidebar] = useState(false);
   const dispatch = useDispatch();
@@ -30,6 +32,10 @@ export default function ReciteHeader() {
     };
   }, [dispatch]);
 
+  const currentSurahName = allSurahs?.find(
+    (surah) => surah.surahNumber === Number(number)
+  ).surahName;
+
   const handleGoToRecitePage = (id) => {
     navigate(`/recite/${id}`);
     setOpenMobileSidebar(false);
@@ -46,7 +52,7 @@ export default function ReciteHeader() {
               setOpenMobileSidebar(true);
             }}
           >
-            Surah Name
+            {currentSurahName} <IoIosArrowDown className="inline"/>
           </button>
           <button
             className="hidden md:block"
@@ -55,7 +61,7 @@ export default function ReciteHeader() {
               // setOpenMobileSidebar(true);
             }}
           >
-            Surah Name
+            {currentSurahName}
           </button>
 
           {/* sidebar for mobile version */}

@@ -160,7 +160,6 @@ export default function IndexPage() {
           </div>
         </div>
       </section>
-
       {/* surah list */}
       <section className="my-10 py-10 bg-[#f5f5f5]">
         <div className="container mx-auto px-4">

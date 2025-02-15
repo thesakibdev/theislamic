@@ -12,11 +12,26 @@ import { useParams } from "react-router-dom";
 import Loading from "@/components/common/Loading";
 import { useGetAllLanguagesQuery } from "@/slices/utils";
 import { useSelector } from "react-redux";
+import OpenBook from "@/assets/icon/open_book.png";
+import ReadBook from "@/assets/icon/book.png";
 
 export default function RecitePage() {
   const { number } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
   const isOpen = useSelector((state) => state.utility.isOpenSidebar);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect if device is mobile
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 767);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial check
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const { data: languages } = useGetAllLanguagesQuery();
@@ -51,16 +66,24 @@ export default function RecitePage() {
               <Tabs defaultValue="reading" className="m-0">
                 <TabsList className="grid w-full grid-cols-2 justify-start">
                   <TabsTrigger
-                    className="p-0 data-[state=active]:rounded-full"
+                    className="p-0 data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
                     value="transliteration"
                   >
-                    Transliteration
+                    {
+                      isMobile ? 
+                      <img src={OpenBook} alt="Transliteration" />
+                      : "Transliteration"
+                    }
                   </TabsTrigger>
                   <TabsTrigger
-                    className="p-0 data-[state=active]:rounded-full"
+                    className="p-0 data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
                     value="reading"
                   >
-                    Reading
+                    {
+                      isMobile ? 
+                      <img src={ReadBook} alt="Reading" />
+                      : "Reading"
+                    }
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="transliteration" className="w-full">
@@ -68,16 +91,16 @@ export default function RecitePage() {
                     <h2 className="text-2xl md:text-3xl text-center font-bold">
                       بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ
                     </h2>
-                    <div className="mt-4 flex items-center flex-col">
+                    <div className="mt-4 flex flex-col">
                       {/* translation author */}
-                      <div className="flex flex-col gap-1 my-2 items-start">
-                        <h4 className="font-bold text-sm text-black">
+                      <div className="flex flex-col gap-1 my-2">
+                        {/* <h4 className="font-bold text-sm text-black">
                           Translation by
-                        </h4>
+                        </h4> */}
                         <p className="text-base text-black font-normal">
-                          Dr. Mustafa Khattab, The Clear Quran Translation
-                          <button onClick={() => setOpenSheet(true)}>
-                            Change
+                          The Clear Quran Translation
+                          <button className="ml-2 text-primary font-bold" onClick={() => setOpenSheet(true)}>
+                            (Change)
                           </button>
                         </p>
                       </div>
@@ -92,15 +115,15 @@ export default function RecitePage() {
                             {currentSurah?.verses?.map((verse, index) => (
                               <div
                                 key={index}
-                                className="py-10 border-b border-primary"
+                                className="border-b border-primary"
                               >
-                                <p className="text-right rtl:mr-3">{`${verse.arabicAyah} (${verse.verseNumber})`}</p>
+                                <p className="text-right text-3xl md:text-4xl my-10 md:my-16 rtl:mr-3">{`${verse.arabicAyah} (${verse.verseNumber})`}</p>
                                 {verse.verseOtherData
                                   ?.filter(
                                     (data) => data.language === selectedLanguage
                                   )
                                   .map((data) => (
-                                    <p key={data._id} className="text-left">
+                                    <p key={data._id} className="text-left mb-10 md:mb-16 text-lg md:text-2xl w-[90%]">
                                       {data.translation}
                                     </p>
                                   ))}
