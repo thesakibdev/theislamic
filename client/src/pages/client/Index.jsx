@@ -139,7 +139,7 @@ export default function IndexPage() {
     <main>
       <section className="pt-[4.5rem] md:pt-30 pb-[5px]">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center gap-5 md:gap-10">
+          <div className="flex flex-col lg:flex-row items-center gap-5 md:gap-10">
             <img src={IndexPageBanner} alt="banner" />
             <div className="">
               <h1 className="text-lg md:text-3xl font-bold text-black">
@@ -167,7 +167,7 @@ export default function IndexPage() {
       {/* surah list */}
       <section className="my-10 py-10 bg-[#f5f5f5]">
         <div className="container mx-auto px-4">
-          <Tabs defaultValue="recent" className="w-[400px] my-5">
+          <Tabs defaultValue="recent" className="my-5">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger
                 className="p-0 data-[state=active]:rounded-none"
@@ -216,7 +216,7 @@ export default function IndexPage() {
                 Juz
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="surah">
+            <TabsContent value="surah" className="w-full">
               {isLoading && (
                 <div className="">
                   <div className="grid grid-cols-4 gap-2 items-center">
@@ -297,10 +297,10 @@ export default function IndexPage() {
                   </div>
                 </div>
               )}
-              <div className="grid sm:grid-cols-2 md:grid-cols-4 justify-between gap-10">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-between gap-10 w-full">
                 {surahs?.map((surah) => (
                   <div
-                    className="grid grid-cols-5 gap-2 items-center border cursor-pointer border-gray-200 p-5 rounded-lg hover:border-primary group"
+                    className="flex gap-5 items-center border cursor-pointer border-gray-200 p-5 rounded-lg hover:border-primary group w-full"
                     key={surah.id}
                     onClick={() => {
                       navigate(`/recite/${surah.surahNumber}`);
@@ -327,18 +327,18 @@ export default function IndexPage() {
                       );
                     }}
                   >
-                    <div className="relative flex items-center justify-center w-[50px] h-[50px]">
-                      <span className="absolute text-black font-bold group-hover:text-primary">
+                    <div className="relative flex items-center justify-center max-w-[22%]">
+                      <span className="absolute text-black text-sm font-medium group-hover:text-primary">
                         {surah.surahNumber}
                       </span>
                       <RubAlHizb
-                        width={50}
-                        height={50}
-                        className="group-hover:text-primary"
+                        width={71}
+                        height={71}
+                        className="group-hover:text-primary text-black font-bold"
                       />
                     </div>
 
-                    <div className="col-span-4">
+                    <div className="max-w-[78%]">
                       <div className="flex gap-5 justify-between">
                         <p className="font-bold text-md font-sans text-start">
                           {surah.surahName}
@@ -362,7 +362,7 @@ export default function IndexPage() {
                 ))}
               </div>
             </TabsContent>
-            <TabsContent value="juz">
+            <TabsContent value="juz" className="w-full">
               You do not have any bookmarks yet ?
             </TabsContent>
           </Tabs>

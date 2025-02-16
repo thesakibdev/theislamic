@@ -14,6 +14,7 @@ import { useGetAllLanguagesQuery } from "@/slices/utils";
 import { useSelector } from "react-redux";
 import OpenBook from "@/assets/icon/open_book.png";
 import ReadBook from "@/assets/icon/book.png";
+import VerseEndIcon from "@/assets/icon/VerseEndIcon";
 
 export default function RecitePage() {
   const { number } = useParams();
@@ -27,10 +28,10 @@ export default function RecitePage() {
       setIsMobile(window.innerWidth <= 767);
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     handleResize(); // Initial check
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const [selectedLanguage, setSelectedLanguage] = useState("en");
@@ -57,9 +58,21 @@ export default function RecitePage() {
   if (isLoading) return <Loading />;
   if (isError) return <p>এরর হয়েছে!</p>;
 
+  function convertToArabicNumber(num) {
+    const arabicNumbers = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+    return num
+      .toString()
+      .split("")
+      .map((digit) => arabicNumbers[digit])
+      .join("");
+  }
   return (
     <>
-      <section className={`flex-1 p-4 pt-20 transition-all duration-300 ${isOpen ? "ml-0" : "-ml-64"}`}>
+      <section
+        className={`flex-1 p-4 pt-20 transition-all duration-300 ${
+          isOpen ? "ml-0" : "-ml-64"
+        }`}
+      >
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row">
             <div className="p-5 flex justify-center w-full">
@@ -69,21 +82,21 @@ export default function RecitePage() {
                     className="p-0 data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
                     value="transliteration"
                   >
-                    {
-                      isMobile ? 
+                    {isMobile ? (
                       <img src={OpenBook} alt="Transliteration" />
-                      : "Transliteration"
-                    }
+                    ) : (
+                      "Transliteration"
+                    )}
                   </TabsTrigger>
                   <TabsTrigger
                     className="p-0 data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
                     value="reading"
                   >
-                    {
-                      isMobile ? 
+                    {isMobile ? (
                       <img src={ReadBook} alt="Reading" />
-                      : "Reading"
-                    }
+                    ) : (
+                      "Reading"
+                    )}
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="transliteration" className="w-full">
@@ -97,9 +110,12 @@ export default function RecitePage() {
                         {/* <h4 className="font-bold text-sm text-black">
                           Translation by
                         </h4> */}
-                        <p className="text-base text-black font-normal">
+                        <p className="text-base text-black font-normal flex gap-3">
                           The Clear Quran Translation
-                          <button className="ml-2 text-primary font-bold" onClick={() => setOpenSheet(true)}>
+                          <button
+                            className="ml-2 text-primary font-bold"
+                            onClick={() => setOpenSheet(true)}
+                          >
                             (Change)
                           </button>
                         </p>
@@ -123,8 +139,11 @@ export default function RecitePage() {
                                     (data) => data.language === selectedLanguage
                                   )
                                   .map((data) => (
-                                    <p key={data._id} className="text-left mb-10 md:mb-16 text-lg md:text-2xl w-[90%]">
-                                      {data.translation}
+                                    <p
+                                      key={data._id}
+                                      className="text-left mb-10 md:mb-16 text-lg md:text-2xl w-[90%]"
+                                    >
+                                      {data.transliteration}
                                     </p>
                                   ))}
                               </div>
@@ -145,15 +164,36 @@ export default function RecitePage() {
                     ) : isLoading ? (
                       <Loading />
                     ) : (
-                      <div className="mt-4 text-right">
-                        <p className="text-base md:text-4xl leading-normal rtl:mr-3 text-black break-words whitespace-normal md:tracking-wide font-amiri font-medium text-justify">
-                          {currentSurah?.verses
-                            ?.map(
-                              (verse, index) =>
-                                `${verse.arabicAyah} (${index + 1})`
-                            )
-                            .join(" ")}
-                        </p>
+                      <div className="mt-4 text-center">
+                        {currentSurah?.verses
+                          ?.slice(0, 7)
+                          .map((verse, index) => (
+                            <span
+                              className="text-base md:text-4xl  rtl:mr-3 text-black  font-arabic font-medium text-center leading-relaxed break-all w-1/2 mx-auto"
+                              key={index}
+                            >
+                              {verse.arabicAyah
+                                .split(" ")
+                                .map((word, wordIndex) => (
+                                  <span key={wordIndex} className="mx-2">
+                                    {word}
+                                  </span> // প্রতিটি শব্দের মধ্যে স্পেস থাকবে
+                                ))}
+                              <span className="text-gray-500">
+                                ({convertToArabicNumber(index + 1)})
+                              </span>
+                            </span>
+                          ))}
+                        {/* <p className="text-base md:text-4xl  rtl:mr-3 text-black  font-arabic font-medium text-justify leading-relaxed break-all">
+                          {currentSurah?.verses?.map((verse, index) => (
+                            <span key={index}>
+                              {verse.arabicAyah}{" "}
+                              <span>
+                                {convertToArabicNumber(verse.verseNumber)}
+                              </span>{" "}
+                            </span>
+                          ))}
+                        </p> */}
                       </div>
                     )}
                   </div>

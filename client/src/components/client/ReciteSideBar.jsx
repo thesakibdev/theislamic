@@ -47,7 +47,7 @@ export default function ReciteSideBar() {
                 />
                 <CiSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-black  text-xl lg:text-3xl" />
               </div>
-              <div className="mt-5 bg-[#80BDA9] max-h-[800px] overflow-auto rounded-md">
+              <div className="mt-5 bg-[#80BDA9] rounded-md">
                 <ul>
                   {allSurahs?.map((surah, index) => (
                     <li

@@ -61,7 +61,7 @@ export default {
         bangla: ['"Hind Siliguri"', '"Noto Sans Bengali"', "sans-serif"],
         amiri: ['"Amiri"', "serif"],
         hindi: ['"Hind Siliguri"', '"Noto Sans Bengali"', "sans-serif"],
-        arabic: ["Foda-Arabic", "Amiri"],
+        arabic: ["Nabi", "Amiri"],
       },
     },
   },
