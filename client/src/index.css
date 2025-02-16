@@ -67,6 +67,12 @@
   }
 }
 
+@font-face {
+  font-family: 'Foda-Arabic';
+  src: url('./assets/fonts/Foda-Stylish-Arabic-Font-TTF.ttf') format('truetype');
+  font-weight: bold;
+}
+
 body {
   font-family: "Open Sans", sans-serif;
 }
