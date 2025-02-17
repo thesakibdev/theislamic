@@ -66,7 +66,9 @@ const CommonForm = memo(function CommonForm({
             className={allClasses.selectClass}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={getControlItem.label || getControlItem?.name} />
+              <SelectValue
+                placeholder={getControlItem.label || getControlItem?.name}
+              />
             </SelectTrigger>
             <SelectContent>
               {getControlItem.options && getControlItem.options.length > 0
@@ -267,6 +269,70 @@ const CommonForm = memo(function CommonForm({
                     "transliteration",
                     "note",
                     "keywords",
+                  ].includes(controlItem.name)
+                )
+                .map((controlItem) => (
+                  <div key={controlItem.name} className="col-span-2">
+                    <Label className="mb-1">{controlItem.label}</Label>
+                    {renderInputsByComponentType(controlItem)}
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end">
+            <Button
+              disabled={isBtnDisabled}
+              type="submit"
+              className={`px-4 py-2 ${allClasses.btnClass}`}
+            >
+              {buttonText || "Submit"}
+            </Button>
+          </div>
+        </div>
+      ) : layout === 4 ? (
+        // Layout 4 Design
+        <div className="space-y-8 py-10">
+          {/* Meta Data Section */}
+          <div className="p-6 bg-primary-foreground rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Meta Data</h2>
+            <div className="grid grid-cols-3 gap-4">
+              {formControls
+                .filter((controlItem) =>
+                  [
+                    "bookName",
+                    "partName",
+                    "partNumber",
+                    "chapterName",
+                    "chapterNumber",
+                  ]?.includes(controlItem.name)
+                )
+                .map((controlItem) => (
+                  <div key={controlItem.name}>
+                    <Label className="mb-1">{controlItem.label}</Label>
+                    {renderInputsByComponentType(controlItem)}
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Hadith Section */}
+          <div className="p-6 bg-primary-foreground rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Hadith</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {formControls
+                .filter((controlItem) =>
+                  [
+                    "hadithNumber",
+                    "internationalNumber",
+                    "hadithArabic",
+                    "referenceBook",
+                    "similarities",
+                    "narrator",
+                    "translation",
+                    "transliteration",
+                    "note",
                   ].includes(controlItem.name)
                 )
                 .map((controlItem) => (

@@ -13,12 +13,18 @@ const hadithListSchema = new mongoose.Schema({
 });
 
 const hadithSchema = new mongoose.Schema({
-  bookName: { type: String, required: true, unique: true },
+  bookName: { type: String, required: true },
   partName: { type: String, required: true },
   partNumber: { type: Number, required: true },
   chapterName: { type: String, required: true },
   chapterNumber: { type: Number, required: true },
   hadithList: [hadithListSchema],
 });
+
+// Create compound unique index on bookName + partNumber + chapterNumber
+hadithSchema.index(
+  { bookName: 1, partNumber: 1, chapterNumber: 1 },
+  { unique: true }
+);
 
 module.exports = mongoose.model("Hadith", hadithSchema);
