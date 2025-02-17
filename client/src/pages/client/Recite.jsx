@@ -159,41 +159,58 @@ export default function RecitePage() {
                     <h2 className="text-2xl md:text-3xl font-bold">
                       بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ
                     </h2>
+
                     {isError ? (
                       <p>এরর হয়েছে!</p>
                     ) : isLoading ? (
                       <Loading />
                     ) : (
                       <div className="mt-4 text-center">
-                        {currentSurah?.verses
+                        {/* {currentSurah?.verses
                           ?.slice(0, 7)
                           .map((verse, index) => (
                             <span
-                              className="text-base md:text-4xl  rtl:mr-3 text-black  font-arabic font-medium text-center leading-relaxed break-all w-1/2 mx-auto"
+                              className="text-base md:text-4xl  rtl:mr-3 text-black  font-arabic font-medium text-center leading-relaxed break-all w-1/2 mx-auto py-2"
                               key={index}
                             >
                               {verse.arabicAyah
                                 .split(" ")
                                 .map((word, wordIndex) => (
-                                  <span key={wordIndex} className="mx-2">
+                                  <span key={wordIndex} className="mx-4">
                                     {word}
                                   </span> // প্রতিটি শব্দের মধ্যে স্পেস থাকবে
                                 ))}
-                              <span className="text-gray-500">
-                                ({convertToArabicNumber(index + 1)})
+                              <div className="relative w-[50px] rtl inline-flex items-center justify-center">
+                                <VerseEndIcon width={40} height={40} />
+                                <p className="absolute text-xs text-center">
+                                  {convertToArabicNumber(verse.verseNumber)}
+                                </p>
+                              </div>
+                            </span>
+                          ))} */}
+                        <div
+                          dir="rtl"
+                          className="text-black w-full mx-auto leading-relaxed text-justify"
+                        >
+                          {currentSurah?.verses?.map((verse, index) => (
+                            <span
+                              key={index}
+                              className="text-base md:text-4xl font-arabic font-medium inline rtl:mr-0 align-middle"
+                            >
+                              {verse.arabicAyah}
+                              <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
+                                <VerseEndIcon
+                                  width={35}
+                                  height={35}
+                                  className="align-middle"
+                                />
+                                <span className="absolute text-xs text-center align-middle">
+                                  {convertToArabicNumber(verse.verseNumber)}
+                                </span>
                               </span>
                             </span>
                           ))}
-                        {/* <p className="text-base md:text-4xl  rtl:mr-3 text-black  font-arabic font-medium text-justify leading-relaxed break-all">
-                          {currentSurah?.verses?.map((verse, index) => (
-                            <span key={index}>
-                              {verse.arabicAyah}{" "}
-                              <span>
-                                {convertToArabicNumber(verse.verseNumber)}
-                              </span>{" "}
-                            </span>
-                          ))}
-                        </p> */}
+                        </div>
                       </div>
                     )}
                   </div>
