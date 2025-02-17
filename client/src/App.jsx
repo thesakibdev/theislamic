@@ -19,6 +19,8 @@ import RecitePage from "./pages/client/Recite";
 import ReciteLayout from "./layout/client/ReciteLayout";
 import AuthProfile from "./components/client/AuthProfile";
 import DonorPage from "./pages/client/Donor";
+import HadithIndex from "./pages/client/HadithIndex";
+import HadithPage from "./pages/client/HadithPage";
 
 export default function App() {
   const { user, isAuthenticated } = useSelector((state) => state.user);
@@ -32,6 +34,9 @@ export default function App() {
         <Route path="/" element={<ReciteLayout />}>
           <Route path="/recite/:number" element={<RecitePage />} />
         </Route>
+        {/* hadith */}
+        <Route path="/hadith" element={<HadithIndex />} />
+        <Route path="/hadith/:number" element={<HadithPage />} />
         <Route path="/donor" element={<DonorPage />} />
       </Route>
 
