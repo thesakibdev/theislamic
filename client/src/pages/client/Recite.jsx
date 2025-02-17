@@ -21,6 +21,7 @@ export default function RecitePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const isOpen = useSelector((state) => state.utility.isOpenSidebar);
   const [isMobile, setIsMobile] = useState(false);
+  const [bismillahValid, setBismillahValid] = useState(true);
 
   // Detect if device is mobile
   useEffect(() => {
@@ -39,6 +40,12 @@ export default function RecitePage() {
   const [openSheet, setOpenSheet] = useState(false);
 
   useEffect(() => {
+    if (number === "9") {
+      setBismillahValid(false);
+    } else {
+      setBismillahValid(true);
+    }
+
     setCurrentPage(Number(number));
   }, [number]);
 
@@ -102,7 +109,9 @@ export default function RecitePage() {
                 <TabsContent value="transliteration" className="w-full">
                   <div className="flex flex-col justify-center w-full">
                     <h2 className="text-2xl md:text-3xl text-center font-bold">
-                      بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ
+                      {bismillahValid
+                        ? "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ"
+                        : ""}
                     </h2>
                     <div className="mt-4 flex flex-col">
                       {/* translation author */}
@@ -157,7 +166,9 @@ export default function RecitePage() {
                 <TabsContent value="reading">
                   <div className="flex flex-col md:max-w-3xl mx-auto text-center justify-center w-full">
                     <h2 className="text-2xl md:text-3xl font-bold">
-                      بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِیْمِ
+                      {bismillahValid
+                        ? "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ"
+                        : ""}
                     </h2>
 
                     {isError ? (
