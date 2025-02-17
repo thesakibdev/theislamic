@@ -13,100 +13,57 @@ const addHadith = async (req, res) => {
   } = req.body;
 
   try {
-    // Data normalization
-    const normalizedHadithName = bookName.trim();
+    // Normalize Data
+    const normalizedBookName = bookName.trim();
     const normalizedPartName = partName.trim();
     const normalizedPartNumber = Number(partNumber);
     const normalizedChapterName = chapterName.trim();
     const normalizedChapterNumber = Number(chapterNumber);
 
-    // Data validation
-    if (!normalizedHadithName) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid bookName.",
-      });
-    }
-    if (!normalizedPartName) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid partName.",
-      });
-    }
-    if (!normalizedPartNumber || isNaN(normalizedPartNumber)) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid partNumber.",
-      });
-    }
-    if (!normalizedChapterName) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid chapterName.",
-      });
-    }
-    if (!normalizedChapterNumber || isNaN(normalizedChapterNumber)) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid chapterNumber.",
-      });
-    }
-    if (!hadithList || !hadithList.hadithNumber || !hadithList.hadithArabic) {
-      return res.status(400).json({
-        error: true,
-        message:
-          "Invalid hadithList. Ensure hadithNumber and hadithArabic are provided.",
-      });
-    }
-
-    // Check if the hadith already exists
-    let hadith = await Hadith.findOne({
-      bookName: normalizedHadithName,
-      partName: normalizedPartName,
+    // Step 1: Find document by bookName + partNumber + chapterNumber
+    let hadithDoc = await Hadith.findOne({
+      bookName: normalizedBookName,
       partNumber: normalizedPartNumber,
-      chapterName: normalizedChapterName,
       chapterNumber: normalizedChapterNumber,
     });
 
-    if (hadith) {
-      // Check if the hadith number already exists in the hadithList
-      const existingHadith = hadith.hadithList.find(
+    if (hadithDoc) {
+      // Step 2: Check if hadithNumber already exists in hadithList
+      const existingHadith = hadithDoc.hadithList.find(
         (h) => h.hadithNumber === hadithList.hadithNumber
       );
 
       if (existingHadith) {
         return res.status(400).json({
           error: true,
-          message: "Hadith already exists.",
+          message: "Hadith already exists in this book, part, and chapter.",
         });
       }
 
-      // Add the new hadith to the existing hadithList
-      hadith.hadithList.push(hadithList);
-      await hadith.save();
+      // Step 3: Push new hadith to hadithList and save
+      hadithDoc.hadithList.push(hadithList);
+      await hadithDoc.save();
 
-      // Invalidate the cache
+      // Invalidate cache (if needed)
       invalidateCache();
 
       return res.status(200).json({
         success: true,
-        message: "Hadith added successfully to existing document.",
-        hadith,
+        message: "New hadith added to existing book, part, and chapter.",
+        hadith: hadithDoc,
       });
     } else {
-      // Create a new hadith document
+      // Step 4: Create a new document if bookName + partNumber + chapterNumber does not exist
       const newHadith = new Hadith({
-        bookName: normalizedHadithName,
+        bookName: normalizedBookName,
         partName: normalizedPartName,
         partNumber: normalizedPartNumber,
         chapterName: normalizedChapterName,
         chapterNumber: normalizedChapterNumber,
-        hadithList: [hadithList],
+        hadithList: [hadithList], // Store hadith as an array
       });
 
       await newHadith.save();
-
-      // Invalidate the cache
       invalidateCache();
 
       return res.status(201).json({

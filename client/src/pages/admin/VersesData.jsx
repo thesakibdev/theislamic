@@ -26,7 +26,6 @@ import {
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
@@ -100,7 +99,10 @@ export default function VersesOtherData() {
           id: language?.code,
           label: language?.name,
         })),
-      allClasses: { selectClass: "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary" },  
+      allClasses: {
+        selectClass:
+          "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary",
+      },
     },
     {
       label: "Translation",
@@ -375,25 +377,16 @@ export default function VersesOtherData() {
                       disabled={currentPage == 1}
                     />
                   </PaginationItem>
-                  <PaginationItem className="flex">
-                    <PaginationLink
-                      className="hover:bg-green-400 cursor-pointer"
-                      href="/quran?page=1"
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <Button
+                      className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                      onClick={() => setCurrentPage(5)}
                     >
-                      1
-                    </PaginationLink>
-                    <PaginationLink
-                      className="hover:bg-green-400 cursor-pointer"
-                      href="/quran?page=2"
-                    >
-                      2
-                    </PaginationLink>
-                    <PaginationLink
-                      className="hover:bg-green-400 cursor-pointer"
-                      href="/quran?page=3"
-                    >
-                      3
-                    </PaginationLink>
+                      Skip
+                    </Button>
                   </PaginationItem>
                   <PaginationItem>
                     <PaginationEllipsis />

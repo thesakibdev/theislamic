@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import ClientLayout from "./layout/client/ClientLayout";
 import VersesOtherData from "./pages/admin/VersesData";
 import Blog from "./pages/admin/Blog";
+import EmailVerify from "./pages/client/EmailVerify";
 
 export default function App() {
   const { user, isAuthenticated } = useSelector((state) => state.user);
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="/" element={<AuthLayout />}>
         <Route path="/signup" element={<Registration />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/verify-email" element={<EmailVerify />} />
       </Route>
 
       <Route
