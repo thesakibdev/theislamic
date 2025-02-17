@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -67,6 +67,22 @@
   }
 }
 
+@font-face {
+  font-family: 'Nabi';
+  src: url('./assets/fonts/Al_Mushaf_Quran.ttf') format('truetype');
+  font-weight: bold;
+}
+
 body {
   font-family: "Open Sans", sans-serif;
+}
+
+.animate-flip {
+  animation: flip 0.5s ease-in-out;
+  display: inline-block;
+}
+
+@keyframes flip {
+  0% { transform: rotateX(90deg); opacity: 0; }
+  100% { transform: rotateX(0deg); opacity: 1; }
 }

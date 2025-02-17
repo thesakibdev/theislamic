@@ -16,7 +16,7 @@ import ArrowDown from "../../assets/icon/arrow-down.png";
 
 // components and use state
 import { useSelector } from "react-redux";
-import { useState } from "react";
+import {  useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import {
   DropdownMenu,
@@ -34,14 +34,17 @@ export default function Header() {
     {
       icon: HomeIcon,
       text: "Home",
+      path: "/",
     },
     {
       icon: WorldIcon,
       text: "Language",
+      path: "/",
     },
     {
       icon: SettingIcon,
       text: "Setting",
+      path: "/",
     },
   ];
 
@@ -80,19 +83,27 @@ export default function Header() {
 
   const subMenuOne = [
     {
+      text: "Index",
+      path: "/index",
+    },
+    {
       text: "Recite",
-      path: "/",
+      path: "/recite",
     },
     {
       text: "Translation",
       path: "/",
     },
     {
-      text: "Index",
+      text: "Thematic",
       path: "/",
     },
     {
       text: "Exegesis",
+      path: "/",
+    },
+    {
+      text: "Word by Word",
       path: "/",
     },
   ];
@@ -139,12 +150,13 @@ export default function Header() {
   const [openDropdownMenu, setOpenDropdownMenu] = useState(false);
   const [openDropdownMenuTwo, setOpenDropdownMenuTwo] = useState(false);
 
+
   // all function
   const handleLogout = () => {
     localStorage.removeItem("user");
   };
   return (
-    <header className="bg-white shadow-md fixed w-full left-0 top-0">
+    <header className={`bg-white shadow-md fixed w-full left-0 top-0 z-50`}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center gap-4">
@@ -182,12 +194,13 @@ export default function Header() {
                         <li
                           key={index}
                           className="flex items-center justify-center px-4 py-4 cursor-pointer hover:bg-gray-100 border-t-2 border-gray-400"
-                          onClick={() =>
+                          onClick={() => {
+                            navigate(item.path);
                             setOpenMenu(
                               !openMenu,
                               setOpenDropdownMenu(!openDropdownMenu)
-                            )
-                          }
+                            );
+                          }}
                         >
                           <span>{item.text}</span>
                         </li>
@@ -251,6 +264,7 @@ export default function Header() {
                 <li
                   key={index}
                   className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => navigate(item.path)}
                 >
                   <img src={item.icon} alt={item.text} />
                   <span className="hidden md:block">{item.text}</span>

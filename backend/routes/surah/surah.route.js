@@ -13,6 +13,7 @@ const {
 
   // get main surahs
   getAllSurahs,
+  getSurahsName,
   getAllSurahsPaginated,
 } = require("../../controllers/surah/surah.controller");
 
@@ -35,6 +36,7 @@ router.delete(
 );
 
 router.get("/surah/all", getAllSurahs);
+router.get("/surah/all-name", getSurahsName);
 
 router.get("/surah/paginated", getAllSurahsPaginated);
 

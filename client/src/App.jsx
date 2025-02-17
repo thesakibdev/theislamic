@@ -14,7 +14,16 @@ import { useSelector } from "react-redux";
 import ClientLayout from "./layout/client/ClientLayout";
 import VersesOtherData from "./pages/admin/VersesData";
 import Blog from "./pages/admin/Blog";
+import IndexPage from "./pages/client/Index";
+import RecitePage from "./pages/client/Recite";
+import ReciteLayout from "./layout/client/ReciteLayout";
+import AuthProfile from "./components/client/AuthProfile";
+import DonorPage from "./pages/client/Donor";
+import HadithReadPage from "./pages/client/HadithReadPage";
+import HadithPage from "./pages/client/HadithPage";
+import HadithIndex from "./pages/client/HadithIndex";
 import EmailVerify from "./pages/client/EmailVerify";
+
 
 export default function App() {
   const { user, isAuthenticated } = useSelector((state) => state.user);
@@ -23,6 +32,16 @@ export default function App() {
     <Routes>
       <Route path="/" element={<ClientLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/index" element={<IndexPage />} />
+        <Route path="/profile" element={<AuthProfile />} />
+        <Route path="/" element={<ReciteLayout />}>
+          <Route path="/recite/:number" element={<RecitePage />} />
+        </Route>
+        {/* hadith */}
+        <Route path="/hadith" element={<HadithPage />} />
+        <Route path="/hadith/:title" element={<HadithIndex />} />
+        <Route path="/hadith/:title/:number" element={<HadithReadPage />} />
+        <Route path="/donor" element={<DonorPage />} />
       </Route>
 
       {/* auth Register and Login route */}
@@ -46,7 +65,7 @@ export default function App() {
         <Route path="hadith" element={<Hadith />} />
         <Route path="tafsir" element={<Tafsir />} />
         <Route path="donors" element={<Donors />} />
-        <Route path="i-wall" element={<Blog/>} />
+        <Route path="i-wall" element={<Blog />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
