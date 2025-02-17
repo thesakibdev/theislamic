@@ -22,6 +22,7 @@ import DonorPage from "./pages/client/Donor";
 import HadithReadPage from "./pages/client/HadithReadPage";
 import HadithPage from "./pages/client/HadithPage";
 import HadithIndex from "./pages/client/HadithIndex";
+import EmailVerify from "./pages/client/EmailVerify";
 
 
 export default function App() {
