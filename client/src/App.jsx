@@ -21,6 +21,7 @@ import AuthProfile from "./components/client/AuthProfile";
 import DonorPage from "./pages/client/Donor";
 import HadithReadPage from "./pages/client/HadithReadPage";
 import HadithPage from "./pages/client/HadithPage";
+import HadithIndex from "./pages/client/HadithIndex";
 
 
 export default function App() {
@@ -37,7 +38,8 @@ export default function App() {
         </Route>
         {/* hadith */}
         <Route path="/hadith" element={<HadithPage />} />
-        <Route path="/hadith/:number" element={<HadithReadPage />} />
+        <Route path="/hadith/:title" element={<HadithIndex />} />
+        <Route path="/hadith/:title/:number" element={<HadithReadPage />} />
         <Route path="/donor" element={<DonorPage />} />
       </Route>
 

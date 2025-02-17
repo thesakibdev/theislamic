@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function HadithIndex() {
-    const navigate = useNavigate();
+  const { title } = useParams();
+  const navigate = useNavigate();
   const hadiths = Array.from({ length: 10 }, (_, index) => ({
     title: "Revelation",
     arabic: "كتاب بدء الوحي",
@@ -37,7 +38,7 @@ export default function HadithIndex() {
               <li
                 key={index}
                 className="flex justify-between bg-primary-foreground text-xl md:text-2xl font-bold py-4 px-5 text-white border-b cursor-pointer"
-                onClick={() => navigate(`/hadith/${hadith.indexNo}`)}
+                onClick={() => navigate(`/hadith/${title}/${hadith.indexNo}`)}
               >
                 <p>{hadith.title}</p>
                 <div className="flex items-center gap-x-1 md:gap-x-10">
