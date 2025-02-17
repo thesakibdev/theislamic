@@ -10,6 +10,7 @@ import {
 } from "../../components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import RubAlHizb from "@/assets/icon/RubAlHizb";
+import CounterUp from "@/components/common/CounterUp";
 
 export default function IndexPage() {
   const navigate = useNavigate();
@@ -156,6 +157,8 @@ export default function IndexPage() {
                 profound connection to the Divine.
                 <p>update</p>
               </p>
+              
+              <CounterUp />
 
               <Button className="text-white mt-5 md:mt-40 flex items-center md:py-4 py-2 px-4 md:px-8">
                 Read More

@@ -76,3 +76,13 @@
 body {
   font-family: "Open Sans", sans-serif;
 }
+
+.animate-flip {
+  animation: flip 0.5s ease-in-out;
+  display: inline-block;
+}
+
+@keyframes flip {
+  0% { transform: rotateX(90deg); opacity: 0; }
+  100% { transform: rotateX(0deg); opacity: 1; }
+}
