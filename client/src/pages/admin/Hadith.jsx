@@ -1,223 +1,339 @@
-import { FaEdit } from "react-icons/fa";
-import { RiDeleteBinLine } from "react-icons/ri";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useForm } from "react-hook-form";
+// import { FaEdit } from "react-icons/fa";
+// import { RiDeleteBinLine } from "react-icons/ri";
 
 import { useGetAllBookListQuery } from "../../slices/utils";
+import {
+  useAddHadithMutation,
+  useGetAllHadithByPaginationQuery,
+} from "../../slices/admin/hadith";
+
+import CommonForm from "@/components/common/Form";
+import { toast } from "react-toastify";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { useState } from "react";
+
+const initialFormData = {
+  bookName: "",
+  partName: "",
+  partNumber: "",
+  chapterName: "",
+  chapterNumber: "",
+  hadithNumber: "",
+  internationalNumber: "",
+  hadithArabic: "",
+  referenceBook: "",
+  similarities: "",
+  translation: "",
+  transliteration: "",
+  narrator: "",
+  note: "",
+};
 
 export default function Hadith() {
-  const {
-    register,
-    reset,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const [openAddHadithForm, setOpenAddHadithForm] = useState(false);
+  const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [formData, setFormData] = useState(initialFormData);
+  const [currentPage, setCurrentPage] = useState(1);
+  console.log(currentPage);
+
+  const [addHadith] = useAddHadithMutation();
 
   const { data: allBookList } = useGetAllBookListQuery();
-  console.log(allBookList);
+  const {
+    data: hadithData,
+    isLoading,
+    isError,
+  } = useGetAllHadithByPaginationQuery({
+    page: currentPage,
+    limit: 1,
+  });
 
-  const addTafsir = (data) => {
-    console.log("Form data", data);
-    reset();
+  const onSubmit = async (event) => {
+    event.preventDefault();
+
+    const updatedFormData = {
+      bookName: formData.bookName,
+      partName: formData.partName,
+      partNumber: formData.partNumber,
+      chapterName: formData.chapterName,
+      chapterNumber: formData.chapterNumber,
+      hadithList: {
+        hadithNumber: formData.hadithNumber,
+        internationalNumber: formData.internationalNumber,
+        hadithArabic: formData.hadithArabic,
+        referenceBook: formData.referenceBook,
+        similarities: formData.similarities,
+        translation: formData.translation,
+        transliteration: formData.transliteration,
+        narrator: formData.narrator,
+        note: formData.note,
+      },
+    };
+
+    try {
+      const addResponse = await addHadith(updatedFormData).unwrap();
+      // Show success or error messages based on the response
+      if (addResponse.error) {
+        toast.error(addResponse.error.message);
+      } else {
+        toast.success(addResponse.message || "Hadith added successfully!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
-  const allHadith = [
+
+  const addHadithFormElements = [
     {
-      id: "01",
-      Name: "Sahih Al-Bukhari",
-      hadithNo: "01",
-      btn: "Edit",
-      delete: "Delete",
+      label: "Book Name",
+      name: "bookName",
+      componentType: "select",
+      options:
+        allBookList &&
+        allBookList.data?.map((language) => ({
+          id: language?.nameEn,
+          label: language?.nameEn,
+        })),
+      allClasses: {
+        selectClass:
+          "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary",
+      },
     },
     {
-      id: "02",
-      Name: "sahih Muslim",
-      hadithNo: "036",
-      btn: "Edit",
-      delete: "Delete",
+      label: "Part Name",
+      name: "partName",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Part Name",
     },
     {
-      id: "03",
-      Name: "sahih Tirmidhi",
-      hadithNo: "041",
-      btn: "Edit",
-      delete: "Delete",
+      label: "Part Number",
+      name: "partNumber",
+      componentType: "input",
+      type: "number",
+      placeholder: "Enter Part Number",
     },
     {
-      id: "04",
-      Name: "sahih Muslim",
-      hadithNo: "036",
-      btn: "Edit",
-      delete: "Delete",
+      label: "Chapter Name",
+      name: "chapterName",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Chapter Name",
     },
     {
-      id: "0004",
-      Name: "sahih Muslim",
-      hadithNo: "036",
-      btn: "Edit",
-      delete: "Delete",
+      label: "Chapter Number",
+      name: "chapterNumber",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Chapter Number",
+    },
+    {
+      label: "Hadith Number",
+      name: "hadithNumber",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Hadith Number",
+    },
+    {
+      label: "International Hadith Number",
+      name: "internationalNumber",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter International Hadith Number",
+    },
+    {
+      label: "Hadith Arabic",
+      name: "hadithArabic",
+      componentType: "textarea",
+      type: "text",
+      placeholder: "Enter Hadith Arabic ( أدخل أبي العربي )",
+    },
+    {
+      label: "Reference Book",
+      name: "referenceBook",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Reference Book",
+    },
+    {
+      label: "Similarities",
+      name: "similarities",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Similarities",
+    },
+    {
+      label: "Translation",
+      name: "translation",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Translation",
+    },
+    {
+      label: "Transliteration",
+      name: "transliteration",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Transliteration",
+    },
+    {
+      label: "Narrator",
+      name: "narrator",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Narrator",
+    },
+    {
+      label: "Note",
+      name: "note",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Note",
     },
   ];
 
   return (
-    <Tabs defaultValue="add-hadith" className="pl-8 scrollbar-none pr-12">
-      {/* Tabs List */}
-      <TabsList className="rounded-none rounded-bl-sm rounded-br-sm">
-        <TabsTrigger className="text-white font-medium" value="add-hadith">
-          Add Hadith
-        </TabsTrigger>
-        <TabsTrigger className="text-white font-medium" value="all-hadith">
-          All Hadith
-        </TabsTrigger>
-      </TabsList>
-
-      {/* Add tafsir Tab Content */}
-      <TabsContent value="add-hadith">
-        <main>
-          <div className="pb-20">
-            <form onSubmit={handleSubmit(addTafsir)} className="space-y-10">
-              {/* Verse Section */}
-              <div className="py-10 px-16 bg-primary-foreground rounded-lg shadow-lg">
-                <h2 className="text-4xl font-bold mb-6 text-center text-primary">
-                  Verse
-                </h2>
-                <div className="grid grid-cols-2 gap-6 mt-2">
-                  <div className="relative">
-                    <label className="block text-base font-semibold text-black mb-2">
-                      Hadith Name
-                    </label>
-                    {errors.hadithName && (
-                      <span className="absolute top-0 right-2 transition-transform duration-300 font-medium text-red-500 text-sm">
-                        {errors.hadithName.message}
-                      </span>
-                    )}
-                    <textarea
-                      {...register("hadithName", {
-                        required: "Hadith Name is required",
-                      })}
-                      placeholder="Write here..."
-                      rows="4"
-                      className="w-full px-4 py-2 rounded-md resize-none border bg-adminInput outline-none focus:ring-2 focus:ring-primary-foreground"
-                    />
-                  </div>
-                  <div className="relative">
-                    <label className="block text-base font-semibold text-black mb-2">
-                      Hadith Content
-                    </label>
-                    {errors.hadithContent && (
-                      <span className="absolute top-0 right-2 transition-transform duration-300 font-medium text-red-500 text-sm">
-                        {errors.hadithContent.message}
-                      </span>
-                    )}
-                    <textarea
-                      {...register("hadithContent", {
-                        required: "Hadith Content is required",
-                      })}
-                      placeholder="Write here..."
-                      rows="4"
-                      className="w-full px-4 py-2 resize-none rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary-foreground"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end space-x-4 mt-6">
-                <button
-                  type="button"
-                  onClick={() => reset()}
-                  className="px-20 py-5 bg-gray-400 text-white text-xl font-semibold rounded-md hover:bg-gray-500 focus:outline-none cursor-pointer"
-                  disabled
-                >
-                  Reset
-                </button>
-                <button
-                  type="submit"
-                  className="px-20 py-5 bg-primary text-xl font-semibold text-white rounded-md hover:bg-green-700 focus:outline-none"
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
-
-            <div className="mt-10">
-              {allBookList?.data &&
-                allBookList?.data?.map((book, index) => (
-                  <div className="flex gap-5" key={index}>
-                    <p>{book.nameEn}</p>
-                    <p className="font-bangla">{book.nameBn}</p>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </main>
-      </TabsContent>
-
-      {/* All Quran Tab Content */}
-      <TabsContent value="all-hadith">
-        <div className="mt-12">
-          <div>
-            {/* Heading */}
-            <div>
-              <table className="table-auto w-full">
-                <thead>
-                  <tr>
-                    <th className=" py-2 text-left font-semibold text-2xl font-sans w-36">
-                      No.
-                    </th>
-                    <th className=" py-2 text-left font-semibold text-2xl font-sans">
-                      Name
-                    </th>
-                    <th className=" py-2 font-semibold text-2xl font-sans text-center">
-                      Hadith Number
-                    </th>
-                    <th className=" py-2 font-semibold text-2xl font-sans text-right">
-                      <select
-                        name="filter"
-                        className="bg-none text-sm text-black font-semibold rounded-md max-w-32 px-5 py-3 bg-white border outline-none border-black shadow-sm cursor-pointer transition ease-in-out duration-300"
-                        id=""
-                      >
-                        <option value="all">Filter</option>
-                        <option value="quranAyatArabic">
-                          Quran Ayat Arabic
-                        </option>
-                        <option value="quranAyatEnglish">
-                          Quran Ayat English
-                        </option>
-                      </select>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allHadith.map((quran, index) => (
-                    <tr key={index}>
-                      <td className=" py-2 text-xl font-semibold text-left font-sans">
-                        {quran.id}
-                      </td>
-                      <td className=" py-2 text-xl font-semibold text-left font-sans">
-                        {quran.Name}
-                      </td>
-                      <td className=" py-2 text-xl font-semibold text-center font-sans">
-                        {quran.hadithNo}
-                      </td>
-                      <td className=" py-2 text-xl font-semibold text-right">
-                        <div className="flex justify-end items-center gap-14">
-                          <button className="px-6 py-2 flex items-center gap-2 text-xl font-semibold text-white bg-primary rounded-md hover:bg-primary-foreground hover:text-black transition duration-200">
-                            {quran.btn}
-                            <FaEdit className="text-xl font-semibold" />
-                          </button>
-                          <button className="px-6 py-2 font-semibold text-xl flex items-center gap-2 text-white bg-deleteRed rounded-md hover:bg-red-600 transition duration-200">
-                            {quran.delete} <RiDeleteBinLine />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+    <>
+      <div className="mt-12">
+        <div className="flex justify-end">
+          <Button
+            className="bg-primary text-white mr-10"
+            onClick={() => {
+              setOpenAddHadithForm(true);
+              setCurrentEditedId(null); // Ensure we're in "Add" mode
+              setFormData(initialFormData);
+            }}
+          >
+            Add New Hadith
+          </Button>
         </div>
-      </TabsContent>
-    </Tabs>
+
+        <div className="mt-10">
+          {isError ? (
+            <div>Error fetching data</div>
+          ) : isLoading ? (
+            <div>Loading...</div>
+          ) : (
+            <div className="">
+              {hadithData?.hadiths?.map((hadith) => (
+                <div className="border border-gray-300 p-4" key={hadith._id}>
+                  <h1>Book Name: {hadith.bookName}</h1>
+                  <div className="flex gap-2">
+                    <p>Part Name: {hadith.partName}</p>
+                    <p> Part Number: {hadith.partNumber}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <p> Chapter Name: {hadith.chapterName}</p>
+                    <p> Chapter Number: {hadith.chapterNumber}</p>
+                  </div>
+                  <h3>Hadith List</h3>
+                  <ul className="">
+                    {hadith.hadithList.map((hadithItem) => (
+                      <li key={hadithItem._id} className="flex gap-2">
+                        <p>Hadith Number: {hadithItem.hadithNumber}</p>
+                        <p>Hadith Arabic: {hadithItem.hadithArabic}</p>
+                        <p>
+                          {" "}
+                          International Hadith Number:{" "}
+                          {hadithItem.internationalNumber}
+                        </p>
+                        <p>Similarities: {hadithItem.similarities}</p>{" "}
+                        <p> Reference Book: {hadithItem.referenceBook}</p>{" "}
+                        <p> Translation: {hadithItem.translation}</p>{" "}
+                        <p> Transliteration: {hadithItem.transliteration}</p>{" "}
+                        <p> Narrator: {hadithItem.narrator}</p>{" "}
+                        <p>{hadithItem.note}</p> <p>Note: {hadithItem.note}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className=" container mx-auto p-4 flex justify-center">
+          <Pagination className="px-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  aria-label="Go to previous page"
+                  onClick={() =>
+                    setCurrentPage(() =>
+                      currentPage == 1 ? 1 : currentPage - 1
+                    )
+                  }
+                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                  disabled={currentPage == 1}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <Button
+                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                  onClick={() => setCurrentPage(5)}
+                >
+                  Skip
+                </Button>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  aria-label="Go to next page"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      </div>
+      <Sheet
+        open={openAddHadithForm}
+        onOpenChange={(isOpen) => setOpenAddHadithForm(isOpen)}
+      >
+        <SheetContent side="right" className="overflow-auto w-[90%]">
+          <SheetHeader>
+            <SheetTitle>
+              {currentEditedId ? "Edit Hadith" : "Add Hadith"}
+            </SheetTitle>
+          </SheetHeader>
+          <CommonForm
+            layout={4}
+            allClasses={{
+              formClass:
+                "grid grid-cols-2 gap-5 mt-10 py-10 px-16 bg-primary-foreground rounded-lg shadow-lg",
+              inputClass:
+                "w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary",
+              textareaClass:
+                "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary",
+            }}
+            onSubmit={onSubmit}
+            formData={formData}
+            setFormData={setFormData}
+            buttonText={currentEditedId ? "Save Changes" : "Add Hadith"}
+            formControls={addHadithFormElements}
+          />
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

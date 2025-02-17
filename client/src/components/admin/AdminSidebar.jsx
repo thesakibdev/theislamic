@@ -14,10 +14,10 @@ export default function AdminSidebar() {
       name: "Verses Other Data",
       link: "verses-other-data",
     },
-    // {
-    //   name: "Hadith",
-    //   link: "hadith",
-    // },
+    {
+      name: "Hadith",
+      link: "hadith",
+    },
     // {
     //   name: "Tafsir",
     //   link: "tafsir",

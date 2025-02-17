@@ -27,8 +27,16 @@ export const authApi = createApi({
         method: "POST",
       }),
     }),
+    verifyEmail: builder.query({
+      query: (token) => `auth/verify-email?token=${token}`,
+    }),
   }),
 });
 
 // Export hooks for usage in functional components
-export const { useRegisterMutation, useLoginMutation } = authApi;
+export const {
+  useRegisterMutation,
+  useLoginMutation,
+  useLogoutMutation,
+  useVerifyEmailQuery,
+} = authApi;

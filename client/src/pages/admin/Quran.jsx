@@ -24,7 +24,6 @@ import {
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
@@ -220,15 +219,6 @@ export default function Quran() {
                 Name
               </p>
             </div>
-            <select
-              className="bg-none text-sm text-black font-semibold rounded-md max-w-32 px-5 py-3 bg-white border outline-none border-black block w-full shadow-sm cursor-pointer transition ease-in-out duration-300"
-              name="filter"
-              id=""
-            >
-              <option value="all">Filter</option>
-              <option value="quranAyatArabic">Quran Ayat Arabic</option>
-              <option value="quranAyatEnglish">Quran Ayat English</option>
-            </select>
           </div>
 
           <div className="mt-10">
@@ -331,25 +321,16 @@ export default function Quran() {
                     disabled={currentPage == 1}
                   />
                 </PaginationItem>
-                <PaginationItem className="flex">
-                  <PaginationLink
-                    className="hover:bg-green-400 cursor-pointer"
-                    href="/quran?page=1"
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                  <Button
+                    className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                    onClick={() => setCurrentPage(5)}
                   >
-                    1
-                  </PaginationLink>
-                  <PaginationLink
-                    className="hover:bg-green-400 cursor-pointer"
-                    href="/quran?page=2"
-                  >
-                    2
-                  </PaginationLink>
-                  <PaginationLink
-                    className="hover:bg-green-400 cursor-pointer"
-                    href="/quran?page=3"
-                  >
-                    3
-                  </PaginationLink>
+                    Skip
+                  </Button>
                 </PaginationItem>
                 <PaginationItem>
                   <PaginationEllipsis />

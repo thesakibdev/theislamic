@@ -47,6 +47,7 @@ export default function App() {
       <Route path="/" element={<AuthLayout />}>
         <Route path="/signup" element={<Registration />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/verify-email" element={<EmailVerify />} />
       </Route>
 
       <Route
