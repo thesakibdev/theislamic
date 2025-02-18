@@ -137,6 +137,7 @@ export default function Header() {
 
   // user related state
   const { user, isAuthenticated } = useSelector((state) => state.user);
+  console.log(user);
   const roles = ["admin", "creator", "editor"];
   const initialAvatar = user?.name
     .split(" ")
