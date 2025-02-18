@@ -20,7 +20,8 @@ const userSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
       state.isAusaveToLocalStoragethenticated = true;
-      (state);
+      state.isAuthenticated = true;
+      saveToLocalStorage(state);
     },
     clearUser: (state) => {
       state.user = null;

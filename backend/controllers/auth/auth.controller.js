@@ -60,7 +60,7 @@ const registerUser = async (req, res) => {
     const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
 
     const mailOptions = {
-      from: `"Your App Name" <${process.env.EMAIL_USER}>`,
+      from: `"The Islamic Center"" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "ইমেইল ভেরিফিকেশন",
       html: `
