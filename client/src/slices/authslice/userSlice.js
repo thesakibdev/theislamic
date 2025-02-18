@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Cookie } from "lucide-react";
 
 // Helper functions for localStorage
 const saveToLocalStorage = (state) => {
   localStorage.setItem("user", JSON.stringify(state));
+  Cookie.set("user", JSON.stringify(state));
 };
 
 const loadFromLocalStorage = () => {

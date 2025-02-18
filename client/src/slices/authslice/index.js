@@ -30,6 +30,9 @@ export const authApi = createApi({
     verifyEmail: builder.query({
       query: (token) => `auth/verify-email?token=${token}`,
     }),
+    getUserDetails: builder.query({
+      query: (id) => `auth/get/user-details/${id}`,
+    }),
   }),
 });
 
@@ -39,4 +42,5 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useVerifyEmailQuery,
+  useGetUserDetailsQuery,
 } = authApi;
