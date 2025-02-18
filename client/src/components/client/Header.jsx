@@ -144,8 +144,8 @@ export default function Header() {
     .map((word) => word[0])
     .join("")
     .toUpperCase();
-
-  // menu action related state
+    // menu action related state
+    console.log(isAuthenticated)
   const [openMenu, setOpenMenu] = useState(false);
   const [openDropdownMenu, setOpenDropdownMenu] = useState(false);
   const [openDropdownMenuTwo, setOpenDropdownMenuTwo] = useState(false);
@@ -294,6 +294,7 @@ export default function Header() {
                           </div>
                         )}
                         <span>{user.name}</span>
+                        {/* <p>{user.name}</p> */}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="bg-destructive text-white hover:text-gray-900 justify-center hover:bg-primary-foreground duration-500 cursor-pointer mt-4"
