@@ -142,7 +142,20 @@ export default function RecitePage() {
                                 key={index}
                                 className="border-b border-primary"
                               >
-                                <p className="text-right text-3xl md:text-4xl my-10 md:my-16 rtl:mr-3">{`${verse.arabicAyah} (${verse.verseNumber})`}</p>
+                                {/* <p className="text-right text-3xl md:text-4xl my-10 md:my-16 rtl:mr-3">{`${verse.arabicAyah} (${verse.verseNumber})`}</p> */}
+                                <div className="text-right text-3xl md:text-4xl my-10 md:my-16 rtl:mr-3">
+                                  <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
+                                    <VerseEndIcon
+                                      width={35}
+                                      height={35}
+                                      className="align-middle"
+                                    />
+                                    <span className="absolute text-xs text-center align-middle">
+                                      {convertToArabicNumber(verse.verseNumber)}
+                                    </span>
+                                  </span>
+                                  {verse.arabicAyah}
+                                </div>
                                 {verse.verseOtherData
                                   ?.filter(
                                     (data) => data.language === selectedLanguage
@@ -206,7 +219,7 @@ export default function RecitePage() {
                           {currentSurah?.verses?.map((verse, index) => (
                             <span
                               key={index}
-                              className="text-base md:text-4xl font-arabic font-medium inline rtl:mr-0 align-middle"
+                              className="text-2xl md:text-4xl font-arabic font-medium inline rtl:mr-0 align-middle"
                             >
                               {verse.arabicAyah}
                               <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
@@ -238,7 +251,7 @@ export default function RecitePage() {
               <SheetHeader>
                 <SheetTitle>Translation</SheetTitle>
               </SheetHeader>
-              <div className="flex flex-col ">
+              <div className="flex flex-col overflow-auto h-screen">
                 {languages?.data?.map((lang) => (
                   <button
                     key={lang}
