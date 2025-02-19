@@ -30,10 +30,10 @@ export default function AdminSidebar() {
     //   name: "I-Wall",
     //   link: "i-wall",
     // },
-    // {
-    //   name: "Donors",
-    //   link: "donors",
-    // },
+    {
+      name: "Donors",
+      link: "donors",
+    },
     // {
     //   name: "About Us",
     //   link: "about-us",

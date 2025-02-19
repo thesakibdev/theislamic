@@ -1,182 +1,400 @@
-import { RiDeleteBinLine } from "react-icons/ri";
+import {
+  useAddDonorMutation,
+  useEditDonorMutation,
+  useGetAllDonorsQuery,
+} from "../../slices/admin/donor";
+import { useState } from "react";
+import CommonForm from "@/components/common/Form";
+import { toast } from "react-toastify";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
+import ImageUploader from "@/components/common/imageUploader";
+
+const initialFormData = {
+  name: "",
+  fatherName: "",
+  email: "",
+  phone: "",
+  designation: "",
+  profession: "",
+  companyName: "",
+  country: "",
+  street: "",
+  city: "",
+  avatar: "",
+  avatarId: "",
+  TotalDonation: null,
+  isDetailsVisible: true,
+};
 
 export default function Donors() {
-  const allDonors = [
+  const [formData, setFormData] = useState(initialFormData);
+  const [openAddDonorForm, setOpenAddDonorForm] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [imagePublicId, setImagePublicId] = useState("");
+  const [imageLoadingState, setImageLoadingState] = useState(false);
+  const [currentEditedId, setCurrentEditedId] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, isLoading } = useGetAllDonorsQuery({
+    page: currentPage,
+    limit: 10,
+  });
+
+  const [addDonor] = useAddDonorMutation();
+  const [editDonor] = useEditDonorMutation();
+
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setOpenAddDonorForm(false);
+    setImageFile(null);
+    setImageLoadingState(false);
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    // Add your form submission logic here
+    const donationAmount = Number(formData.TotalDonation);
+    const updatedFormData = {
+      name: formData.name,
+      fatherName: formData.fatherName,
+      email: formData.email,
+      phone: formData.phone,
+      designation: formData.designation,
+      profession: formData.profession,
+      companyName: formData.companyName,
+      country: formData.country,
+      street: formData.street,
+      city: formData.city,
+      TotalDonation: donationAmount,
+      isDetailsVisible: formData.isDetailsVisible,
+      avatar: uploadedImageUrl,
+      avatarId: imagePublicId,
+    };
+
+    try {
+      if (currentEditedId !== null) {
+        const editResponse = await editDonor({
+          id: currentEditedId,
+          ...updatedFormData,
+        }).unwrap();
+        resetForm();
+        // Show success message from server
+        toast.success(editResponse.message || "Donor updated successfully!");
+      } else {
+        const addResponse = await addDonor(updatedFormData).unwrap();
+        // Show success or error messages based on the response
+        if (addResponse.error) {
+          toast.error(addResponse.error.message);
+        } else {
+          resetForm();
+          toast.success(addResponse.message || "Donor added successfully!");
+        }
+      }
+    } catch (error) {
+      // Extract and display server error message or default message
+      const errorMessage = error.data?.message || "Error submitting data!";
+      console.error("Error submitting data:", error);
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleEditDonor = (donor) => {
+    setOpenAddDonorForm(true);
+    setCurrentEditedId(donor._id);
+    setFormData({
+      name: donor.name,
+      fatherName: donor.fatherName,
+      email: donor.email,
+      phone: donor.phone,
+      profession: donor.profession,
+      designation: donor.designation,
+      companyName: donor.companyName,
+      street: donor.street,
+      city: donor.city,
+      country: donor.country,
+      TotalDonation: donor.TotalDonation,
+      isDetailsVisible: donor.isDetailsVisible,
+    });
+  };
+
+  const addDonorFormElements = [
     {
-      id: 1,
-      image:
-        "https://images.unsplash.com/photo-1531973576160-7125cd663d86?crop=entropy&cs=srgb&fm=jpg&ixid=M3w2NjMyNTh8MHwxfHNlYXJjaHwxfHxjb21wYW55fGVufDB8fHx8MTczNzI5NDYwNHww&ixlib=rb-4.0.3&q=85",
-      title: {
-        name: "Donor 1",
-        role: "Seo of ABC Company",
-      },
-      country: "Country 1",
-      city: "City 1",
-      quranAyatArabic: "Quran Ayat Arabic 1",
-      quranAyatEnglish: "Quran Ayat English 1",
+      label: "Donor Name",
+      name: "name",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Donor Name",
     },
     {
-      id: 2,
-      image:
-        "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w2NjMyNTh8MHwxfHNlYXJjaHwzfHxjb21wYW55fGVufDB8fHx8MTczNzI5NDYwNHww&ixlib=rb-4.0.3&q=85",
-      title: {
-        name: "Donor 2",
-        role: "Seo of XYZ Company",
-      },
-      country: "Country 2",
-      city: "City 2",
-      quranAyatArabic: "Quran Ayat Arabic 2",
-      quranAyatEnglish: "Quran Ayat English 2",
+      label: "Donor Father Name",
+      name: "fatherName",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Donor Father Name",
     },
     {
-      id: 3,
-      image:
-        "https://images.unsplash.com/photo-1570126618953-d437176e8c79?crop=entropy&cs=srgb&fm=jpg&ixid=M3w2NjMyNTh8MHwxfHNlYXJjaHw5fHxjb21wYW55fGVufDB8fHx8MTczNzI5NDYwNHww&ixlib=rb-4.0.3&q=85",
-      title: {
-        name: "Donor 3",
-        role: "Seo of PQR Company",
-      },
-      country: "Country 3",
-      city: "City 3",
-      quranAyatArabic: "Quran Ayat Arabic 3",
-      quranAyatEnglish: "Quran Ayat English 3",
+      label: "Donor Email",
+      name: "email",
+      componentType: "input",
+      type: "email",
+      placeholder: "Enter Donor Email",
+    },
+    {
+      label: "Donor Phone",
+      name: "phone",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Donor Phone",
+    },
+    {
+      label: "Donor profession",
+      name: "profession",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Donor profession",
+    },
+    {
+      label: "Donor Designation",
+      name: "designation",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Donor Designation",
+    },
+    {
+      label: "Company Name",
+      name: "companyName",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Donor Company Name",
+    },
+    {
+      label: "Street",
+      name: "street",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Donor Street",
+    },
+    {
+      label: "City",
+      name: "city",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Donor City",
+    },
+    {
+      label: "Country",
+      name: "country",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Donor country",
+    },
+    {
+      label: "Total Donation",
+      name: "TotalDonation",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Total Donation Amount",
+    },
+    {
+      label: "Is Donor Details Visible",
+      name: "isDetailsVisible",
+      componentType: "checkbox",
+      type: "checkbox",
     },
   ];
-  return (
-    <div className="p-12">
-      <h1 className="text-4xl font-bold">Honorable Donors List</h1>
-      <div className="mt-8">
-        <table className="min-w-full">
-          <thead className="border-2 border-primary border-spacing-y-5 border-spacing-x-5 rounded-lg border-separate ">
-            <tr>
-              <th className=" py-2 text-left font-semibold text-2xl font-sans">
-                Profile
-              </th>
-              <th className=" py-2 text-left font-semibold text-2xl font-sans">
-                Name
-              </th>
-              <th className=" py-2 font-semibold text-2xl font-sans text-center">
-                Country
-              </th>
-              <th className=" py-2 font-semibold text-2xl font-sans text-center">
-                City
-              </th>
-              <th className=" py-2 font-semibold text-2xl font-sans text-right">
-                <select
-                  name="filter"
-                  className="bg-none text-sm text-black font-semibold rounded-md max-w-20 px-5 py-3 bg-white border outline-none border-black shadow-sm cursor-pointer transition ease-in-out duration-300"
-                  id=""
-                >
-                  <option value="all">Filter</option>
-                  <option value="quranAyatArabic">Quran Ayat Arabic</option>
-                  <option value="quranAyatEnglish">Quran Ayat English</option>
-                </select>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white">
-            {allDonors.map((donor) => (
-              <tr key={donor.id} className="border rounded-lg border-primary">
-                <td className="p-5">
-                  <div className="w-32 h-32 rounded-lg flex-shrink-0">
-                    <img
-                      className="w-full h-full rounded-lg object-cover"
-                      src={donor.image}
-                      alt="profile"
-                    />
-                  </div>
-                </td>
-                <td className="p-5">
-                  <div className="flex flex-col">
-                    <span className="text-2xl font-semibold font-sans">
-                      {donor.title.name}
-                    </span>
-                    <span className="text-sm font-semibold font-sans">
-                      {donor.title.role}
-                    </span>
-                  </div>
-                </td>
-                <td className="p-5 text-center">{donor.country}</td>
-                <td className="p-5 text-center">{donor.city}</td>
-                <td className="p-5 text-right">
-                  <button className="h-full px-5 bg-deleteRed">
-                    {" "}
-                    <RiDeleteBinLine className="text-2xl" />{" "}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
 
-        <table className="min-w-full border-separate border-spacing-y-4 border-spacing-x-2">
-          <thead className="border-2 border-primary rounded-lg">
-            <tr className="border-separate border-primary">
-              <th className="py-2 px-4 text-left font-semibold text-2xl font-sans border-none rounded-tl-lg">
-                Profile
-              </th>
-              <th className="py-2 px-4 text-left font-semibold text-2xl font-sans border-none">
-                Name
-              </th>
-              <th className="py-2 px-4 font-semibold text-2xl font-sans text-center border-none">
-                Country
-              </th>
-              <th className="py-2 px-4 font-semibold text-2xl font-sans text-center border-none">
-                City
-              </th>
-              <th className="py-2 px-4 font-semibold text-2xl font-sans text-right border-none rounded-tr-lg">
-                <select
-                  name="filter"
-                  className="bg-none text-sm text-black font-semibold rounded-md max-w-20 px-5 py-3 bg-white border outline-none border-black shadow-sm cursor-pointer transition ease-in-out duration-300"
-                >
-                  <option value="all">Filter</option>
-                  <option value="quranAyatArabic">Quran Ayat Arabic</option>
-                  <option value="quranAyatEnglish">Quran Ayat English</option>
-                </select>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white">
-            {allDonors.map((donor, index) => (
-              <tr
-                key={index}
-                className="border border-primary  transition duration-200"
-              >
-                <td className="p-5 border-none">
-                  <div className="w-32 h-32 rounded-lg flex-shrink-0">
-                    <img
-                      className="w-full h-full rounded-lg object-cover"
-                      src={donor.image}
-                      alt="profile"
-                    />
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+
+  return (
+    <>
+      <div className="p-12">
+        <div className="flex justify-end">
+          <Button
+            className="bg-primary text-white mr-10"
+            onClick={() => {
+              setOpenAddDonorForm(true);
+              setCurrentEditedId(null); // Ensure we're in "Add" mode
+              setFormData(initialFormData);
+            }}
+          >
+            Add New Verse
+          </Button>
+        </div>
+
+        <div className="container mx-auto px-4">
+          <div className="">
+            <h1 className="text-4xl font-semibold text-center">
+              Honorable Donor List
+            </h1>
+            <div className="">
+              {isLoading ? (
+                <p>Loading...</p>
+              ) : data?.donors?.length > 0 ? (
+                data?.donors?.map((donor) => (
+                  <div
+                    key={donor.name}
+                    className="border p-4 grid md:grid-cols-5 items-center justify-between my-6 gap-5 rounded-md"
+                  >
+                    {donor.avatar === "" ? (
+                      <div className="w-[100px] h-[100px] mx-auto bg-gray-300"></div>
+                    ) : (
+                      <img
+                        src={donor.avatar}
+                        alt={donor.name}
+                        className="rounded-md"
+                      />
+                    )}
+                    <div className="md:col-span-3">
+                      <p className="text-lg">
+                        <span className="font-semibold">Name:</span>{" "}
+                        {donor.name}
+                      </p>
+                      <div className="grid md:grid-cols-3">
+                        <p className="text-lg">
+                          <span className="font-semibold">Profession:</span>{" "}
+                          {donor.profession}
+                        </p>
+                        <p className="text-lg">
+                          <span className="font-semibold">Company:</span>{" "}
+                          {donor.companyName}
+                        </p>
+                        <p className="text-lg">
+                          <span className="font-semibold">Designation: </span>
+                          {donor.designation}
+                        </p>
+                        <p className="text-lg">
+                          <span className="font-semibold">Street:</span>{" "}
+                          {donor.street}
+                        </p>
+                        <p className="text-lg">
+                          <span className="font-semibold">City:</span>{" "}
+                          {donor.city}
+                        </p>
+                        <p className="text-lg">
+                          <span className="font-semibold">Country:</span>{" "}
+                          {donor.country}
+                        </p>
+                        <p className="text-lg">
+                          <span className="font-semibold">Total Donation:</span>{" "}
+                          Tk {donor.TotalDonation}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="md:col-span-1 flex justify-end">
+                      <Button
+                        className="bg-primary text-white hover:bg-primary/50 hover:text-black duration-500"
+                        onClick={() => handleEditDonor(donor)}
+                      >
+                        Edit
+                      </Button>
+                    </div>
                   </div>
-                </td>
-                <td className="p-5 border-none">
-                  <div className="flex flex-col">
-                    <span className="text-2xl font-semibold font-sans">
-                      {donor.title.name}
-                    </span>
-                    <span className="text-sm font-semibold font-sans">
-                      {donor.title.role}
-                    </span>
-                  </div>
-                </td>
-                <td className="p-5 text-center border-none">
-                  {donor.country}
-                </td>
-                <td className="p-5 text-center border-none">
-                  {donor.city}
-                </td>
-                <td className="p-5 text-right border-none">
-                  <button className="h-full px-5 bg-deleteRed">
-                    <RiDeleteBinLine className="text-2xl" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                ))
+              ) : (
+                <p>No Donors Found</p>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <Pagination className="px-4">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    aria-label="Go to previous page"
+                    onClick={() =>
+                      setCurrentPage(() =>
+                        currentPage == 1 ? 1 : currentPage - 1
+                      )
+                    }
+                    className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                    disabled={currentPage == 1}
+                  />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                  <Button
+                    className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                    onClick={() => setCurrentPage(5)}
+                  >
+                    Skip
+                  </Button>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext
+                    aria-label="Go to next page"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </div>
       </div>
-    </div>
+      <Sheet
+        open={openAddDonorForm}
+        onOpenChange={(isOpen) => setOpenAddDonorForm(isOpen)}
+      >
+        <SheetContent side="right" className="overflow-auto w-[90%]">
+          <SheetHeader>
+            <SheetTitle>
+              {currentEditedId ? "Edit Donor" : "Add Donor"}
+            </SheetTitle>
+          </SheetHeader>
+
+          <ImageUploader
+            uploadEndpoint={`${baseUrl}/donor/upload-image`}
+            imageFile={imageFile}
+            setImageFile={setImageFile}
+            imageLoadingState={imageLoadingState}
+            uploadedImageUrl={uploadedImageUrl}
+            setImagePublicId={setImagePublicId}
+            setUploadedImageUrl={setUploadedImageUrl}
+            setImageLoadingState={setImageLoadingState}
+            isEditMode={currentEditedId !== null}
+          />
+
+          <CommonForm
+            allClasses={{
+              formClass:
+                "grid grid-cols-2 gap-5 mt-10 py-10 px-16 bg-primary-foreground rounded-lg shadow-lg",
+              inputClass:
+                "w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary",
+              checkBoxClass:
+                "border-white data-[state=checked]:bg-primary data-[state=checked]:text-white h-6 w-6 rounded-lg",
+              textareaClass:
+                "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary",
+              btnClass:
+                "bg-primary text-white hover:text-black duration-300 mt-5 ",
+            }}
+            onSubmit={onSubmit}
+            formData={formData}
+            setFormData={setFormData}
+            buttonText={currentEditedId ? "Save Changes" : "Add Donor"}
+            formControls={addDonorFormElements}
+          />
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

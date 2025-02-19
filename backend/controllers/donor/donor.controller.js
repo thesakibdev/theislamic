@@ -6,7 +6,7 @@ const handleImageUpload = async (req, res) => {
   try {
     const fileBuffer = req.file.buffer; // File buffer from multer
     const public_id = `image_${Date.now()}`; // Generate unique public_id
-    const folder = "Blog_images"; // Specify Cloudinary folder
+    const folder = "Donor_images"; // Specify Cloudinary folder
 
     // Upload the image and get optimized URL and public_id
     const { optimizedUrl, public_id: uploadedPublicId } =
@@ -37,12 +37,15 @@ const createDonor = async (req, res) => {
       email,
       phone,
       companyName,
+      profession,
       designation,
       country,
-      address,
+      street,
+      city,
       avatar,
+      avatarId,
       TotalDonation,
-      isDetailsVisible
+      isDetailsVisible,
     } = req.body;
 
     // data validation
@@ -81,11 +84,14 @@ const createDonor = async (req, res) => {
       phone,
       companyName,
       designation,
+      profession,
       country,
-      address,
+      street,
+      city,
       avatar,
+      avatarId,
       TotalDonation,
-      isDetailsVisible
+      isDetailsVisible,
     });
 
     const savedDonor = await newDonor.save();
@@ -113,11 +119,13 @@ const editDonor = async (req, res) => {
       phone,
       companyName,
       designation,
+      profession,
       country,
-      address,
+      street,
+      city,
       avatar,
       TotalDonation,
-      isDetailsVisible
+      isDetailsVisible,
     } = req.body;
 
     const updatedDonor = await Donor.findOneAndUpdate(
@@ -129,11 +137,13 @@ const editDonor = async (req, res) => {
         phone,
         companyName,
         designation,
+        profession,
         country,
-        address,
+        street,
+        city,
         avatar,
         TotalDonation,
-        isDetailsVisible
+        isDetailsVisible,
       },
       { new: true }
     );

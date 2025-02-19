@@ -36,7 +36,7 @@ export const blogApi = createApi({
     // Fetch paginated Blogs
     getAllBlogs: builder.query({
       query: ({ page, limit }) => ({
-        url: `/admin/blog/get?page=${page}&limit=${limit}`,
+        url: `admin/blog/get?page=${page}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["Blog"],
