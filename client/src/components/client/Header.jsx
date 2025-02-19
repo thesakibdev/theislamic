@@ -83,7 +83,7 @@ export default function Header() {
     },
     {
       text: "Recite",
-      path: "/recite",
+      path: "/recite/1",
     },
     {
       text: "Translation",
@@ -132,7 +132,6 @@ export default function Header() {
 
   // user related state
   const { user, isAuthenticated } = useSelector((state) => state.user);
-  console.log(user);
   const roles = ["admin", "creator", "editor"];
   const initialAvatar = user?.name
     .split(" ")
@@ -140,8 +139,7 @@ export default function Header() {
     .map((word) => word[0])
     .join("")
     .toUpperCase();
-  // menu action related state
-  console.log(isAuthenticated);
+    // menu action related state
   const [openMenu, setOpenMenu] = useState(false);
   const [openDropdownMenu, setOpenDropdownMenu] = useState(false);
   const [openDropdownMenuTwo, setOpenDropdownMenuTwo] = useState(false);

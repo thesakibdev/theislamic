@@ -7,6 +7,7 @@ const {
   updateUserRole,
   updateUserProfile,
   verifyEmail,
+  getUserDetails,
 } = require("../../controllers/auth/auth.controller");
 const checkUserRole = require("../../middleware/authCheck.middleware");
 
@@ -17,6 +18,7 @@ router.get('/verify-email', verifyEmail);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.put("/update-profile", authMiddleware, updateUserProfile);
+router.get("/get/user-details/:id", authMiddleware, getUserDetails);
 router.get("/check-auth", authMiddleware, (req, res) => {
   const user = req.user;
   res
