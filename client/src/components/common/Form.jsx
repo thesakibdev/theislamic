@@ -10,6 +10,7 @@ import {
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 
 const CommonForm = memo(function CommonForm({
   layout,
@@ -26,6 +27,7 @@ const CommonForm = memo(function CommonForm({
     inputClass: "",
     selectClass: "",
     textareaClass: "",
+    checkBoxClass: "",
   },
 }) {
   function renderInputsByComponentType(getControlItem) {
@@ -52,6 +54,21 @@ const CommonForm = memo(function CommonForm({
           />
         );
 
+        break;
+      case "checkbox":
+        element = (
+          <Checkbox
+            id={getControlItem.name}
+            checked={!!formData[getControlItem.name]} 
+            className={allClasses.checkBoxClass}
+            onCheckedChange={(checked) =>
+              setFormData({
+                ...formData,
+                [getControlItem.name]: checked, // ✅ Returns true/false correctly
+              })
+            }
+          />
+        );
         break;
       case "select":
         element = (
@@ -366,13 +383,16 @@ const CommonForm = memo(function CommonForm({
               </div>
             ))}
           </div>
-          <Button
-            disabled={isBtnDisabled}
-            type="submit"
-            className={`px-4 py-2 ${allClasses.btnClass}`}
-          >
-            {buttonText || "Submit"}
-          </Button>
+          {/* Buttons */}
+          <div className="flex justify-end">
+            <Button
+              disabled={isBtnDisabled}
+              type="submit"
+              className={`px-4 py-2 ${allClasses.btnClass}`}
+            >
+              {buttonText || "Submit"}
+            </Button>
+          </div>
         </main>
       )}
     </form>

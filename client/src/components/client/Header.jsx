@@ -16,7 +16,7 @@ import ArrowDown from "../../assets/icon/arrow-down.png";
 
 // components and use state
 import { useSelector } from "react-redux";
-import {  useState } from "react";
+import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import {
   DropdownMenu,
@@ -62,12 +62,7 @@ export default function Header() {
     {
       icon: Donate,
       text: "Donors",
-      path: "/",
-    },
-    {
-      icon: Account,
-      text: "Accounts",
-      path: "/",
+      path: "/donor",
     },
     {
       icon: Iwall,
@@ -148,7 +143,6 @@ export default function Header() {
   const [openMenu, setOpenMenu] = useState(false);
   const [openDropdownMenu, setOpenDropdownMenu] = useState(false);
   const [openDropdownMenuTwo, setOpenDropdownMenuTwo] = useState(false);
-
 
   // all function
   const handleLogout = () => {
@@ -246,7 +240,10 @@ export default function Header() {
                   <li
                     key={index}
                     className="flex items-center gap-2 px-4 py-4 cursor-pointer hover:bg-gray-100 border-b-2 border-gray-400"
-                    onClick={() => setOpenMenu(!openMenu)}
+                    onClick={() => {
+                      navigate(item.path);
+                      setOpenMenu(!openMenu);
+                    }}
                   >
                     <img src={item.icon} alt={item.text} />
                     <span>{item.text}</span>

@@ -181,7 +181,6 @@ const deleteHadith = async (req, res) => {
 };
 
 // hadith other language data
-
 const addHadithOtherLanguage = async (req, res) => {
   const {
     language,
