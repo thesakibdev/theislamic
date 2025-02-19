@@ -13,6 +13,7 @@ const blogRouter = require("./routes/blog/blog.route");
 const hadithRouter = require("./routes/hadith/hadith.route");
 const languageRouter = require("./routes/utils/language.route");
 const bookListRouter = require("./routes/utils/bookList.route");
+const donorRouter = require("./routes/donor/donor.route");
 
 dotenv.config();
 
@@ -75,6 +76,9 @@ app.use("/api/v1/admin/blog", blogRouter);
 
 // hadith route
 app.use("/api/v1/admin/hadith", hadithRouter);
+
+// donor route
+app.use("/api/v1/donor", donorRouter);
 
 // visitor route
 app.use("/api/v1/admin/analytics", visitorRouter);
