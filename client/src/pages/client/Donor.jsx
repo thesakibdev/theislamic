@@ -1,56 +1,12 @@
+import { useGetAllDonorsQuery } from "../../slices/admin/donor";
+import { useState } from "react";
+
 export default function DonorPage() {
-  const donorList = [
-    {
-      name: "John Doe",
-      avatar: "",
-      profession: "Software Engineer",
-      companyName: "ABC Company",
-      designation: "CEO",
-      street: "Street 1",
-      city: "City 1",
-      country: "Country 1",
-    },
-    {
-      name: "John Doe",
-      avatar: "",
-      profession: "Software Engineer",
-      companyName: "ABC Company",
-      designation: "CEO",
-      street: "Street 1",
-      city: "City 1",
-      country: "Country 1",
-    },
-    {
-      name: "John Doe",
-      avatar: "",
-      profession: "Software Engineer",
-      companyName: "ABC Company",
-      designation: "CEO",
-      street: "Street 1",
-      city: "City 1",
-      country: "Country 1",
-    },
-    {
-      name: "John Doe",
-      avatar: "",
-      profession: "Software Engineer",
-      companyName: "ABC Company",
-      designation: "CEO",
-      street: "Street 1",
-      city: "City 1",
-      country: "Country 1",
-    },
-    {
-      name: "John Doe",
-      avatar: "",
-      profession: "Software Engineer",
-      companyName: "ABC Company",
-      designation: "CEO",
-      street: "Street 1",
-      city: "City 1",
-      country: "Country 1",
-    },
-  ];
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, isLoading } = useGetAllDonorsQuery({
+    page: currentPage,
+    limit: 10,
+  });
 
   return (
     <section className="pt-[4.5rem] md:pt-40">
@@ -60,7 +16,7 @@ export default function DonorPage() {
             Honorable Donor List
           </h1>
           <div className="">
-            {donorList.map((donor) => (
+            {data?.donors?.map((donor) => (
               <div
                 key={donor.name}
                 className="border p-4 grid md:grid-cols-4 items-center justify-between my-6 gap-2"
