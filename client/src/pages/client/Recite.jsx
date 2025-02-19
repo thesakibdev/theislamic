@@ -76,14 +76,14 @@ export default function RecitePage() {
   return (
     <>
       <section
-        className={`flex-1 p-4 pt-20 transition-all duration-300 ${
+        className={`flex-1 p-4 pt-20 transition-all scrollbar-hidden duration-300 ${
           isOpen ? "ml-0" : "-ml-64"
         }`}
       >
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row">
-            <div className="p-5 flex justify-center w-full">
-              <Tabs defaultValue="reading" className="m-0">
+            <div className="p-2 flex justify-center w-full">
+              <Tabs defaultValue="reading" className="m-0 pt-5 overflow-auto max-h-screen px-10 scrollbar-custom">
                 <TabsList className="grid w-full grid-cols-2 justify-start">
                   <TabsTrigger
                     className="p-0 data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
@@ -143,7 +143,7 @@ export default function RecitePage() {
                                 className="border-b border-primary"
                               >
                                 {/* <p className="text-right text-3xl md:text-4xl my-10 md:my-16 rtl:mr-3">{`${verse.arabicAyah} (${verse.verseNumber})`}</p> */}
-                                <div className="text-right text-3xl md:text-4xl my-10 md:my-16 rtl:mr-3">
+                                <div className="text-right text-3xl md:text-4xl mt-10 md:mt-16 rtl:mr-3">
                                   <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
                                     <VerseEndIcon
                                       width={35}
@@ -190,28 +190,6 @@ export default function RecitePage() {
                       <Loading />
                     ) : (
                       <div className="mt-4 text-center">
-                        {/* {currentSurah?.verses
-                          ?.slice(0, 7)
-                          .map((verse, index) => (
-                            <span
-                              className="text-base md:text-4xl  rtl:mr-3 text-black  font-arabic font-medium text-center leading-relaxed break-all w-1/2 mx-auto py-2"
-                              key={index}
-                            >
-                              {verse.arabicAyah
-                                .split(" ")
-                                .map((word, wordIndex) => (
-                                  <span key={wordIndex} className="mx-4">
-                                    {word}
-                                  </span> // প্রতিটি শব্দের মধ্যে স্পেস থাকবে
-                                ))}
-                              <div className="relative w-[50px] rtl inline-flex items-center justify-center">
-                                <VerseEndIcon width={40} height={40} />
-                                <p className="absolute text-xs text-center">
-                                  {convertToArabicNumber(verse.verseNumber)}
-                                </p>
-                              </div>
-                            </span>
-                          ))} */}
                         <div
                           dir="rtl"
                           className="text-black w-full mx-auto leading-relaxed text-justify"
@@ -219,7 +197,7 @@ export default function RecitePage() {
                           {currentSurah?.verses?.map((verse, index) => (
                             <span
                               key={index}
-                              className="text-2xl md:text-4xl font-arabic font-medium inline rtl:mr-0 align-middle"
+                              className="text-2xl md:text-4xl font-arabic font-medium inline rtl:mr-0 align-middle ayah"
                             >
                               {verse.arabicAyah}
                               <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
@@ -228,7 +206,7 @@ export default function RecitePage() {
                                   height={35}
                                   className="align-middle"
                                 />
-                                <span className="absolute text-xs text-center align-middle">
+                                <span className="absolute text-xl text-center align-middle">
                                   {convertToArabicNumber(verse.verseNumber)}
                                 </span>
                               </span>
