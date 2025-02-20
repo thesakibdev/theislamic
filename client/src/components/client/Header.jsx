@@ -7,7 +7,6 @@ import MenuIcon from "../../assets/icon/menu-icon.png";
 import OpenBook from "../../assets/icon/open_book.png";
 import Book from "../../assets/icon/book.png";
 import Donate from "../../assets/icon/donate.png";
-import Account from "../../assets/icon/finance.png";
 import Iwall from "../../assets/icon/i-wall.png";
 import Social from "../../assets/icon/social.png";
 import ManPraying from "../../assets/icon/man_praying.png";
@@ -254,7 +253,10 @@ export default function Header() {
                 <h2 className="text-xl font-semibold text-center">🕌 Become a Donor & </h2>
                 <h2 className="text-xl font-semibold text-center">Make an Impact</h2>
                 <p className="text-justify text-sm">Becoming a donor means more than just giving; it means changing lives, supporting communities, and earning endless rewards from Allah (SWT).</p>
-                <button onClick={() => navigate("/donate-checkout")} className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">Make A Donate</button>
+                <button onClick={() => {
+                  navigate("/donate-checkout")
+                  setOpenMenu(!openMenu);
+                  }} className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">Make A Donate</button>
               </div>
             </SheetContent>
           </Sheet>
