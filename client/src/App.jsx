@@ -23,6 +23,7 @@ import HadithReadPage from "./pages/client/HadithReadPage";
 import HadithPage from "./pages/client/HadithPage";
 import HadithIndex from "./pages/client/HadithIndex";
 import EmailVerify from "./pages/client/EmailVerify";
+import DonateCheckout from "./pages/client/DonateCheckout";
 
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/hadith/:title" element={<HadithIndex />} />
         <Route path="/hadith/:title/:number" element={<HadithReadPage />} />
         <Route path="/donor" element={<DonorPage />} />
+        <Route path="/donate-checkout" element={<DonateCheckout />} />
       </Route>
 
       {/* auth Register and Login route */}
