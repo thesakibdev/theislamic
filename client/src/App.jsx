@@ -23,6 +23,7 @@ import HadithReadPage from "./pages/client/HadithReadPage";
 import HadithPage from "./pages/client/HadithPage";
 import HadithIndex from "./pages/client/HadithIndex";
 import EmailVerify from "./pages/client/EmailVerify";
+import Dashboard from "./pages/admin/Dashboard";
 
 
 export default function App() {
@@ -59,7 +60,7 @@ export default function App() {
           </CheckAuth>
         }
       >
-        <Route path="dashboard" />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="quran" element={<Quran />} />
         <Route path="verses-other-data" element={<VersesOtherData />} />
         <Route path="hadith" element={<Hadith />} />

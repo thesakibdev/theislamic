@@ -48,7 +48,6 @@ export default function Hadith() {
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const [currentPage, setCurrentPage] = useState(1);
-  console.log(currentPage);
 
   const [addHadith] = useAddHadithMutation();
 
@@ -61,6 +60,11 @@ export default function Hadith() {
     page: currentPage,
     limit: 1,
   });
+
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setOpenAddHadithForm(false);
+  };
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -89,8 +93,10 @@ export default function Hadith() {
       // Show success or error messages based on the response
       if (addResponse.error) {
         toast.error(addResponse.error.message);
+        console.log(addResponse.error);
       } else {
         toast.success(addResponse.message || "Hadith added successfully!");
+        resetForm();
       }
     } catch (error) {
       console.log(error);

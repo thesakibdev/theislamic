@@ -1,23 +1,18 @@
 import { useState } from "react";
 import { FaTachometerAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import ArrowDown from "../../assets/icon/arrow-down.png";
+import OpenBook from "../../assets/icon/open_book.png";
+import Book from "../../assets/icon/book.png";
 
 export default function AdminSidebar() {
   const navigate = useNavigate();
+  const activePath = window.location.pathname.split("/")[2];
+
+  const [openQuran, setOpenQuran] = useState(false);
+  const [openHadith, setOpenHadith] = useState(false);
 
   const headerMenu = [
-    {
-      name: "Quran",
-      link: "quran",
-    },
-    {
-      name: "Verses Other Data",
-      link: "verses-other-data",
-    },
-    {
-      name: "Hadith",
-      link: "hadith",
-    },
     // {
     //   name: "Tafsir",
     //   link: "tafsir",
@@ -40,10 +35,7 @@ export default function AdminSidebar() {
     // },
   ];
 
-  const [activeLink, setActiveLink] = useState("quran");
-
   const handleClick = (link) => {
-    setActiveLink(link);
     navigate(link);
   };
 
@@ -60,12 +52,95 @@ export default function AdminSidebar() {
 
         {/* Menu Section */}
         <div className="mb-6 pl-12">
-          <div className="flex items-center space-x-2 mb-4">
-            <FaTachometerAlt className="text-lg" />
+          <div
+            className={`flex items-center space-x-2 mb-4 cursor-pointer`}
+            onClick={() => handleClick("dashboard")}
+          >
+            <FaTachometerAlt
+              className={`text-xl ${
+                activePath === "dashboard" ? "text-black/50" : "text-white"
+              }  `}
+            />
             <span className="text-lg font-semibold">Dashboard</span>
           </div>
 
           <h2 className="text-base capitalize font-bold mb-4">Menu</h2>
+
+          <div className="mb-5">
+            {/* quran menu list */}
+            <div>
+              <div
+                className="flex items-center justify-between pr-4 my-4 cursor-pointer"
+                onClick={() => setOpenQuran(!openQuran, setOpenHadith(false))}
+              >
+                <img src={OpenBook} alt="Open Book" />
+                <span className="text-lg font-semibold">Quran</span>
+                <img src={ArrowDown} alt="Arrow Down" />
+              </div>
+              <div className={openQuran ? "block" : "hidden"}>
+                <ul className="flex flex-col gap-5">
+                  <li
+                    className="flex items-center space-x-2 text-md cursor-pointer pl-4 border-b pb-4"
+                    onClick={() => {
+                      navigate("quran");
+                    }}
+                  >
+                    <div
+                      className={`w-4 h-4 ${
+                        activePath === "quran" ? "bg-black" : "bg-white"
+                      } rounded-full`}
+                    ></div>
+                    <span>Quran</span>
+                  </li>
+                  <li
+                    className="flex items-center space-x-2 text-md cursor-pointer pl-4 border-b pb-4"
+                    onClick={() => {
+                      navigate("verses-other-data");
+                    }}
+                  >
+                    <div
+                      className={`w-4 h-4 ${
+                        activePath === "verses-other-data"
+                          ? "bg-black"
+                          : "bg-white"
+                      } rounded-full`}
+                    ></div>
+                    <span>Verses-Other-Data</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* hadith menu list */}
+            <div>
+              <div
+                className="flex items-center justify-between pr-4 my-4 cursor-pointer"
+                onClick={() => setOpenHadith(!openHadith, setOpenQuran(false))}
+              >
+                <img src={Book} alt="Open Book" />
+                <span className="text-lg font-semibold">Hadith</span>
+                <img src={ArrowDown} alt="Arrow Down" />
+              </div>
+              <div className={openHadith ? "block" : "hidden"}>
+                <ul className="flex flex-col gap-5">
+                  <li
+                    className="flex items-center space-x-2 text-md cursor-pointer pl-4 border-b pb-4"
+                    onClick={() => {
+                      navigate("hadith");
+                    }}
+                  >
+                    <div
+                      className={`w-4 h-4 ${
+                        activePath === "hadith" ? "bg-black" : "bg-white"
+                      } rounded-full`}
+                    ></div>
+                    <span>Hadith</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <ul className="flex flex-col gap-5">
             {headerMenu.map((item, index) => (
               <li key={index}>
@@ -75,7 +150,7 @@ export default function AdminSidebar() {
                 >
                   <div
                     className={`w-6 h-6 ${
-                      activeLink === item.link ? "bg-black" : "bg-white"
+                      activePath === item.link ? "bg-black" : "bg-white"
                     } rounded-full`}
                   ></div>
                   <span>{item.name}</span>
@@ -101,6 +176,13 @@ export default function AdminSidebar() {
             <button className="flex items-center space-x-2 text-lg">
               <div className="w-6 h-6 bg-white rounded-full"></div>
               <span>Blue</span>
+            </button>
+            <button
+              className="flex items-center space-x-2 text-lg"
+              onClick={() => navigate("/")}
+            >
+              <div className="w-6 h-6 bg-white rounded-full"></div>
+              <span>Visit Website</span>
             </button>
           </div>
         </div>
