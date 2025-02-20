@@ -113,6 +113,8 @@ const editDonor = async (req, res) => {
     const id = req.params.id;
 
     const {
+      avatar,
+      avatarId,
       name,
       fatherName,
       email,
@@ -123,41 +125,35 @@ const editDonor = async (req, res) => {
       country,
       street,
       city,
-      avatar,
       TotalDonation,
       isDetailsVisible,
     } = req.body;
 
-    const updatedDonor = await Donor.findOneAndUpdate(
-      { _id: id },
-      {
-        name,
-        fatherName,
-        email,
-        phone,
-        companyName,
-        designation,
-        profession,
-        country,
-        street,
-        city,
-        avatar,
-        TotalDonation,
-        isDetailsVisible,
-      },
-      { new: true }
-    );
+    const findDonor = await Donor.findById(id);
 
-    if (!updatedDonor) {
-      return res.status(404).json({ error: true, message: "Donor not found." });
-    }
+    findDonor.TotalDonation = TotalDonation || findDonor.TotalDonation;
+    findDonor.isDetailsVisible = isDetailsVisible || findDonor.isDetailsVisible;
+    findDonor.name = name || findDonor.name;
+    findDonor.fatherName = fatherName || findDonor.fatherName;
+    findDonor.email = email || findDonor.email;
+    findDonor.phone = phone || findDonor.phone;
+    findDonor.companyName = companyName || findDonor.companyName;
+    findDonor.designation = designation || findDonor.designation;
+    findDonor.profession = profession || findDonor.profession;
+    findDonor.country = country || findDonor.country;
+    findDonor.street = street || findDonor.street;
+    findDonor.city = city || findDonor.city;
+    findDonor.avatar = avatar || findDonor.avatar;
+    findDonor.avatarId = avatarId || findDonor.avatarId;
+
+    await findDonor.save();
 
     invalidateCache("donors");
 
     return res.status(200).json({
       success: true,
       message: "Donor updated successfully.",
-      updatedDonor,
+      findDonor,
     });
   } catch (error) {
     console.error(error);
