@@ -1,3 +1,4 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -27,6 +28,7 @@ export default function DonateCheckout() {
   };
 
   const [donationAmount, setDonationAmount] = useState();
+  const [isDetailsVisible, setIsDetailsVisible] = useState(true);
   const {
     register,
     handleSubmit,
@@ -36,13 +38,14 @@ export default function DonateCheckout() {
 
   const onSubmit = (data) => {
     data.donationAmount = donationAmount;
+    data.isDetailsVisible = isDetailsVisible;
     console.log("Form Data:", data);
     reset();
   };
   return (
     <>
-      <section className="pt-16">
-        <div className="container mx-auto flex flex-col md:flex-row justify-between ">
+      <main className="pt-16">
+        <div className="container mx-auto flex my-4 flex-col md:flex-row justify-between ">
           <div className="rounded-md px-5 py-3 w-full md:w-3/5">
             <div className=" flex flex-col gap-3 md:gap-6">
               <h1 className="text-2xl md:text-4xl font-bold">
@@ -237,19 +240,6 @@ export default function DonateCheckout() {
                         placeholder="Your street"
                       />
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <label className="block text-lg font-normal">
-                        Zip Code *
-                      </label>
-                      <input
-                        {...register("zipCode", { required: true })}
-                        type="number"
-                        className={`w-full p-2 border outline-none focus:border-primary rounded-lg ${
-                          errors.zipCode ? "border-red-500" : ""
-                        }`}
-                        placeholder="Your Zip Code"
-                      />
-                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1">
@@ -310,8 +300,24 @@ export default function DonateCheckout() {
                   </div>
                 </div>
 
+                <div className="flex items-center gap-2 mt-2 border-t pt-4 border-primary">
+                  <Checkbox
+                    id="termsUserDetails"
+                    defaultChecked={true}
+                    {...register("isDetailsVisible")} // register the checkbox
+                    onCheckedChange={(checked) => {
+                      setIsDetailsVisible(checked);
+                    }}
+                  />
+                  <label
+                    htmlFor="termsUserDetails"
+                    className="text-sm text-justify font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    I don&apos; t want to show my Information publicly.
+                  </label>
+                </div>
                 {/* submittion  */}
-                <div className="border-t pt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-primary">
+                <div className="border-t pt-5 grid grid-cols- md:grid-cols-2 gap-4 border-primary">
                   <div className="">
                     <div className="w-full items-center flex gap-1 mb-4">
                       <label className="text-xl"> One Time Donation:</label>
@@ -405,7 +411,7 @@ export default function DonateCheckout() {
             </div>
           </aside>
         </div>
-      </section>
+      </main>
     </>
   );
 }
