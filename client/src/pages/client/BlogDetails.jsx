@@ -69,7 +69,7 @@ export default function BlogDetails() {
 
   return (
     <section className="pt-16 px-4 md:px-0">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto py-5">
         <div className="bg-primary-foreground/20 flex flex-col justify-center p-4 rounded-lg">
           <h2 className="text-3xl font-bold text-black mb-4">
             How to Spend the Perfect Day on Croatia’s Most Magical Island

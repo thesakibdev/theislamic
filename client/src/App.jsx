@@ -25,6 +25,7 @@ import HadithIndex from "./pages/client/HadithIndex";
 import EmailVerify from "./pages/client/EmailVerify";
 import DonateCheckout from "./pages/client/DonateCheckout";
 import BlogDetails from "./pages/client/BlogDetails";
+import Blogs from "./pages/client/Blogs";
 
 
 export default function App() {
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="/donor" element={<DonorPage />} />
         <Route path="/donate-checkout" element={<DonateCheckout />} />
         {/* blogs */}
+        <Route path="/blogs" element={<Blogs />} />
         <Route path="/blog-details" element={<BlogDetails />} />
 
       </Route>
