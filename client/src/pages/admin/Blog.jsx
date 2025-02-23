@@ -18,9 +18,9 @@ import { useSelector } from "react-redux";
 
 const initialFormData = {
   title: "",
-  description: {},
+  description: "", // Changed from {} to ""
   thumbnail: null,
-  thumbnailId: "",
+  thumbnailId: null,
   shortDesc: "",
   slug: "",
   metaDesc: "",
@@ -31,8 +31,8 @@ const initialFormData = {
 export default function Blog() {
   const [formData, setFormData] = useState(initialFormData);
   const [imageFile, setImageFile] = useState(null);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
-  const [imagePublicId, setImagePublicId] = useState("");
+  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+  const [imagePublicId, setImagePublicId] = useState(null);
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -55,7 +55,8 @@ export default function Blog() {
 
   const resetForm = () => {
     setFormData(initialFormData);
-    setUploadedImageUrl("");
+    setUploadedImageUrl(null);
+    setImagePublicId(null);
     setImageLoadingState(false);
     setCurrentEditedId(null);
   };
@@ -106,17 +107,16 @@ export default function Blog() {
       formData.slug.trim() !== "" &&
       formData.metaDesc.trim() !== "" &&
       formData.metaKeyword.trim() !== "" &&
-      RTEContent !== ""
+      RTEContent !== "" &&
+      RTEContent.length > 0 // Additional check for content length
     );
   };
 
   useEffect(() => {
-    if (currentEditedId !== null) {
-      RTERef.current?.setContent(formData.description || "");
-    } else {
-      RTERef.current?.setContent("");
+    if (RTERef.current) {
+      RTERef.current.setContent(formData.description || "");
     }
-  }, [currentEditedId, formData.description]);
+  }, [formData.description]);
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
