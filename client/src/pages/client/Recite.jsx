@@ -59,7 +59,7 @@ export default function RecitePage() {
   });
 
   const currentSurah = surahData?.surahs?.find(
-    (surah) => surah.surahNumber === Number(number)
+    (surah) => surah === Number(number)
   );
 
   if (isLoading) return <Loading />;
@@ -84,7 +84,7 @@ export default function RecitePage() {
           <div className="flex flex-col md:flex-row">
             <div className="p-2 flex justify-center w-full">
               <Tabs defaultValue="reading" className="m-0 pt-5 overflow-auto max-h-screen px-4 md:px-10 scrollbar-custom">
-                <TabsList className="grid w-full grid-cols-2 justify-start">
+                <TabsList className="grid mx-auto max-w-[600px] grid-cols-2 justify-start">
                   <TabsTrigger
                     className="p-0 data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
                     value="transliteration"
@@ -176,7 +176,7 @@ export default function RecitePage() {
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="reading">
+                <TabsContent value="reading" className="w-full">
                   <div className="flex flex-col md:max-w-3xl mx-auto text-center justify-center w-full">
                     <h2 className="text-2xl md:text-3xl font-bold">
                       {bismillahValid

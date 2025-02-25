@@ -28,7 +28,7 @@ export default function ReciteSideBar() {
   useEffect(() => {
     setCurrentPage(Number(number));
   }, [number]);
-
+  
   if (isLoading) {
     return <div>Loading...</div>;
   }

@@ -86,7 +86,7 @@ export default function Header() {
     },
     {
       text: "Translation",
-      path: "/",
+      path: "/translation",
     },
     {
       text: "Thematic",

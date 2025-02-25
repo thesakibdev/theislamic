@@ -26,6 +26,7 @@ import EmailVerify from "./pages/client/EmailVerify";
 import DonateCheckout from "./pages/client/DonateCheckout";
 import BlogDetails from "./pages/client/BlogDetails";
 import Blogs from "./pages/client/Blogs";
+import Translation from "./pages/client/Translation";
 
 
 export default function App() {
@@ -36,6 +37,8 @@ export default function App() {
       <Route path="/" element={<ClientLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/index" element={<IndexPage />} />
+        <Route path="/translation" element={<Translation />} />
+        <Route path="/translation/:title" element={<Translation />} />
         <Route path="/profile" element={<AuthProfile />} />
         <Route path="/" element={<ReciteLayout />}>
           <Route path="/recite/:number" element={<RecitePage />} />
