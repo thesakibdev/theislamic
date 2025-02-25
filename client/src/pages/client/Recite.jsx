@@ -83,7 +83,7 @@ export default function RecitePage() {
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row">
             <div className="p-2 flex justify-center w-full">
-              <Tabs defaultValue="reading" className="m-0 pt-5 overflow-auto max-h-screen px-10 scrollbar-custom">
+              <Tabs defaultValue="reading" className="m-0 pt-5 overflow-auto max-h-screen px-4 md:px-10 scrollbar-custom">
                 <TabsList className="grid w-full grid-cols-2 justify-start">
                   <TabsTrigger
                     className="p-0 data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
@@ -140,10 +140,9 @@ export default function RecitePage() {
                             {currentSurah?.verses?.map((verse, index) => (
                               <div
                                 key={index}
-                                className="border-b border-primary"
+                                className="border-b border-primary flex flex-col gap-5 py-7 md:py-10"
                               >
-                                {/* <p className="text-right text-3xl md:text-4xl my-10 md:my-16 rtl:mr-3">{`${verse.arabicAyah} (${verse.verseNumber})`}</p> */}
-                                <div className="text-right text-3xl md:text-4xl mt-10 md:mt-16 rtl:mr-3">
+                                <div className="text-right text-3xl md:text-4xl rtl:mr-3">
                                   <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
                                     <VerseEndIcon
                                       width={35}
@@ -154,8 +153,9 @@ export default function RecitePage() {
                                       {convertToArabicNumber(verse.verseNumber)}
                                     </span>
                                   </span>
-                                  {verse.arabicAyah}
+                                  <span className="">{verse.arabicAyah}</span>
                                 </div>
+                                
                                 {verse.verseOtherData
                                   ?.filter(
                                     (data) => data.language === selectedLanguage
@@ -163,7 +163,7 @@ export default function RecitePage() {
                                   .map((data) => (
                                     <p
                                       key={data._id}
-                                      className="text-left mb-10 md:mb-16 text-lg md:text-2xl w-[90%]"
+                                      className="text-left text-base md:text-2xl w-[90%]"
                                     >
                                       {data.transliteration}
                                     </p>

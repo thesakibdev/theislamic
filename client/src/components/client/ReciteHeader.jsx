@@ -5,7 +5,10 @@ import { CiSearch } from "react-icons/ci";
 import { Sheet, SheetContent } from "../ui/sheet";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetAllSurahsNameQuery } from "@/slices/admin/surah";
+import {
+  useGetAllSurahsNameQuery,
+  useGetAllSurahsPaginatedQuery,
+} from "@/slices/admin/surah";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 export default function ReciteHeader() {
@@ -15,6 +18,18 @@ export default function ReciteHeader() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data: surahData, isLoading } = useGetAllSurahsPaginatedQuery({
+    page: currentPage,
+    limit: 1,
+  });
+
+  const currentSurah = surahData?.surahs?.find(
+    (surah) => surah?.surahNumber === Number(number)
+  );
+  useEffect(() => {
+    setCurrentPage(Number(number));
+  }, [number]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -36,7 +51,9 @@ export default function ReciteHeader() {
   const currentSurahName = allSurahs?.find(
     (surah) => surah.surahNumber === Number(number)
   ).surahName;
-
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
   const handleGoToRecitePage = (id) => {
     navigate(`/recite/${id}`);
     setOpenMobileSidebar(false);
@@ -151,19 +168,18 @@ export default function ReciteHeader() {
                           />
                           {/* <CiSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-black  text-xl lg:text-3xl" /> */}
                         </div>
-                        {/* <ul className="bg-[#80BDA9] rounded-md">
-                  {
-                    currentSurah?.verses.map((verse, index) => (
-                      <li
-                        key={index}
-                        className="hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-lg md:text-xl  text-center cursor-pointer p-3"
-                        // onClick={() => handleGoToRecitePage(verse.verseNumber)}
-                      >
-                        {verse.verseNumber}
-                      </li>
-                    ))
-                  }
-                </ul> */}
+                        <ul className="bg-[#80BDA9] rounded-md">
+                          {currentSurah?.verses.map((verse, index) => (
+                            <li
+                              key={index}
+                              // className="hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-lg md:text-xl  text-center cursor-pointer p-3"
+                              className={`hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-lg md:text-xl text-center cursor-pointer p-3 `}
+                              // onClick={() => handleGoToRecitePage(verse.verseNumber)}
+                            >
+                              {verse.verseNumber}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     </div>
                   </TabsContent>

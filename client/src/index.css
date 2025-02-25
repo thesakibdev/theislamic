@@ -86,33 +86,8 @@ body {
   0% { transform: rotateX(90deg); opacity: 0; }
   100% { transform: rotateX(0deg); opacity: 1; }
 }
-.verse-active {
-  background-color: #028A0F !important;
-  color: white !important;
-  font-weight: bold !important;
 
-  
-}/* Custom scrollbar for Webkit Browsers (Chrome, Edge, Safari) */
+
 .scrollbar-custom::-webkit-scrollbar {
-  width: 8px; /* Sidebar scrollbar এর প্রস্থ */
-}
-
-.scrollbar-custom::-webkit-scrollbar-track {
-  background: #e5e7eb; /* Scrollbar এর ব্যাকগ্রাউন্ড */
-  border-radius: 10px;
-}
-
-.scrollbar-custom::-webkit-scrollbar-thumb {
-  background: #80BDA9; /* Scrollbar এর রঙ */
-  border-radius: 10px;
-}
-
-.scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: #5a9c8a; /* Hover করলে রঙ পরিবর্তন */
-}
-
-/* Firefox scrollbar styling */
-.scrollbar-custom {
-  scrollbar-width: thin;
-  scrollbar-color: #80BDA9 #e5e7eb;
+  display: none;
 }

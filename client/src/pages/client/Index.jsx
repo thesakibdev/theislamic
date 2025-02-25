@@ -297,7 +297,7 @@ export default function IndexPage() {
                   </div>
                 </div>
               )}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-between gap-10 w-full">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 justify-between gap-10 w-full">
                 {surahs?.map((surah) => (
                   <div
                     className="flex gap-5 items-center border cursor-pointer border-gray-200 p-5 rounded-lg hover:border-primary group w-full"
@@ -363,7 +363,7 @@ export default function IndexPage() {
               </div>
             </TabsContent>
             <TabsContent value="juz" className="w-full">
-              You do not have any bookmarks yet ?
+              Juz coming soon!
             </TabsContent>
           </Tabs>
         </div>
