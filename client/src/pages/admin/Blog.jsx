@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 
 const initialFormData = {
   title: "",
-  description: "", // Changed from {} to ""
+  description: "",
   thumbnail: null,
   thumbnailId: null,
   shortDesc: "",
@@ -31,14 +31,13 @@ const initialFormData = {
 export default function Blog() {
   const [formData, setFormData] = useState(initialFormData);
   const [imageFile, setImageFile] = useState(null);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
-  const [imagePublicId, setImagePublicId] = useState(null);
-  const [imageLoadingState, setImageLoadingState] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [imagePublicId, setImagePublicId] = useState("");
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
+  
   const { user } = useSelector((state) => state.user);
-
+  
   const [addBlog] = useAddBlogMutation();
   const [editBlog] = useEditBlogMutation();
   const [deleteBlog] = useDeleteBlogMutation();
@@ -50,15 +49,22 @@ export default function Blog() {
     page: currentPage,
     limit: 6,
   });
+  
+  const [imageLoadingState, setImageLoadingState] = useState(isLoading);
+  console.log("isLoading", isLoading);
+  console.log("uploadedImageUrl", uploadedImageUrl);
+  console.log("imagePublicId", imagePublicId);
 
   const RTERef = useRef(null);
 
   const resetForm = () => {
     setFormData(initialFormData);
+    setImageFile(null);
     setUploadedImageUrl(null);
     setImagePublicId(null);
     setImageLoadingState(false);
     setCurrentEditedId(null);
+    RTERef.current.setContent("");
   };
 
   const onSubmit = async (event) => {
@@ -73,6 +79,8 @@ export default function Blog() {
       author: user.id,
     };
 
+    console.log("Updated Form Data:", updatedFormData);
+
     try {
       if (currentEditedId !== null) {
         const editResponse = await editBlog({
@@ -86,6 +94,7 @@ export default function Blog() {
         const addResponse = await addBlog(updatedFormData).unwrap();
         if (addResponse.error) {
           toast.error(addResponse.error.message);
+          setImageLoadingState(false);
         } else {
           toast.success(addResponse.message || "Blog added successfully!");
           resetForm();
