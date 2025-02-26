@@ -143,7 +143,8 @@ export default function RecitePage() {
                                 className="border-b border-primary flex flex-col gap-5 py-7 md:py-10"
                               >
                                 <div className="text-right text-3xl md:text-4xl rtl:mr-3">
-                                  <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
+                                  <span className="">{verse.arabicAyah}</span>
+                                  {/* <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
                                     <VerseEndIcon
                                       width={35}
                                       height={35}
@@ -152,8 +153,7 @@ export default function RecitePage() {
                                     <span className="absolute text-xs text-center align-middle">
                                       {convertToArabicNumber(verse.verseNumber)}
                                     </span>
-                                  </span>
-                                  <span className="">{verse.arabicAyah}</span>
+                                  </span> */}
                                 </div>
                                 
                                 {verse.verseOtherData
