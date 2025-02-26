@@ -18,10 +18,10 @@ export default function DonorPage() {
   });
 
   return (
-    <section className="pt-[4.5rem] md:pt-40">
+    <section className="pt-[4.5rem] md:pt-40 pb-10">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl font-semibold text-center">
+          <h1 className="text-2xl md:text-4xl font-semibold text-center">
             Honorable Donor List
           </h1>
 
@@ -31,18 +31,22 @@ export default function DonorPage() {
             data?.donors?.map((donor) => (
               <div
                 key={donor.name}
-                className="border p-4 flex flex-col md:flex-row my-6 gap-5 rounded-md relative"
+                className="border p-4 grid grid-cols-1 md:grid-cols-5 my-6 gap-5 rounded-md relative"
               >
-                {donor.avatar === "" ? (
-                  <div className="w-[100px] h-[100px] mx-auto bg-gray-300"></div>
-                ) : (
-                  <img
-                    src={donor.avatar}
-                    alt={donor.name}
-                    className="rounded-md max-h-[200px] mx-auto md:mx-0"
-                  />
-                )}
-                <div>
+                <div className="md:col-span-1 overflow-hidden rounded-md">
+                  {donor.avatar === "" ? (
+                    <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
+                  ) : (
+                    <div className="max-h-[400px] md:max-h-[200px] w-full object-fill">
+                      <img
+                        src={donor.avatar}
+                        alt={donor.name}
+                        className="rounded-md h-full w-full object-cover mx-auto md:mx-0"
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="md:col-span-4">
                   <p className="text-xl md:text-2xl font-bold mb-2">
                     Name: {donor.name}
                   </p>
@@ -110,7 +114,9 @@ export default function DonorPage() {
               <PaginationItem>
                 <Button
                   className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                  onClick={() => setCurrentPage(5)}
+                  onClick={() => setCurrentPage(() => 
+                    currentPage > 2 ? 1 : currentPage + 2
+                  )}
                 >
                   Skip
                 </Button>

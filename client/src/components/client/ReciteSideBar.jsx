@@ -15,7 +15,6 @@ export default function ReciteSideBar() {
   const isOpen = useSelector((state) => state.utility.isOpenSidebar);
   // const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeVerse, setActiveVerse] = useState(null);
 
   const { data: surahData, isLoading } = useGetAllSurahsPaginatedQuery({
     page: currentPage,
@@ -29,27 +28,7 @@ export default function ReciteSideBar() {
   useEffect(() => {
     setCurrentPage(Number(number));
   }, [number]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.getAttribute("id").split("-")[1];
-            setActiveVerse(Number(id));
-          }
-        });
-      },
-      { threshold: 0.6 }
-    );
-
-    document
-      .querySelectorAll(".ayah")
-      .forEach((ayah) => observer.observe(ayah));
-
-    return () => observer.disconnect();
-  }, [currentSurah]);
-
+  
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -58,7 +37,7 @@ export default function ReciteSideBar() {
   };
   return (
     <aside
-      className={`hidden md:block bg-gray-200 w-2/6 pt-24 transition-transform duration-300 
+      className={`hidden md:block bg-gray-200 w-4/12 pt-24 transition-transform duration-300 
         ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
     >
       {/* sidebar for desktop version */}
@@ -119,11 +98,7 @@ export default function ReciteSideBar() {
                     <li
                       key={index}
                       // className="hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-lg md:text-xl  text-center cursor-pointer p-3"
-                      className={`hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-lg md:text-xl text-center cursor-pointer p-3 ${
-                        activeVerse === verse.verseNumber
-                          ? "bg-[#028A0F] text-black font-bold"
-                          : ""
-                      }`}
+                      className={`hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-lg md:text-xl text-center cursor-pointer p-3 `}
                       // onClick={() => handleGoToRecitePage(verse.verseNumber)}
                     >
                       {verse.verseNumber}

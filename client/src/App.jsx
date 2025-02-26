@@ -24,6 +24,10 @@ import HadithReadPage from "./pages/client/HadithReadPage";
 import HadithPage from "./pages/client/HadithPage";
 import HadithIndex from "./pages/client/HadithIndex";
 import EmailVerify from "./pages/client/EmailVerify";
+import DonateCheckout from "./pages/client/DonateCheckout";
+import BlogDetails from "./pages/client/BlogDetails";
+import Blogs from "./pages/client/Blogs";
+import Translation from "./pages/client/Translation";
 import Dashboard from "./pages/admin/Dashboard";
 
 
@@ -35,6 +39,8 @@ export default function App() {
       <Route path="/" element={<ClientLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/index" element={<IndexPage />} />
+        <Route path="/translation" element={<Translation />} />
+        <Route path="/translation/:title" element={<Translation />} />
         <Route path="/profile" element={<AuthProfile />} />
         <Route path="/" element={<ReciteLayout />}>
           <Route path="/recite/:number" element={<RecitePage />} />
@@ -43,7 +49,13 @@ export default function App() {
         <Route path="/hadith" element={<HadithPage />} />
         <Route path="/hadith/:title" element={<HadithIndex />} />
         <Route path="/hadith/:title/:number" element={<HadithReadPage />} />
+        {/* donor */}
         <Route path="/donor" element={<DonorPage />} />
+        <Route path="/donate-checkout" element={<DonateCheckout />} />
+        {/* blogs */}
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/blog-details" element={<BlogDetails />} />
+
       </Route>
 
       {/* auth Register and Login route */}
