@@ -36,6 +36,8 @@ const createDonor = async (req, res) => {
       fatherName,
       email,
       phone,
+      dateOfBirth,
+      typeOfDonation,
       companyName,
       profession,
       designation,
@@ -46,6 +48,7 @@ const createDonor = async (req, res) => {
       avatarId,
       TotalDonation,
       isDetailsVisible,
+      donateDate,
     } = req.body;
 
     // data validation
@@ -57,7 +60,6 @@ const createDonor = async (req, res) => {
     }
 
     const donorDoc = await Donor.findOne({
-      email,
       phone,
       name,
       fatherName,
@@ -82,6 +84,8 @@ const createDonor = async (req, res) => {
       fatherName,
       email,
       phone,
+      dateOfBirth,
+      typeOfDonation,
       companyName,
       designation,
       profession,
@@ -92,6 +96,7 @@ const createDonor = async (req, res) => {
       avatarId,
       TotalDonation,
       isDetailsVisible,
+      donateDate,
     });
 
     const savedDonor = await newDonor.save();
@@ -117,6 +122,8 @@ const editDonor = async (req, res) => {
       fatherName,
       email,
       phone,
+      dateOfBirth,
+      typeOfDonation,
       companyName,
       designation,
       profession,
@@ -126,6 +133,7 @@ const editDonor = async (req, res) => {
       avatar,
       TotalDonation,
       isDetailsVisible,
+      donateDate,
     } = req.body;
 
     const updatedDonor = await Donor.findOneAndUpdate(
@@ -135,6 +143,8 @@ const editDonor = async (req, res) => {
         fatherName,
         email,
         phone,
+        dateOfBirth,
+        typeOfDonation,
         companyName,
         designation,
         profession,
@@ -144,6 +154,7 @@ const editDonor = async (req, res) => {
         avatar,
         TotalDonation,
         isDetailsVisible,
+        donateDate,
       },
       { new: true }
     );
