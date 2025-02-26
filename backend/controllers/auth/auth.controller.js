@@ -2,8 +2,11 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const transporter = require("../../middleware/nodemailer.middleware");
+const dotenv = require("dotenv");
 
 const User = require("../../models/user.model");
+
+dotenv.config();
 
 //register
 const registerUser = async (req, res) => {
@@ -286,7 +289,6 @@ const updateUserProfile = async (req, res) => {
 //auth middleware
 const authMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
-  fffdsg;
 
   if (!token) {
     return res.status(401).json({
@@ -354,6 +356,41 @@ const updateUserRole = async (req, res) => {
   }
 };
 
+const getUserDetails = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const userDetails = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      companyName: user.companyName,
+      designation: user.designation,
+      country: user.country,
+      address: user.address,
+      totalDonation: user.totalDonation,
+      avatar: user.profileImage,
+      isVerified: user.isVerified,
+    };
+
+    res.status(200).json({
+      success: true,
+      message: "User details fetched successfully",
+      userDetails,
+    });
+  } catch (error) {
+    console.error("Error in getUserDetails:", error);
+  }
+};
+
 module.exports = {
   registerUser,
   verifyEmail,
@@ -362,4 +399,5 @@ module.exports = {
   authMiddleware,
   updateUserRole,
   updateUserProfile,
+  getUserDetails,
 };

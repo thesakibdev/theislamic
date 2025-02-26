@@ -118,6 +118,8 @@ const editDonor = async (req, res) => {
     const id = req.params.id;
 
     const {
+      avatar,
+      avatarId,
       name,
       fatherName,
       email,
@@ -130,12 +132,29 @@ const editDonor = async (req, res) => {
       country,
       street,
       city,
-      avatar,
       TotalDonation,
       isDetailsVisible,
       donateDate,
     } = req.body;
 
+    const findDonor = await Donor.findById(id);
+
+    findDonor.TotalDonation = TotalDonation || findDonor.TotalDonation;
+    findDonor.isDetailsVisible = isDetailsVisible || findDonor.isDetailsVisible;
+    findDonor.name = name || findDonor.name;
+    findDonor.fatherName = fatherName || findDonor.fatherName;
+    findDonor.email = email || findDonor.email;
+    findDonor.phone = phone || findDonor.phone;
+    findDonor.companyName = companyName || findDonor.companyName;
+    findDonor.designation = designation || findDonor.designation;
+    findDonor.profession = profession || findDonor.profession;
+    findDonor.country = country || findDonor.country;
+    findDonor.street = street || findDonor.street;
+    findDonor.city = city || findDonor.city;
+    findDonor.avatar = avatar || findDonor.avatar;
+    findDonor.avatarId = avatarId || findDonor.avatarId;
+
+    await findDonor.save();
     const updatedDonor = await Donor.findOneAndUpdate(
       { _id: id },
       {
@@ -168,7 +187,7 @@ const editDonor = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Donor updated successfully.",
-      updatedDonor,
+      findDonor,
     });
   } catch (error) {
     console.error(error);

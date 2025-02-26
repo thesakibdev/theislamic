@@ -4,7 +4,7 @@ import authProfileImg from "../../assets/auth-profile-default.png";
 import { useSelector } from "react-redux";
 
 export default function AuthProfile() {
-  const { user, isAuthenticated } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   console.log(user);
   return (
     <section className="bg-primary min-h-screen pb-10">

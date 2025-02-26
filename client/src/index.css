@@ -86,3 +86,18 @@ body {
   0% { transform: rotateX(90deg); opacity: 0; }
   100% { transform: rotateX(0deg); opacity: 1; }
 }
+.verse-active {
+  background-color: #028A0F !important;
+  color: white !important;
+  font-weight: bold !important;
+
+  
+}/* Custom scrollbar for Webkit Browsers (Chrome, Edge, Safari) */
+.scrollbar-custom::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox scrollbar styling */
+.scrollbar-custom {
+  scrollbar-width: none;
+}
