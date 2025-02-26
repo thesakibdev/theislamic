@@ -145,6 +145,8 @@ const editDonor = async (req, res) => {
     findDonor.fatherName = fatherName || findDonor.fatherName;
     findDonor.email = email || findDonor.email;
     findDonor.phone = phone || findDonor.phone;
+    findDonor.dateOfBirth = dateOfBirth || findDonor.dateOfBirth;
+    findDonor.typeOfDonation = typeOfDonation || findDonor.typeOfDonation;
     findDonor.companyName = companyName || findDonor.companyName;
     findDonor.designation = designation || findDonor.designation;
     findDonor.profession = profession || findDonor.profession;
@@ -153,6 +155,7 @@ const editDonor = async (req, res) => {
     findDonor.city = city || findDonor.city;
     findDonor.avatar = avatar || findDonor.avatar;
     findDonor.avatarId = avatarId || findDonor.avatarId;
+    findDonor.donateDate = donateDate || findDonor.donateDate;
 
     await findDonor.save();
     const updatedDonor = await Donor.findOneAndUpdate(
