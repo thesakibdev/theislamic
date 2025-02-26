@@ -18,10 +18,10 @@ export default function DonorPage() {
   });
 
   return (
-    <section className="pt-[4.5rem] md:pt-40">
+    <section className="pt-[4.5rem] md:pt-40 pb-10">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl font-semibold text-center">
+          <h1 className="text-2xl md:text-4xl font-semibold text-center">
             Honorable Donor List
           </h1>
 

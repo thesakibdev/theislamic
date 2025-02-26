@@ -81,7 +81,7 @@ export default function Header() {
       path: "/index",
     },
     {
-      text: "Recite",
+      text: "Recitation",
       path: "/recite/1",
     },
     {
