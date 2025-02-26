@@ -8,6 +8,7 @@ import Quran from "./pages/admin/Quran";
 import NotFound from "./pages/404";
 import Tafsir from "./pages/admin/Tafsir";
 import Hadith from "./pages/admin/Hadith";
+import HadithOther from "./pages/admin/HadithOther";
 import Donors from "./pages/admin/Donors";
 import CheckAuth from "./middleware/CheckAuth";
 import { useSelector } from "react-redux";
@@ -23,6 +24,7 @@ import HadithReadPage from "./pages/client/HadithReadPage";
 import HadithPage from "./pages/client/HadithPage";
 import HadithIndex from "./pages/client/HadithIndex";
 import EmailVerify from "./pages/client/EmailVerify";
+import Dashboard from "./pages/admin/Dashboard";
 
 
 export default function App() {
@@ -59,10 +61,11 @@ export default function App() {
           </CheckAuth>
         }
       >
-        <Route path="dashboard" />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="quran" element={<Quran />} />
         <Route path="verses-other-data" element={<VersesOtherData />} />
         <Route path="hadith" element={<Hadith />} />
+        <Route path="hadith-other" element={<HadithOther />} />
         <Route path="tafsir" element={<Tafsir />} />
         <Route path="donors" element={<Donors />} />
         <Route path="i-wall" element={<Blog />} />

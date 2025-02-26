@@ -18,9 +18,9 @@ import { useSelector } from "react-redux";
 
 const initialFormData = {
   title: "",
-  description: {},
+  description: "",
   thumbnail: null,
-  thumbnailId: "",
+  thumbnailId: null,
   shortDesc: "",
   slug: "",
   metaDesc: "",
@@ -33,12 +33,11 @@ export default function Blog() {
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imagePublicId, setImagePublicId] = useState("");
-  const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
+  
   const { user } = useSelector((state) => state.user);
-
+  
   const [addBlog] = useAddBlogMutation();
   const [editBlog] = useEditBlogMutation();
   const [deleteBlog] = useDeleteBlogMutation();
@@ -50,14 +49,22 @@ export default function Blog() {
     page: currentPage,
     limit: 6,
   });
+  
+  const [imageLoadingState, setImageLoadingState] = useState(isLoading);
+  console.log("isLoading", isLoading);
+  console.log("uploadedImageUrl", uploadedImageUrl);
+  console.log("imagePublicId", imagePublicId);
 
   const RTERef = useRef(null);
 
   const resetForm = () => {
     setFormData(initialFormData);
-    setUploadedImageUrl("");
+    setImageFile(null);
+    setUploadedImageUrl(null);
+    setImagePublicId(null);
     setImageLoadingState(false);
     setCurrentEditedId(null);
+    RTERef.current.setContent("");
   };
 
   const onSubmit = async (event) => {
@@ -72,6 +79,8 @@ export default function Blog() {
       author: user.id,
     };
 
+    console.log("Updated Form Data:", updatedFormData);
+
     try {
       if (currentEditedId !== null) {
         const editResponse = await editBlog({
@@ -85,6 +94,7 @@ export default function Blog() {
         const addResponse = await addBlog(updatedFormData).unwrap();
         if (addResponse.error) {
           toast.error(addResponse.error.message);
+          setImageLoadingState(false);
         } else {
           toast.success(addResponse.message || "Blog added successfully!");
           resetForm();
@@ -106,17 +116,16 @@ export default function Blog() {
       formData.slug.trim() !== "" &&
       formData.metaDesc.trim() !== "" &&
       formData.metaKeyword.trim() !== "" &&
-      RTEContent !== ""
+      RTEContent !== "" &&
+      RTEContent.length > 0 // Additional check for content length
     );
   };
 
   useEffect(() => {
-    if (currentEditedId !== null) {
-      RTERef.current?.setContent(formData.description || "");
-    } else {
-      RTERef.current?.setContent("");
+    if (RTERef.current) {
+      RTERef.current.setContent(formData.description || "");
     }
-  }, [currentEditedId, formData.description]);
+  }, [formData.description]);
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
 

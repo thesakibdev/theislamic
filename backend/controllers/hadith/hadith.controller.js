@@ -406,8 +406,8 @@ const getAllHadithPaginated = async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
   try {
-    const currentPage = parseInt(page, 10) || 1;
-    const pageLimit = parseInt(limit, 10) || 10;
+    const currentPage = Math.max(parseInt(page, 10) || 1, 1);
+    const pageLimit = Math.max(parseInt(limit, 10) || 10, 1);
 
     const cacheKey = `hadithsPage_${currentPage}_limit_${pageLimit}`;
     const cachedHadiths = await getCache(cacheKey);
@@ -416,73 +416,130 @@ const getAllHadithPaginated = async (req, res) => {
       return res.status(200).json(cachedHadiths);
     }
 
-    const hadiths = await Hadith.aggregate([
+    // Aggregation পাইপলাইন
+    const aggregationPipeline = [
+      { $unwind: "$hadithList" }, // প্রতিটি হাদিসকে আলাদা ডকুমেন্ট করা
+      {
+        $sort: {
+          bookName: 1,
+          partNumber: 1,
+          chapterNumber: 1,
+          "hadithList.hadithNumber": 1,
+        },
+      },
+      {
+        $group: {
+          _id: {
+            bookName: "$bookName",
+            partNumber: "$partNumber",
+            chapterNumber: "$chapterNumber",
+          },
+          bookName: { $first: "$bookName" },
+          partNumber: { $first: "$partNumber" },
+          partName: { $first: "$partName" },
+          chapterNumber: { $first: "$chapterNumber" },
+          chapterName: { $first: "$chapterName" },
+          hadiths: { $push: "$hadithList" }, // আলাদা করা হাদিসগুলো সংগ্রহ
+          totalHadiths: { $sum: 1 }, // প্রতিটি গ্রুপের হাদিস কাউন্ট
+        },
+      },
       { $sort: { bookName: 1, partNumber: 1, chapterNumber: 1 } },
+      {
+        $group: {
+          _id: {
+            bookName: "$bookName",
+            partNumber: "$partNumber",
+          },
+          bookName: { $first: "$bookName" },
+          partNumber: { $first: "$partNumber" },
+          partName: { $first: "$partName" },
+          chapters: {
+            $push: {
+              chapterNumber: "$chapterNumber",
+              chapterName: "$chapterName",
+              hadiths: "$hadiths",
+              totalChapterHadiths: "$totalHadiths",
+            },
+          },
+          totalPartHadiths: { $sum: "$totalHadiths" }, // পার্টের মোট হাদিস
+        },
+      },
+      { $sort: { bookName: 1, partNumber: 1 } },
+      {
+        $group: {
+          _id: "$bookName",
+          bookName: { $first: "$bookName" },
+          parts: {
+            $push: {
+              partNumber: "$partNumber",
+              partName: "$partName",
+              chapters: "$chapters",
+              totalPartHadiths: "$totalPartHadiths",
+            },
+          },
+          totalBookHadiths: { $sum: "$totalPartHadiths" }, // বইয়ের মোট হাদিস
+        },
+      },
+      { $sort: { bookName: 1 } },
       { $skip: (currentPage - 1) * pageLimit },
       { $limit: pageLimit },
-    ]);
+    ];
 
-    for (let hadith of hadiths) {
-      const hadiths = await Hadith.aggregate([
-        { $match: { _id: hadith._id } },
-        { $unwind: "$hadithList" },
-        { $sort: { "hadithList.hadithNumber": 1 } },
-        {
-          $group: {
-            _id: "$_id",
-            hadithList: { $push: "$hadithList" },
-          },
-        },
-      ]);
+    const [result] = await Hadith.aggregate(aggregationPipeline);
 
-      hadith.hadithList = hadiths.length > 0 ? hadiths[0].hadithList : [];
-    }
-
+    // অনুবাদিত হাদিস সংগ্রহ
     const hadithOtherLanguage = await HadithOtherLanguage.find().lean();
 
-    const formattedHadiths = hadiths.map((hadith) => ({
-      _id: hadith._id,
-      bookName: hadith.bookName,
-      partNumber: hadith.partNumber,
-      partName: hadith.partName,
-      chapterName: hadith.chapterName,
-      chapterNumber: hadith.chapterNumber,
-      hadithList: hadith.hadithList.map((hadithItem) => ({
-        _id: hadithItem._id,
-        hadithNumber: hadithItem.hadithNumber,
-        internationalNumber: hadithItem.internationalNumber,
-        hadithArabic: hadithItem.hadithArabic,
-        narrator: hadithItem.narrator,
-        referenceBook: hadithItem.referenceBook,
-        similarities: hadithItem.similarities,
-        translation: hadithItem.translation,
-        transliteration: hadithItem.transliteration,
-        note: hadithItem.note,
-        hadithOtherLanguage: hadithOtherLanguage
-          .filter(
-            (hl) =>
-              hl.bookName === hadith.bookName &&
-              hl.partNumber === hadith.partNumber &&
-              hl.chapterNumber === hadith.chapterNumber &&
-              hl.hadithNumber === hadithItem.hadithNumber
-          )
-          .map(
-            ({ bookName, partNumber, chapterNumber, hadithNumber, ...rest }) =>
-              rest
-          ),
-      })),
-    }));
-
-    const count = await Hadith.countDocuments();
-
-    const paginatedData = {
-      hadiths: formattedHadiths,
-      totalHadiths: count,
-      totalPages: Math.ceil(count / pageLimit),
-      currentPage,
+    // রেস্পন্স ফরম্যাটিং
+    const formattedResponse = {
+      bookName: result?.bookName || "",
+      totalBookHadiths: result?.totalBookHadiths || 0,
+      parts:
+        result?.parts?.map((part) => ({
+          partNumber: part.partNumber,
+          partName: part.partName,
+          totalPartHadiths: part.totalPartHadiths,
+          chapters: part.chapters.map((chapter) => ({
+            chapterNumber: chapter.chapterNumber,
+            chapterName: chapter.chapterName,
+            totalChapterHadiths: chapter.totalChapterHadiths,
+            hadithList: chapter.hadiths
+              .sort((a, b) => a.hadithNumber - b.hadithNumber)
+              .map((hadith) => ({
+                ...hadith,
+                hadithOtherLanguage: hadithOtherLanguage
+                  .filter(
+                    (hl) =>
+                      hl.bookName === result.bookName &&
+                      hl.partNumber === part.partNumber &&
+                      hl.chapterNumber === chapter.chapterNumber &&
+                      hl.hadithNumber === hadith.hadithNumber
+                  )
+                  .map(
+                    ({
+                      bookName,
+                      partNumber,
+                      chapterNumber,
+                      hadithNumber,
+                      ...rest
+                    }) => rest
+                  ),
+              })),
+          })),
+        })) || [],
     };
 
-    // Cache the response for 10 minutes
+    const totalBooks = await Hadith.distinct("bookName").countDocuments();
+
+    const paginatedData = {
+      data: formattedResponse,
+      currentPage,
+      totalPages: Math.ceil(totalBooks / pageLimit),
+      totalBooks,
+      itemsPerPage: pageLimit,
+    };
+
+    // Cache 10 মিনিটের জন্য
     setCache(cacheKey, paginatedData, 600);
 
     res.status(200).json({

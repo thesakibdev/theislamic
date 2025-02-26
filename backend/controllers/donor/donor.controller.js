@@ -36,6 +36,8 @@ const createDonor = async (req, res) => {
       fatherName,
       email,
       phone,
+      dateOfBirth,
+      typeOfDonation,
       companyName,
       profession,
       designation,
@@ -46,6 +48,7 @@ const createDonor = async (req, res) => {
       avatarId,
       TotalDonation,
       isDetailsVisible,
+      donateDate,
     } = req.body;
 
     // data validation
@@ -57,7 +60,6 @@ const createDonor = async (req, res) => {
     }
 
     const donorDoc = await Donor.findOne({
-      email,
       phone,
       name,
       fatherName,
@@ -82,6 +84,8 @@ const createDonor = async (req, res) => {
       fatherName,
       email,
       phone,
+      dateOfBirth,
+      typeOfDonation,
       companyName,
       designation,
       profession,
@@ -92,6 +96,7 @@ const createDonor = async (req, res) => {
       avatarId,
       TotalDonation,
       isDetailsVisible,
+      donateDate,
     });
 
     const savedDonor = await newDonor.save();
@@ -119,6 +124,8 @@ const editDonor = async (req, res) => {
       fatherName,
       email,
       phone,
+      dateOfBirth,
+      typeOfDonation,
       companyName,
       designation,
       profession,
@@ -127,6 +134,7 @@ const editDonor = async (req, res) => {
       city,
       TotalDonation,
       isDetailsVisible,
+      donateDate,
     } = req.body;
 
     const findDonor = await Donor.findById(id);
@@ -137,6 +145,8 @@ const editDonor = async (req, res) => {
     findDonor.fatherName = fatherName || findDonor.fatherName;
     findDonor.email = email || findDonor.email;
     findDonor.phone = phone || findDonor.phone;
+    findDonor.dateOfBirth = dateOfBirth || findDonor.dateOfBirth;
+    findDonor.typeOfDonation = typeOfDonation || findDonor.typeOfDonation;
     findDonor.companyName = companyName || findDonor.companyName;
     findDonor.designation = designation || findDonor.designation;
     findDonor.profession = profession || findDonor.profession;
@@ -145,8 +155,35 @@ const editDonor = async (req, res) => {
     findDonor.city = city || findDonor.city;
     findDonor.avatar = avatar || findDonor.avatar;
     findDonor.avatarId = avatarId || findDonor.avatarId;
+    findDonor.donateDate = donateDate || findDonor.donateDate;
 
     await findDonor.save();
+    const updatedDonor = await Donor.findOneAndUpdate(
+      { _id: id },
+      {
+        name,
+        fatherName,
+        email,
+        phone,
+        dateOfBirth,
+        typeOfDonation,
+        companyName,
+        designation,
+        profession,
+        country,
+        street,
+        city,
+        avatar,
+        TotalDonation,
+        isDetailsVisible,
+        donateDate,
+      },
+      { new: true }
+    );
+
+    if (!updatedDonor) {
+      return res.status(404).json({ error: true, message: "Donor not found." });
+    }
 
     invalidateCache("donors");
 

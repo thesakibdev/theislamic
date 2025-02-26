@@ -1,4 +1,4 @@
-import { UploadCloudIcon, XIcon } from "lucide-react";
+import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Label } from "../ui/label";
 import { useEffect, useRef } from "react";
 import { Button } from "../ui/button";
@@ -67,7 +67,7 @@ export default function ImageUploader({
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         className={`${
-          isEditMode ? "opacity-40" : ""
+          isEditMode ? "opacity-60" : ""
         } border-2 border-dashed rounded-lg p-4`}
       >
         <Input
@@ -91,30 +91,21 @@ export default function ImageUploader({
         ) : imageLoadingState ? (
           <Skeleton className="h-10 bg-gray-100" />
         ) : (
-          <>
-            {uploadedImageUrl && (
-              <div className="relative">
-                <div className="flex items-center">
-                  {/* <FileIcon className="w-8 text-primary mr-2 h-8" /> */}
-                  <img
-                    src={uploadedImageUrl}
-                    alt="Uploaded Image"
-                    className="w-full h-[170px] object-cover bg-no-repeat
-                    bg-center rounded-lg"
-                  />
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-muted-foreground hover:text-foreground absolute top-2 right-2"
-                  onClick={handleRemoveImage}
-                >
-                  <XIcon className="w-4 h-4" />
-                  <span className="sr-only">Remove File</span>
-                </Button>
-              </div>
-            )}
-          </>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <FileIcon className="w-8 text-primary mr-2 h-8" />
+            </div>
+            <p className="text-sm font-medium">{imageFile.name}</p>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={handleRemoveImage}
+            >
+              <XIcon className="w-4 h-4" />
+              <span className="sr-only">Remove File</span>
+            </Button>
+          </div>
         )}
       </div>
     </div>

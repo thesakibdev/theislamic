@@ -7,7 +7,7 @@ import MenuIcon from "../../assets/icon/menu-icon.png";
 import OpenBook from "../../assets/icon/open_book.png";
 import Book from "../../assets/icon/book.png";
 import Donate from "../../assets/icon/donate.png";
-import Account from "../../assets/icon/finance.png";
+
 import Iwall from "../../assets/icon/i-wall.png";
 import Social from "../../assets/icon/social.png";
 import ManPraying from "../../assets/icon/man_praying.png";

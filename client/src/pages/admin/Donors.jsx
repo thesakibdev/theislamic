@@ -28,6 +28,8 @@ const initialFormData = {
   fatherName: "",
   email: "",
   phone: "",
+  dateOfBirth: "",
+  typeOfDonation: "",
   designation: "",
   profession: "",
   companyName: "",
@@ -38,6 +40,7 @@ const initialFormData = {
   avatarId: null,
   TotalDonation: null,
   isDetailsVisible: true,
+  donateDate: "",
 };
 
 export default function Donors() {
@@ -74,6 +77,8 @@ export default function Donors() {
       fatherName: formData.fatherName,
       email: formData.email,
       phone: formData.phone,
+      dateOfBirth: formData.dateOfBirth,
+      typeOfDonation: formData.typeOfDonation,
       designation: formData.designation,
       profession: formData.profession,
       companyName: formData.companyName,
@@ -84,7 +89,9 @@ export default function Donors() {
       isDetailsVisible: formData.isDetailsVisible,
       avatar: uploadedImageUrl,
       avatarId: imagePublicId,
+      donateDate: formData.donateDate,
     };
+    console.log(updatedFormData);
 
     try {
       if (currentEditedId !== null) {
@@ -121,6 +128,8 @@ export default function Donors() {
       fatherName: donor.fatherName,
       email: donor.email,
       phone: donor.phone,
+      dateOfBirth: donor.dateOfBirth,
+      typeOfDonation: donor.typeOfDonation,
       profession: donor.profession,
       designation: donor.designation,
       companyName: donor.companyName,
@@ -128,7 +137,9 @@ export default function Donors() {
       city: donor.city,
       country: donor.country,
       TotalDonation: donor.TotalDonation,
+      avatar: donor.avatar,
       isDetailsVisible: donor.isDetailsVisible,
+      donateDate: donor.donateDate,
     });
   };
 
@@ -160,6 +171,20 @@ export default function Donors() {
       componentType: "input",
       type: "text",
       placeholder: "Enter Donor Phone",
+    },
+    {
+      label: "Donor Date of Birth",
+      name: "dateOfBirth",
+      componentType: "input",
+      type: "date",
+      placeholder: "Enter Donor Date of Birth",
+    },
+    {
+      label: "Type of Donation",
+      name: "typeOfDonation",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Type of Donation",
     },
     {
       label: "Donor profession",
@@ -215,6 +240,12 @@ export default function Donors() {
       name: "isDetailsVisible",
       componentType: "checkbox",
       type: "checkbox",
+    },
+    {
+      label: "Donation Date",
+      name: "donateDate",
+      componentType: "input",
+      type: "date",
     },
   ];
 
@@ -385,7 +416,6 @@ export default function Donors() {
             setImagePublicId={setImagePublicId}
             setUploadedImageUrl={setUploadedImageUrl}
             setImageLoadingState={setImageLoadingState}
-            isEditMode={currentEditedId !== null}
           />
 
           <CommonForm
