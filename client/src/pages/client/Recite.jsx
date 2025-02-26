@@ -59,7 +59,7 @@ export default function RecitePage() {
   });
 
   const currentSurah = surahData?.surahs?.find(
-    (surah) => surah === Number(number)
+    (surah) => surah.surahNumber === Number(number)
   );
 
   if (isLoading) return <Loading />;
@@ -225,7 +225,7 @@ export default function RecitePage() {
             open={openSheet}
             onOpenChange={(isOpen) => setOpenSheet(isOpen)}
           >
-            <SheetContent className="bg-primary">
+            <SheetContent className="bg-white">
               <SheetHeader>
                 <SheetTitle>Translation</SheetTitle>
               </SheetHeader>
@@ -239,7 +239,7 @@ export default function RecitePage() {
                     }}
                     className={`px-4 py-2 m-2 ${
                       selectedLanguage === lang
-                        ? "bg-green-500 text-white"
+                        ? "bg-green-500 text-black"
                         : "bg-gray-200"
                     }`}
                   >
