@@ -136,6 +136,19 @@ export default function AdminSidebar() {
                     ></div>
                     <span>Hadith</span>
                   </li>
+                  <li
+                    className="flex items-center space-x-2 text-md cursor-pointer pl-4 border-b pb-4"
+                    onClick={() => {
+                      navigate("hadith-other");
+                    }}
+                  >
+                    <div
+                      className={`w-4 h-4 ${
+                        activePath === "hadith-other" ? "bg-black" : "bg-white"
+                      } rounded-full`}
+                    ></div>
+                    <span>Hadith Other</span>
+                  </li>
                 </ul>
               </div>
             </div>
