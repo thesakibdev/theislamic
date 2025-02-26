@@ -48,7 +48,6 @@ export default function Hadith() {
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const [currentPage, setCurrentPage] = useState(1);
-  console.log(currentPage);
 
   const [addHadith] = useAddHadithMutation();
 
@@ -61,6 +60,13 @@ export default function Hadith() {
     page: currentPage,
     limit: 1,
   });
+
+  console.log("hadithData", hadithData);
+
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setOpenAddHadithForm(false);
+  };
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -89,8 +95,10 @@ export default function Hadith() {
       // Show success or error messages based on the response
       if (addResponse.error) {
         toast.error(addResponse.error.message);
+        console.log(addResponse.error);
       } else {
         toast.success(addResponse.message || "Hadith added successfully!");
+        resetForm();
       }
     } catch (error) {
       console.log(error);
@@ -229,10 +237,9 @@ export default function Hadith() {
             <div>Loading...</div>
           ) : (
             <div className="">
-              {hadithData?.hadiths?.map((hadith) => (
-                <div className="border border-gray-300 p-4" key={hadith._id}>
-                  <h1>Book Name: {hadith.bookName}</h1>
-                  <div className="flex gap-2">
+              <div className="border border-gray-300 p-4">
+                <h1>Book Name: {hadithData?.data?.bookName}</h1>
+                {/* <div className="flex gap-2">
                     <p>Part Name: {hadith.partName}</p>
                     <p> Part Number: {hadith.partNumber}</p>
                   </div>
@@ -259,9 +266,8 @@ export default function Hadith() {
                         <p>{hadithItem.note}</p> <p>Note: {hadithItem.note}</p>
                       </li>
                     ))}
-                  </ul>
-                </div>
-              ))}
+                  </ul> */}
+              </div>
             </div>
           )}
         </div>
@@ -281,17 +287,17 @@ export default function Hadith() {
                   disabled={currentPage == 1}
                 />
               </PaginationItem>
-              <PaginationItem>
+              {/* <PaginationItem>
                 <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
+              </PaginationItem> */}
+              {/* <PaginationItem>
                 <Button
                   className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                  onClick={() => setCurrentPage(5)}
+                  onClick={() => setCurrentPage(currentPage + 5)}
                 >
                   Skip
                 </Button>
-              </PaginationItem>
+              </PaginationItem> */}
               <PaginationItem>
                 <PaginationEllipsis />
               </PaginationItem>

@@ -7,7 +7,7 @@ export const hadithApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl, credentials: "include" }),
   tagTypes: ["Hadith", "HadithOtherLanguage"],
   endpoints: (builder) => ({
-    // Add a new verse to a Surah
+    // Add a new hadith to a Hadith collection
     addHadith: builder.mutation({
       query: (formData) => ({
         url: "/admin/hadith/add",
@@ -17,8 +17,18 @@ export const hadithApi = createApi({
       }),
       invalidatesTags: ["Hadith"],
     }),
+    // Add a new hadith to a HadithOtherLanguage collection
+    addHadithOtherLanguage: builder.mutation({
+      query: (formData) => ({
+        url: "/admin/hadith/add/other-language",
+        method: "POST",
+        body: formData,
+        headers: { "Content-Type": "application/json" },
+      }),
+      invalidatesTags: ["Hadith", "HadithOtherLanguage"],
+    }),
     getAllHadithByPagination: builder.query({
-      query: ({ page, limit}) => ({
+      query: ({ page, limit }) => ({
         url: `/admin/hadith/get/all?page=${page}&limit=${limit}`,
         method: "GET",
       }),
@@ -27,4 +37,8 @@ export const hadithApi = createApi({
   }),
 });
 
-export const { useAddHadithMutation, useGetAllHadithByPaginationQuery } = hadithApi;
+export const {
+  useAddHadithMutation,
+  useAddHadithOtherLanguageMutation,
+  useGetAllHadithByPaginationQuery,
+} = hadithApi;

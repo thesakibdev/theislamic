@@ -28,24 +28,27 @@ const initialFormData = {
   fatherName: "",
   email: "",
   phone: "",
+  dateOfBirth: "",
+  typeOfDonation: "",
   designation: "",
   profession: "",
   companyName: "",
   country: "",
   street: "",
   city: "",
-  avatar: "",
-  avatarId: "",
+  avatar: null,
+  avatarId: null,
   TotalDonation: null,
   isDetailsVisible: true,
+  donateDate: "",
 };
 
 export default function Donors() {
   const [formData, setFormData] = useState(initialFormData);
   const [openAddDonorForm, setOpenAddDonorForm] = useState(false);
   const [imageFile, setImageFile] = useState(null);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
-  const [imagePublicId, setImagePublicId] = useState("");
+  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+  const [imagePublicId, setImagePublicId] = useState(null);
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
 
@@ -74,6 +77,8 @@ export default function Donors() {
       fatherName: formData.fatherName,
       email: formData.email,
       phone: formData.phone,
+      dateOfBirth: formData.dateOfBirth,
+      typeOfDonation: formData.typeOfDonation,
       designation: formData.designation,
       profession: formData.profession,
       companyName: formData.companyName,
@@ -84,7 +89,9 @@ export default function Donors() {
       isDetailsVisible: formData.isDetailsVisible,
       avatar: uploadedImageUrl,
       avatarId: imagePublicId,
+      donateDate: formData.donateDate,
     };
+    console.log(updatedFormData);
 
     try {
       if (currentEditedId !== null) {
@@ -121,6 +128,8 @@ export default function Donors() {
       fatherName: donor.fatherName,
       email: donor.email,
       phone: donor.phone,
+      dateOfBirth: donor.dateOfBirth,
+      typeOfDonation: donor.typeOfDonation,
       profession: donor.profession,
       designation: donor.designation,
       companyName: donor.companyName,
@@ -128,7 +137,9 @@ export default function Donors() {
       city: donor.city,
       country: donor.country,
       TotalDonation: donor.TotalDonation,
+      avatar: donor.avatar,
       isDetailsVisible: donor.isDetailsVisible,
+      donateDate: donor.donateDate,
     });
   };
 
@@ -160,6 +171,20 @@ export default function Donors() {
       componentType: "input",
       type: "text",
       placeholder: "Enter Donor Phone",
+    },
+    {
+      label: "Donor Date of Birth",
+      name: "dateOfBirth",
+      componentType: "input",
+      type: "date",
+      placeholder: "Enter Donor Date of Birth",
+    },
+    {
+      label: "Type of Donation",
+      name: "typeOfDonation",
+      componentType: "input",
+      type: "text",
+      placeholder: "Enter Type of Donation",
     },
     {
       label: "Donor profession",
@@ -216,6 +241,12 @@ export default function Donors() {
       componentType: "checkbox",
       type: "checkbox",
     },
+    {
+      label: "Donation Date",
+      name: "donateDate",
+      componentType: "input",
+      type: "date",
+    },
   ];
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -237,80 +268,94 @@ export default function Donors() {
         </div>
 
         <div className="container mx-auto px-4">
-          <div className="">
+          <div className="max-w-5xl mx-auto">
             <h1 className="text-4xl font-semibold text-center">
               Honorable Donor List
             </h1>
-            <div className="">
-              {isLoading ? (
-                <p>Loading...</p>
-              ) : data?.donors?.length > 0 ? (
-                data?.donors?.map((donor) => (
-                  <div
-                    key={donor.name}
-                    className="border p-4 grid md:grid-cols-5 items-center justify-between my-6 gap-5 rounded-md"
-                  >
-                    {donor.avatar === "" ? (
-                      <div className="w-[100px] h-[100px] mx-auto bg-gray-300"></div>
-                    ) : (
-                      <img
-                        src={donor.avatar}
-                        alt={donor.name}
-                        className="rounded-md"
-                      />
-                    )}
-                    <div className="md:col-span-3">
-                      <p className="text-lg">
-                        <span className="font-semibold">Name:</span>{" "}
-                        {donor.name}
+
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : data?.donors?.length > 0 ? (
+              data?.donors?.map((donor) => (
+                <div
+                  key={donor.name}
+                  className="border p-4 flex flex-col md:flex-row my-6 gap-5 rounded-md relative"
+                >
+                  {donor.avatar === "" ? (
+                    <div className="w-[100px] h-[100px] mx-auto bg-gray-300"></div>
+                  ) : (
+                    <img
+                      src={donor.avatar}
+                      alt={donor.name}
+                      className="rounded-md max-h-[200px] mx-auto md:mx-0"
+                    />
+                  )}
+                  <div>
+                    <div className="flex justify-between">
+                      <p className="text-xl md:text-2xl font-bold mb-2">
+                        Name: {donor.name}
                       </p>
-                      <div className="grid md:grid-cols-3">
-                        <p className="text-lg">
-                          <span className="font-semibold">Profession:</span>{" "}
-                          {donor.profession}
-                        </p>
-                        <p className="text-lg">
-                          <span className="font-semibold">Company:</span>{" "}
-                          {donor.companyName}
-                        </p>
-                        <p className="text-lg">
-                          <span className="font-semibold">Designation: </span>
-                          {donor.designation}
-                        </p>
-                        <p className="text-lg">
-                          <span className="font-semibold">Street:</span>{" "}
-                          {donor.street}
-                        </p>
-                        <p className="text-lg">
-                          <span className="font-semibold">City:</span>{" "}
-                          {donor.city}
-                        </p>
-                        <p className="text-lg">
-                          <span className="font-semibold">Country:</span>{" "}
-                          {donor.country}
-                        </p>
-                        <p className="text-lg">
-                          <span className="font-semibold">Total Donation:</span>{" "}
-                          Tk {donor.TotalDonation}
-                        </p>
+                      <div className="absolute top-4 right-4 flex justify-end">
+                        <Button
+                          className="bg-primary text-white hover:bg-primary/50 hover:text-black duration-500"
+                          onClick={() => handleEditDonor(donor)}
+                        >
+                          Edit
+                        </Button>
                       </div>
                     </div>
-                    <div className="md:col-span-1 flex justify-end">
-                      <Button
-                        className="bg-primary text-white hover:bg-primary/50 hover:text-black duration-500"
-                        onClick={() => handleEditDonor(donor)}
-                      >
-                        Edit
-                      </Button>
+                    <div className="grid md:grid-cols-2 gap-y-3 gap-x-10">
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Profession:
+                        </span>{" "}
+                        {donor.profession}
+                      </p>
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Company:
+                        </span>{" "}
+                        {donor.companyName}
+                      </p>
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Designation:{" "}
+                        </span>
+                        {donor.designation}
+                      </p>
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Street:
+                        </span>{" "}
+                        {donor.street}
+                      </p>
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          City:
+                        </span>{" "}
+                        {donor.city}
+                      </p>
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Country:
+                        </span>{" "}
+                        {donor.country}
+                      </p>
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Total Donation:
+                        </span>{" "}
+                        Tk {donor.TotalDonation}
+                      </p>
                     </div>
                   </div>
-                ))
-              ) : (
-                <p>No Donors Found</p>
-              )}
-            </div>
+                </div>
+              ))
+            ) : (
+              <p>No Donors Found</p>
+            )}
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center px-4">
             <Pagination className="px-4">
               <PaginationContent>
                 <PaginationItem>
@@ -371,7 +416,6 @@ export default function Donors() {
             setImagePublicId={setImagePublicId}
             setUploadedImageUrl={setUploadedImageUrl}
             setImageLoadingState={setImageLoadingState}
-            isEditMode={currentEditedId !== null}
           />
 
           <CommonForm

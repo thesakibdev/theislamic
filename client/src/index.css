@@ -91,3 +91,8 @@ body {
 .scrollbar-custom::-webkit-scrollbar {
   display: none;
 }
+
+/* Firefox scrollbar styling */
+.scrollbar-custom {
+  scrollbar-width: none;
+}
