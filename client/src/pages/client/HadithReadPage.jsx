@@ -1,8 +1,31 @@
 import { useParams } from "react-router-dom";
 import allahSymbol from "@/assets/icon/allah-symbol.png";
+import { useGetAllHadithQuery } from "../../slices/admin/hadith";
+import { useGetAllBookListQuery } from "../../slices/utils";
 
 export default function HadithReadPage() {
-  const { number } = useParams();
+  const { number, id } = useParams();
+  const { data: bookList } = useGetAllBookListQuery();
+  const { data: response } = useGetAllHadithQuery();
+  const hadiths = response?.data;
+  console.log(hadiths);
+  console.log(bookList);
+  console.log(id);
+
+  const selectedBookName = bookList?.data.find((book) => book.id === id);
+  console.log(selectedBookName?.nameEn);
+  const selectedHadiths = hadiths?.filter(
+    (hadith) => hadith.bookName === selectedBookName?.nameEn
+  );
+  console.log(selectedHadiths);
+
+  const selectedHadith = selectedHadiths
+    ?.flatMap((hadith) =>
+      hadith.parts.find((part) => part.partNumber === parseInt(number))
+    )
+    .find(Boolean);
+  console.log("selectedHadith", selectedHadith);
+
   const hadith = {
     title: "Revelation",
     hadithArabic: "كتاب بدء الوحي",
@@ -20,35 +43,48 @@ export default function HadithReadPage() {
     <section>
       <div className="py-16 ">
         {/* heading */}
-        <div className="container mx-auto  flex justify-between items-center text-xl py-5 md:text-3xl font-bold">
-          <h1>{hadith.title}</h1>
+        <div className="container px-4 mx-auto  flex justify-between items-center text-xl py-5 md:text-3xl font-bold">
+          <h1>{selectedHadith?.partName}</h1>
           <img src={allahSymbol} alt="allah symbol" />
           <p>{hadith.hadithArabic}</p>
         </div>
-        {/* hadith chapter */}
-        <div className="py-10 my-10 bg-primary-foreground px-2 md:px-0">
-          <div className="container mx-auto flex flex-col md:flex-row justify-between gap-5 text-xl text-white md:text-2xl font-medium">
-            <h1 className="max-w-xl">{hadith.hadithChapter} <span className="text-primary font-bold">Chapter no. {number} </span> </h1>
-            <h1 className="max-w-xl text-3xl">{hadith.hadithChapterArabic} </h1>
-          </div>
-        </div>
-        {/* hadith para */}
-        <div className="py-10 bg-primary-foreground px-2 md:px-0">
-          <div className="container mx-auto text-xl text-white md:text-2xl font-medium">
-            <h1 className="text-center">{`وَقَوْلُ اللَّهِ جَلَّ ذِكْرُهُ: {إِنَّا أَوْحَيْنَا إِلَيْكَ كَمَا أَوْحَيْنَا إِلَى نُوحٍ وَالنَّبِيِّينَ مِنْ بَعْدِهِ}`}</h1>
-            <div className="flex flex-col md:flex-row gap-5 justify-between mt-14">
-              <h2 className="max-w-xl">{hadith.hadithPara1} </h2>
-              <h2 className="max-w-xl text-3xl">{hadith.hadithPara1Arabic} </h2>
+
+        {selectedHadith?.chapters?.map((chapter, index) => (
+          <div key={index}>
+            <div className="my-10 px-2 md:px-0">
+              <div className="bg-primary-foreground py-10">
+                <div className="container px-4  mx-auto flex flex-col md:flex-row justify-between gap-5 text-xl text-white md:text-2xl font-medium">
+                  <h1 className="max-w-xl">
+                    {chapter.chapterName}{" "}
+                    <span className="text-primary font-bold">
+                      Chapter no. {chapter.chapterNumber}{" "}
+                    </span>{" "}
+                  </h1>
+                  <h1 className="max-w-xl text-3xl">
+                    {hadith.hadithChapterArabic}{" "}
+                  </h1>
+                </div>
+              </div>
+              {/* hadith list */}
+              {chapter.hadithList?.map((hadith, index) => (
+                <div
+                  className="my-10 py-10 bg-primary-foreground px-2 md:px-0 text-xl text-white md:text-2xl font-medium"
+                  key={index}
+                >
+                  <div className="container px-4 mx-auto flex flex-col md:flex-row gap-5 justify-between mt-14">
+                    <div className="">
+                      <h3>Narrated by: {hadith.narrator}</h3>
+                      <h2 className="max-w-xl">{hadith.hadithArabic} </h2>
+                    </div>
+                    <h2 className="max-w-xl text-3xl">
+                      {hadith.hadithArabic}{" "}
+                    </h2>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-        {/* hadith para */}
-        <div className="my-10 py-10 bg-primary-foreground px-2 md:px-0 text-xl text-white md:text-2xl font-medium">
-          <div className="container mx-auto flex flex-col md:flex-row gap-5 justify-between mt-14">
-            <h2 className="max-w-xl">{hadith.hadithPara1} </h2>
-            <h2 className="max-w-xl text-3xl">{hadith.hadithPara1Arabic} </h2>
-          </div>
-        </div>
+        ))}
       </div>
     </section>
   );

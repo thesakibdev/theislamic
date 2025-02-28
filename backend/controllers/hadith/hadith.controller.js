@@ -236,8 +236,6 @@ const editHadith = async (req, res) => {
   const { bookName, partNumber, chapterNumber, hadithNumber, updatedData } =
     req.body;
 
-  console.log("Edit Hadith Request:", req.body);
-
   try {
     // Find the hadith document
     const hadithDoc = await Hadith.findOne({ bookName });
@@ -316,6 +314,8 @@ const editHadith = async (req, res) => {
     // Save the updated document
     await hadithDoc.save();
 
+    invalidateCache();
+
     return res.status(200).json({
       success: true,
       message: "Hadith updated successfully.",
@@ -333,8 +333,6 @@ const editHadith = async (req, res) => {
 
 const deleteHadith = async (req, res) => {
   const { bookName, partNumber, chapterNumber, hadithNumber } = req.body;
-
-  console.log("Delete Hadith Request:", req.body);
 
   try {
     // Find the hadith document
@@ -415,6 +413,8 @@ const deleteHadith = async (req, res) => {
     // Save the updated document
     await hadithDoc.save();
 
+    invalidateCache();
+
     return res.status(200).json({
       success: true,
       message: "Hadith deleted successfully.",
@@ -439,7 +439,8 @@ const addHadithOtherLanguage = async (req, res) => {
     chapterNumber,
     hadithNumber,
     hadithText,
-    referenceBook,
+    translation,
+    transliteration,
     note,
   } = req.body;
 
@@ -451,7 +452,6 @@ const addHadithOtherLanguage = async (req, res) => {
     const normalChapterNumber = parseInt(chapterNumber, 10);
     const normalHadithNumber = parseInt(hadithNumber, 10);
     const normalHadithText = hadithText?.trim();
-    const normalReferenceBook = referenceBook?.trim();
     const normalNote = note?.trim();
 
     // Number validation helper function
@@ -506,7 +506,8 @@ const addHadithOtherLanguage = async (req, res) => {
       chapterNumber: normalChapterNumber,
       hadithNumber: normalHadithNumber,
       hadithText: normalHadithText,
-      referenceBook: normalReferenceBook,
+      translation,
+      transliteration,
       note: normalNote,
     });
 
@@ -539,7 +540,6 @@ const editHadithOtherLanguage = async (req, res) => {
     chapterNumber,
     hadithNumber,
     hadithText,
-    referenceBook,
     note,
   } = req.body;
 
@@ -551,7 +551,6 @@ const editHadithOtherLanguage = async (req, res) => {
     const normalChapterNumber = parseInt(chapterNumber, 10);
     const normalHadithNumber = parseInt(hadithNumber, 10);
     const normalHadithText = hadithText?.trim();
-    const normalReferenceBook = referenceBook?.trim();
     const normalNote = note?.trim();
 
     // Number validation helper function
@@ -593,7 +592,6 @@ const editHadithOtherLanguage = async (req, res) => {
         chapterNumber: normalChapterNumber,
         hadithNumber: normalHadithNumber,
         hadithText: normalHadithText,
-        referenceBook: normalReferenceBook,
         note: normalNote,
       },
       { new: true }
@@ -652,258 +650,99 @@ const deleteHadithOtherLanguage = async (req, res) => {
   }
 };
 
-// const getAllHadithPaginated = async (req, res) => {
-//   const { page = 1, limit = 10 } = req.query;
-
-//   try {
-//     const currentPage = Math.max(parseInt(page, 10) || 1, 1);
-//     const pageLimit = Math.max(parseInt(limit, 10) || 10, 1);
-
-//     const cacheKey = `hadithsPage_${currentPage}_limit_${pageLimit}`;
-//     const cachedHadiths = await getCache(cacheKey);
-
-//     if (cachedHadiths) {
-//       return res.status(200).json(cachedHadiths);
-//     }
-
-//     // Aggregation পাইপলাইন
-//     const aggregationPipeline = [
-//       { $unwind: "$hadithList" }, // প্রতিটি হাদিসকে আলাদা ডকুমেন্ট করা
-//       {
-//         $sort: {
-//           bookName: 1,
-//           partNumber: 1,
-//           chapterNumber: 1,
-//           "hadithList.hadithNumber": 1,
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: {
-//             bookName: "$bookName",
-//             partNumber: "$partNumber",
-//             chapterNumber: "$chapterNumber",
-//           },
-//           bookName: { $first: "$bookName" },
-//           partNumber: { $first: "$partNumber" },
-//           partName: { $first: "$partName" },
-//           chapterNumber: { $first: "$chapterNumber" },
-//           chapterName: { $first: "$chapterName" },
-//           hadiths: { $push: "$hadithList" }, // আলাদা করা হাদিসগুলো সংগ্রহ
-//           totalHadiths: { $sum: 1 }, // প্রতিটি গ্রুপের হাদিস কাউন্ট
-//         },
-//       },
-//       { $sort: { bookName: 1, partNumber: 1, chapterNumber: 1 } },
-//       {
-//         $group: {
-//           _id: {
-//             bookName: "$bookName",
-//             partNumber: "$partNumber",
-//           },
-//           bookName: { $first: "$bookName" },
-//           partNumber: { $first: "$partNumber" },
-//           partName: { $first: "$partName" },
-//           chapters: {
-//             $push: {
-//               chapterNumber: "$chapterNumber",
-//               chapterName: "$chapterName",
-//               hadiths: "$hadiths",
-//               totalChapterHadiths: "$totalHadiths",
-//             },
-//           },
-//           totalPartHadiths: { $sum: "$totalHadiths" }, // পার্টের মোট হাদিস
-//         },
-//       },
-//       { $sort: { bookName: 1, partNumber: 1 } },
-//       {
-//         $group: {
-//           _id: "$bookName",
-//           bookName: { $first: "$bookName" },
-//           parts: {
-//             $push: {
-//               partNumber: "$partNumber",
-//               partName: "$partName",
-//               chapters: "$chapters",
-//               totalPartHadiths: "$totalPartHadiths",
-//             },
-//           },
-//           totalBookHadiths: { $sum: "$totalPartHadiths" }, // বইয়ের মোট হাদিস
-//         },
-//       },
-//       { $sort: { bookName: 1 } },
-//       { $skip: (currentPage - 1) * pageLimit },
-//       { $limit: pageLimit },
-//     ];
-
-//     const [result] = await Hadith.aggregate(aggregationPipeline);
-
-//     // অনুবাদিত হাদিস সংগ্রহ
-//     const hadithOtherLanguage = await HadithOtherLanguage.find().lean();
-
-//     // রেস্পন্স ফরম্যাটিং
-//     const formattedResponse = {
-//       bookName: result?.bookName || "",
-//       totalBookHadiths: result?.totalBookHadiths || 0,
-//       parts:
-//         result?.parts?.map((part) => ({
-//           partNumber: part.partNumber,
-//           partName: part.partName,
-//           totalPartHadiths: part.totalPartHadiths,
-//           chapters: part.chapters.map((chapter) => ({
-//             chapterNumber: chapter.chapterNumber,
-//             chapterName: chapter.chapterName,
-//             totalChapterHadiths: chapter.totalChapterHadiths,
-//             hadithList: chapter.hadiths
-//               .sort((a, b) => a.hadithNumber - b.hadithNumber)
-//               .map((hadith) => ({
-//                 ...hadith,
-//                 hadithOtherLanguage: hadithOtherLanguage
-//                   .filter(
-//                     (hl) =>
-//                       hl.bookName === result.bookName &&
-//                       hl.partNumber === part.partNumber &&
-//                       hl.chapterNumber === chapter.chapterNumber &&
-//                       hl.hadithNumber === hadith.hadithNumber
-//                   )
-//                   .map(
-//                     ({
-//                       bookName,
-//                       partNumber,
-//                       chapterNumber,
-//                       hadithNumber,
-//                       ...rest
-//                     }) => rest
-//                   ),
-//               })),
-//           })),
-//         })) || [],
-//     };
-
-//     const totalBooks = await Hadith.distinct("bookName").countDocuments();
-
-//     const paginatedData = {
-//       data: formattedResponse,
-//       currentPage,
-//       totalPages: Math.ceil(totalBooks / pageLimit),
-//       totalBooks,
-//       itemsPerPage: pageLimit,
-//     };
-
-//     // Cache 10 মিনিটের জন্য
-//     setCache(cacheKey, paginatedData, 600);
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Hadiths fetched successfully",
-//       paginatedData,
-//     });
-//   } catch (error) {
-//     console.error("Error fetching hadiths:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Error fetching hadiths",
-//     });
-//   }
-// };
-
 const getAllHadithPaginated = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10, hadithPage = 1, hadithLimit = 5 } = req.query;
 
   try {
     const currentPage = Math.max(parseInt(page, 10) || 1, 1);
     const pageLimit = Math.max(parseInt(limit, 10) || 10, 1);
+    const hadithCurrentPage = Math.max(parseInt(hadithPage, 10) || 1, 1);
+    const hadithPageLimit = Math.max(parseInt(hadithLimit, 10) || 5, 1);
 
-    // Create cache key based on pagination parameters
-    const cacheKey = `hadithsPage_${currentPage}_limit_${pageLimit}`;
+    // Create cache key for hadith pagination
+    const cacheKey = `hadithsPage_${currentPage}_limit_${pageLimit}_hadithPage_${hadithCurrentPage}_hadithLimit_${hadithPageLimit}`;
     const cachedHadiths = await getCache(cacheKey);
 
-    // Return cached data if available
     if (cachedHadiths) {
       return res.status(200).json(cachedHadiths);
     }
 
-    // Aggregation pipeline for sorting and pagination
+    // Aggregation pipeline for books & parts pagination
     const aggregationPipeline = [
-      // Sort by bookName, partNumber, chapterNumber, and hadithNumber
-      {
-        $sort: {
-          bookName: 1,
-          "parts.partNumber": 1,
-        },
-      },
-      // Skip and limit for pagination
+      { $sort: { bookName: 1, "parts.partNumber": 1 } },
       { $skip: (currentPage - 1) * pageLimit },
       { $limit: pageLimit },
     ];
 
-    // Execute aggregation
     const hadiths = await Hadith.aggregate(aggregationPipeline);
-
-    // Count total documents for pagination
     const totalHadiths = await Hadith.countDocuments();
-
-    // Get all hadith translations in other languages
     const hadithOtherLanguage = await HadithOtherLanguage.find().lean();
 
-    // Format the response with serialized data
-    const formattedHadiths = hadiths.map((hadith) => {
-      return {
-        bookName: hadith.bookName,
-        parts: hadith.parts
-          // Sort parts by partNumber
-          .sort((a, b) => a.partNumber - b.partNumber)
-          .map((part) => {
-            return {
-              partName: part.partName,
-              partNumber: part.partNumber,
-              chapters: part.chapters
-                // Sort chapters by chapterNumber
-                .sort((a, b) => a.chapterNumber - b.chapterNumber)
-                .map((chapter) => {
+    // Format the response with paginated hadithList
+    const formattedHadiths = hadiths.map((hadith) => ({
+      bookName: hadith.bookName,
+      parts: hadith.parts
+        .sort((a, b) => a.partNumber - b.partNumber)
+        .map((part) => ({
+          partName: part.partName,
+          partNumber: part.partNumber,
+          chapters: part.chapters
+            .sort((a, b) => a.chapterNumber - b.chapterNumber)
+            .map((chapter) => {
+              // HadithList pagination
+              const totalHadithCount = chapter.hadithList.length;
+              const paginatedHadithList = chapter.hadithList
+                .sort((a, b) => a.hadithNumber - b.hadithNumber)
+                .slice(
+                  (hadithCurrentPage - 1) * hadithPageLimit,
+                  hadithCurrentPage * hadithPageLimit
+                )
+                .map((h) => {
+                  const otherLanguages = hadithOtherLanguage
+                    .filter(
+                      (hl) =>
+                        hl.bookName === hadith.bookName &&
+                        hl.partNumber === part.partNumber &&
+                        hl.chapterNumber === chapter.chapterNumber &&
+                        hl.hadithNumber === h.hadithNumber
+                    )
+                    .map(
+                      ({
+                        bookName,
+                        partNumber,
+                        chapterNumber,
+                        hadithNumber,
+                        ...rest
+                      }) => rest
+                    );
+
                   return {
-                    chapterName: chapter.chapterName,
-                    chapterNumber: chapter.chapterNumber,
-                    hadithList: chapter.hadithList
-                      // Sort hadiths by hadithNumber
-                      .sort((a, b) => a.hadithNumber - b.hadithNumber)
-                      .map((h) => {
-                        // Find corresponding translations in other languages
-                        const otherLanguages = hadithOtherLanguage
-                          .filter(
-                            (hl) =>
-                              hl.bookName === hadith.bookName &&
-                              hl.partNumber === part.partNumber &&
-                              hl.chapterNumber === chapter.chapterNumber &&
-                              hl.hadithNumber === h.hadithNumber
-                          )
-                          .map(
-                            ({
-                              bookName,
-                              partNumber,
-                              chapterNumber,
-                              hadithNumber,
-                              ...rest
-                            }) => rest
-                          );
-
-                        // Return the hadith with other language translations
-                        return {
-                          ...h,
-                          hadithOtherLanguage: otherLanguages,
-                        };
-                      }),
+                    ...h,
+                    hadithOtherLanguage: otherLanguages,
                   };
-                }),
-            };
-          }),
-        _id: hadith._id,
-        createdAt: hadith.createdAt,
-        updatedAt: hadith.updatedAt,
-        __v: hadith.__v,
-      };
-    });
+                });
 
-    // Create pagination data
+              return {
+                chapterName: chapter.chapterName,
+                chapterNumber: chapter.chapterNumber,
+                hadithList: paginatedHadithList,
+                hadithPagination: {
+                  hadithCurrentPage,
+                  totalHadithPages: Math.ceil(
+                    totalHadithCount / hadithPageLimit
+                  ),
+                  totalHadithCount,
+                },
+              };
+            }),
+        })),
+      _id: hadith._id,
+      createdAt: hadith.createdAt,
+      updatedAt: hadith.updatedAt,
+      __v: hadith.__v,
+    }));
+
+    // Final paginated response
     const paginatedData = {
       data: formattedHadiths,
       currentPage,
@@ -912,10 +751,9 @@ const getAllHadithPaginated = async (req, res) => {
       itemsPerPage: pageLimit,
     };
 
-    // Cache the response for 10 minutes (600 seconds)
+    // Cache for 10 minutes
     setCache(cacheKey, paginatedData, 600);
 
-    // Send the formatted response
     res.status(200).json({
       success: true,
       message: "Hadiths fetched successfully",
@@ -930,6 +768,81 @@ const getAllHadithPaginated = async (req, res) => {
   }
 };
 
+const getAllHadith = async (req, res) => {
+  try {
+    const hadiths = await Hadith.aggregate([
+      { 
+        $sort: { 
+          bookName: 1, 
+          "parts.partNumber": 1,
+          "parts.chapters.chapterNumber": 1,
+          "parts.chapters.hadithList.hadithNumber": 1
+        } 
+      }
+    ]);
+
+    const hadithOtherLanguage = await HadithOtherLanguage.find().lean();
+
+    // সিরিয়ালাইজেশন লজিক
+    const formattedHadiths = hadiths.map((hadith, bookIndex) => ({
+      bookName: hadith.bookName,
+      serializedBookNumber: bookIndex + 1, // বই সিরিয়াল নম্বর
+      parts: hadith.parts
+        .sort((a, b) => a.partNumber - b.partNumber)
+        .map((part, partIndex) => ({
+          ...part,
+          serializedPartNumber: partIndex + 1, // পার্ট সিরিয়াল নম্বর
+          chapters: part.chapters
+            .sort((a, b) => a.chapterNumber - b.chapterNumber)
+            .map((chapter, chapterIndex) => ({
+              ...chapter,
+              serializedChapterNumber: chapterIndex + 1, // চ্যাপ্টার সিরিয়াল নম্বর
+              hadithList: chapter.hadithList
+                .sort((a, b) => a.hadithNumber - b.hadithNumber)
+                .map((hadith, hadithIndex) => {
+                  const otherLanguages = hadithOtherLanguage
+                    .filter(
+                      (hl) =>
+                        hl.bookName === hadith.bookName &&
+                        hl.partNumber === part.partNumber &&
+                        hl.chapterNumber === chapter.chapterNumber &&
+                        hl.hadithNumber === hadith.hadithNumber
+                    )
+                    .map(
+                      ({
+                        bookName,
+                        partNumber,
+                        chapterNumber,
+                        hadithNumber,
+                        ...rest
+                      }) => rest
+                    );
+
+                  return {
+                    ...hadith,
+                    serializedHadithNumber: hadithIndex + 1, // হাদিস সিরিয়াল নম্বর
+                    hadithOtherLanguage: otherLanguages,
+                  };
+                })
+            }))
+        }))
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: "সমস্ত হাদিস সিরিয়ালাইজডভাবে fetched হয়েছে",
+      data: formattedHadiths
+    });
+
+  } catch (error) {
+    console.error("হাদিস fetch করতে সমস্যা:", error);
+    res.status(500).json({
+      success: false,
+      message: "হাদিস fetch করতে সমস্যা হয়েছে",
+    });
+  }
+};
+
 module.exports = {
   addHadith,
   editHadith,
@@ -938,4 +851,5 @@ module.exports = {
   editHadithOtherLanguage,
   deleteHadithOtherLanguage,
   getAllHadithPaginated,
+  getAllHadith,
 };

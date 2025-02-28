@@ -1,14 +1,30 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useGetAllHadithQuery } from "../../slices/admin/hadith";
+import { useGetAllBookListQuery } from "../../slices/utils";
 
 export default function HadithIndex() {
-  const { title } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const hadiths = Array.from({ length: 10 }, (_, index) => ({
-    title: "Revelation",
-    arabic: "كتاب بدء الوحي",
-    hadithNo: 1,
-    indexNo: index + 1,
-  }));
+  // const hadiths = Array.from({ length: 10 }, (_, index) => ({
+  //   title: "Revelation",
+  //   arabic: "كتاب بدء الوحي",
+  //   hadithNo: 1,
+  //   indexNo: index + 1,
+  // }));
+
+  const { data: bookList } = useGetAllBookListQuery();
+  const { data: response } = useGetAllHadithQuery();
+  const hadiths = response?.data;
+  console.log(hadiths);
+  console.log(bookList);
+  console.log(id);
+
+  const selectedBookName = bookList?.data.find((book) => book.id === id);
+  console.log(selectedBookName?.nameEn);
+  const selectedHadiths = hadiths?.filter(
+    (hadith) => hadith.bookName === selectedBookName?.nameEn
+  );
+  console.log(selectedHadiths);
 
   return (
     <section>
@@ -16,7 +32,9 @@ export default function HadithIndex() {
         {/* hadith heading */}
         <div className="bg-primary-foreground flex flex-col gap-5 text-white font-serif py-5 md:py-10 px-5 md:px-16 rounded-xl my-10">
           <div className="flex justify-between">
-            <h1 className="text-xl md:text-2xl font-bold">Sahih Al-Bukhari</h1>
+            <h1 className="text-xl md:text-2xl font-bold">
+              {selectedHadiths?.[0].bookName}
+            </h1>
             <p className="text-xl md:text-2xl font-bold">صحيح البخاري</p>
           </div>
           <p className="text-sm md:text-lg">
@@ -34,18 +52,18 @@ export default function HadithIndex() {
         {/* hadith list */}
         <div>
           <ul className="rounded-xl bg-white overflow-hidden">
-            {hadiths.map((hadith, index) => (
+            {selectedHadiths?.map((hadith, index) => (
               <li
                 key={index}
-                className="flex justify-between bg-primary-foreground text-xl md:text-2xl font-bold py-4 px-5 text-white border-b cursor-pointer"
-                onClick={() => navigate(`/hadith/${title}/${hadith.indexNo}`)}
+                className=" bg-primary-foreground text-xl md:text-2xl font-bold py-4 px-5 text-white border-b cursor-pointer"
+                // onClick={() => navigate(`/hadith/${title}/${hadith.indexNo}`)}
               >
-                <p>{hadith.title}</p>
-                <div className="flex items-center gap-x-1 md:gap-x-10">
-                  <p className="">{hadith.arabic}</p>
-                  <p className="mx-3">{hadith.hadithNo}</p>
-                  <p>{hadith.indexNo}</p>
-                </div>
+                {hadith.parts?.map((part, index) => (
+                  <div className="flex justify-between" key={index} onClick={() => navigate(`/hadith/${id}/${part.partNumber}`)}>
+                    <p className="">{part.partName}</p>
+                    <p className="">{part.partNumber}</p>
+                  </div>
+                ))}
               </li>
             ))}
           </ul>

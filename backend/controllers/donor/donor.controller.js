@@ -136,6 +136,7 @@ const editDonor = async (req, res) => {
       isDetailsVisible,
       donateDate,
     } = req.body;
+    console.log(req.body);
 
     const findDonor = await Donor.findById(id);
 
@@ -173,7 +174,12 @@ const editDonor = async (req, res) => {
         country,
         street,
         city,
-        avatar,
+        avatar:
+          avatar !== null && avatar !== undefined ? avatar : findDonor.avatar,
+        avatarId:
+          avatarId !== null && avatarId !== undefined
+            ? avatarId
+            : findDonor.avatarId,
         TotalDonation,
         isDetailsVisible,
         donateDate,

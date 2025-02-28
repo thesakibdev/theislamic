@@ -10,7 +10,6 @@ const hadithSchema = new mongoose.Schema({
   chapterNumber: { type: Number, required: true },
   hadithNumber: { type: Number, required: true },
   hadithText: { type: String, required: true },
-  referenceBook: { type: String },
   similarities: { type: String },
   translation: { type: String },
   transliteration: { type: String },

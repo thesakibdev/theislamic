@@ -319,10 +319,12 @@ const CommonForm = memo(function CommonForm({
                 .filter((controlItem) =>
                   [
                     "bookName",
+                    "language",
                     "partName",
                     "partNumber",
                     "chapterName",
                     "chapterNumber",
+                    "keywords",
                   ]?.includes(controlItem.name)
                 )
                 .map((controlItem) => (
@@ -344,6 +346,7 @@ const CommonForm = memo(function CommonForm({
                     "hadithNumber",
                     "internationalNumber",
                     "hadithArabic",
+                    "hadithText",
                     "referenceBook",
                     "similarities",
                     "narrator",

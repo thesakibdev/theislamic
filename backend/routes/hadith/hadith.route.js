@@ -8,6 +8,7 @@ const {
   editHadithOtherLanguage,
   deleteHadithOtherLanguage,
   getAllHadithPaginated,
+  getAllHadith,
 } = require("../../controllers/hadith/hadith.controller");
 
 const router = express.Router();
@@ -25,5 +26,6 @@ router.delete("/delete/other-language/:id", deleteHadithOtherLanguage);
 
 // get all hadiths
 router.get("/get/all", getAllHadithPaginated);
+router.get("/get/all/hadith", getAllHadith);
 
 module.exports = router;
