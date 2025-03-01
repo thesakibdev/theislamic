@@ -50,39 +50,53 @@ export default function HadithReadPage() {
         </div>
 
         {selectedHadith?.chapters?.map((chapter, index) => (
-          <div key={index}>
-            <div className="my-10 px-2 md:px-0">
-              <div className="bg-primary-foreground py-10">
-                <div className="container px-4  mx-auto flex flex-col md:flex-row justify-between gap-5 text-xl text-white md:text-2xl font-medium">
-                  <h1 className="max-w-xl">
-                    {chapter.chapterName}{" "}
-                    <span className="text-primary font-bold">
-                      Chapter no. {chapter.chapterNumber}{" "}
-                    </span>{" "}
-                  </h1>
-                  <h1 className="max-w-xl text-3xl">
-                    {hadith.hadithChapterArabic}{" "}
-                  </h1>
-                </div>
+          <div key={index} className="my-10">
+            <div className="bg-primary-foreground py-10">
+              <div className="container px-4  mx-auto flex flex-col md:flex-row justify-between gap-5 text-xl text-white md:text-2xl font-medium">
+                <h1 className="max-w-xl">
+                  {chapter.chapterName}{" "}
+                  <span className="text-primary font-bold">
+                    Chapter no. {chapter.chapterNumber}{" "}
+                  </span>{" "}
+                </h1>
+                <h1 className="max-w-xl text-3xl">
+                  {hadith.hadithChapterArabic}{" "}
+                </h1>
               </div>
-              {/* hadith list */}
-              {chapter.hadithList?.map((hadith, index) => (
-                <div
-                  className="my-10 py-10 bg-primary-foreground px-2 md:px-0 text-xl text-white md:text-2xl font-medium"
-                  key={index}
-                >
-                  <div className="container px-4 mx-auto flex flex-col md:flex-row gap-5 justify-between mt-14">
-                    <div className="">
-                      <h3>Narrated by: {hadith.narrator}</h3>
-                      <h2 className="max-w-xl">{hadith.hadithArabic} </h2>
-                    </div>
-                    <h2 className="max-w-xl text-3xl">
+            </div>
+            {/* hadith list */}
+            {chapter.hadithList?.map((hadith, index) => (
+              <div
+                className="my-10 py-5 bg-primary-foreground px-2 md:px-0 text-xl text-white md:text-2xl font-medium"
+                key={index}
+              >
+                <div className="container px-4 mx-auto flex flex-col md:flex-row justify-between gap-5">
+                  <div className="max-w-xl">
+                    <h3 className="text-sm font-bold capitalize md:text-base mb-2">
+                      Narrated by: {hadith.narrator}
+                    </h3>
+                    <h2 className="text-sm capitalize">
                       {hadith.hadithArabic}{" "}
                     </h2>
                   </div>
+                  <h2 className="max-w-xl text-3xl">{hadith.hadithArabic} </h2>
                 </div>
-              ))}
-            </div>
+                <div className="container px-4 mx-auto flex flex-col md:flex-row justify-between gap-5 mt-5">
+                  <div className="text-xs md:text-sm">
+                    <p>Rrference : <span className="text-primary">{hadith.referenceBook}</span></p>
+                    <p>
+                      In-book reference :{" "}
+                      <span>Book {selectedHadith?.partNumber}</span>{" "}
+                      <span>Hadith {hadith.hadithNumber}</span>
+                    </p>
+                  </div>
+                  <div className="flex gap-2 text-xs md:text-sm">
+                    <p>Report Error |</p>
+                    <p>Share</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ))}
       </div>

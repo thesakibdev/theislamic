@@ -53,13 +53,13 @@ export default function HadithIndex() {
         <div>
           <ul className="rounded-xl bg-white overflow-hidden">
             {selectedHadiths?.map((hadith, index) => (
-              <li
-                key={index}
-                className=" bg-primary-foreground text-xl md:text-2xl font-bold py-4 px-5 text-white border-b cursor-pointer"
-                // onClick={() => navigate(`/hadith/${title}/${hadith.indexNo}`)}
-              >
+              <li key={index}>
                 {hadith.parts?.map((part, index) => (
-                  <div className="flex justify-between" key={index} onClick={() => navigate(`/hadith/${id}/${part.partNumber}`)}>
+                  <div
+                    className="flex justify-between bg-primary-foreground text-xl md:text-2xl font-bold py-4 px-5 text-white border-b cursor-pointer"
+                    key={index}
+                    onClick={() => navigate(`/hadith/${id}/${part.partNumber}`)}
+                  >
                     <p className="">{part.partName}</p>
                     <p className="">{part.partNumber}</p>
                   </div>
