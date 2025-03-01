@@ -47,8 +47,8 @@ export default function App() {
         </Route>
         {/* hadith */}
         <Route path="/hadith" element={<HadithPage />} />
-        <Route path="/hadith/:id" element={<HadithIndex />} />
-        <Route path="/hadith/:id/:number" element={<HadithReadPage />} />
+        <Route path="/hadith/:title" element={<HadithIndex />} />
+        <Route path="/hadith/:title/:number" element={<HadithReadPage />} />
         <Route path="/donor" element={<DonorPage />} />
         <Route path="/donate-checkout" element={<DonateCheckout />} />
         {/* blogs */}
