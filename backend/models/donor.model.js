@@ -4,7 +4,7 @@ const donorSchema = new mongoose.Schema({
   name: { type: String, required: true },
   fatherName: { type: String },
   email: { type: String },
-  phone: { type: String, required: true },
+  phone: { type: String, required: true, unique: true },
   dateOfBirth: { type: String },
   profession: { type: String, default: "Not Provided" },
   designation: { type: String, default: "Not Provided" },

@@ -41,6 +41,7 @@ const initialFormData = {
   transliteration: "",
   narrator: "",
   note: "",
+  keywords: [],
 };
 
 export default function Hadith() {
@@ -48,20 +49,24 @@ export default function Hadith() {
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const [currentPage, setCurrentPage] = useState(1);
+  const [hadithPage, setHadithPage] = useState(1);
 
   const [addHadith] = useAddHadithMutation();
 
   const { data: allBookList } = useGetAllBookListQuery();
   const {
-    data: hadithData,
+    data: response,
     isLoading,
     isError,
   } = useGetAllHadithByPaginationQuery({
     page: currentPage,
     limit: 1,
+    hadithPage: hadithPage,
+    hadithLimit: 5,
   });
 
-  console.log("hadithData", hadithData);
+  // Extract data from the response
+  const hadithData = response?.data || [];
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -87,6 +92,7 @@ export default function Hadith() {
         transliteration: formData.transliteration,
         narrator: formData.narrator,
         note: formData.note,
+        keywords: formData.keywords,
       },
     };
 
@@ -212,6 +218,13 @@ export default function Hadith() {
       type: "text",
       placeholder: "Enter Note",
     },
+    {
+      label: "Keywords",
+      name: "keywords",
+      componentType: "multiInput",
+      type: "text",
+      placeholder: "Enter Keywords",
+    },
   ];
 
   return (
@@ -235,39 +248,59 @@ export default function Hadith() {
             <div>Error fetching data</div>
           ) : isLoading ? (
             <div>Loading...</div>
+          ) : hadithData.length === 0 ? (
+            <div>No hadiths found</div>
           ) : (
-            <div className="">
-              <div className="border border-gray-300 p-4">
-                <h1>Book Name: {hadithData?.data?.bookName}</h1>
-                {/* <div className="flex gap-2">
-                    <p>Part Name: {hadith.partName}</p>
-                    <p> Part Number: {hadith.partNumber}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <p> Chapter Name: {hadith.chapterName}</p>
-                    <p> Chapter Number: {hadith.chapterNumber}</p>
-                  </div>
-                  <h3>Hadith List</h3>
-                  <ul className="">
-                    {hadith.hadithList.map((hadithItem) => (
-                      <li key={hadithItem._id} className="flex gap-2">
-                        <p>Hadith Number: {hadithItem.hadithNumber}</p>
-                        <p>Hadith Arabic: {hadithItem.hadithArabic}</p>
-                        <p>
-                          {" "}
-                          International Hadith Number:{" "}
-                          {hadithItem.internationalNumber}
-                        </p>
-                        <p>Similarities: {hadithItem.similarities}</p>{" "}
-                        <p> Reference Book: {hadithItem.referenceBook}</p>{" "}
-                        <p> Translation: {hadithItem.translation}</p>{" "}
-                        <p> Transliteration: {hadithItem.transliteration}</p>{" "}
-                        <p> Narrator: {hadithItem.narrator}</p>{" "}
-                        <p>{hadithItem.note}</p> <p>Note: {hadithItem.note}</p>
-                      </li>
+            <div className="border border-gray-300 p-4">
+              {hadithData.map((hadith, index) => (
+                <div className="border border-gray-300 p-4" key={index}>
+                  {/* Add optional chaining for nested data */}
+                  <h2>Book Name: {hadith?.bookName}</h2>
+                  <div>
+                    {hadith?.parts?.map((hadithItem, index) => (
+                      <div key={index}>
+                        <p>Part Name: {hadithItem?.partName}</p>
+                        <p>Part Number: {hadithItem?.partNumber}</p>
+
+                        <div>
+                          {hadithItem?.chapters?.map((chapter, index) => (
+                            <div key={index}>
+                              <p>Chapter Name: {chapter?.chapterName}</p>
+                              <p>Chapter Number: {chapter?.chapterNumber}</p>
+
+                              <div>
+                                {chapter?.hadithList?.map((hadith, index) => (
+                                  <div
+                                    className="border border-gray-300 p-4 my-3 grid grid-cols-3 gap-5"
+                                    key={index}
+                                  >
+                                    <p>Hadith Number: {hadith?.hadithNumber}</p>
+                                    <p>
+                                      International Hadith Number:{" "}
+                                      {hadith?.internationalNumber}
+                                    </p>
+                                    <p>Hadith Arabic: {hadith?.hadithArabic}</p>
+                                    <p>
+                                      Reference Book: {hadith?.referenceBook}
+                                    </p>
+                                    <p>Similarities: {hadith?.similarities}</p>
+                                    <p>Translation: {hadith?.translation}</p>
+                                    <p>
+                                      Transliteration: {hadith?.transliteration}
+                                    </p>
+                                    <p>Narrator: {hadith?.narrator}</p>
+                                    <p>Note: {hadith?.note}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     ))}
-                  </ul> */}
-              </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

@@ -1,70 +1,20 @@
 import { CiSearch } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
+import {
+  useGetAllBookListQuery,
+  useGetAllLanguagesQuery,
+} from "../../slices/utils";
 
 export default function HadithPage() {
   const navigate = useNavigate();
-  const hadith=[
-    {
-      hadithNo:1,
-      title:"Sahih Al-Bukhari",
-      arabic:"صحيح البخاري",
-    },
-    {
-      hadithNo:2,
-      title:"Sahih Muslim",
-      arabic:"صحيح المسلم",
-    },
-    {
-      hadithNo:3,
-      title:"Sahih Tirmizi",
-      arabic:"صحيح الترميزي",
-    },
-    {
-      hadithNo:4,
-      title:"Sahih Ibn Majah",
-      arabic:"صحيح ابن ماجه",
-    },
-    {
-      hadithNo:5,
-      title:"Sahih al-Bukhari",
-      arabic:"صحيح البخاري",
-    },
-    {
-      hadithNo:6,
-      title:"Sahih Muslim",
-      arabic:"صحيح المسلم",
-    },
-    {
-      hadithNo:7,
-      title:"Sahih Tirmizi",
-      arabic:"صحيح الترميزي",
-    },
-    {
-      hadithNo:8,
-      title:"Sahih Ibn Majah",
-      arabic:"صحيح ابن ماجه",
-    },
-    {
-      hadithNo:9,
-      title:"Sahih al-Bukhari",
-      arabic:"صحيح البخاري",
-    },
-    {
-      hadithNo:10,
-      title:"Sahih Muslim",
-      arabic:"صحيح المسلم",
-    },
-    {
-      hadithNo:11,
-      title:"Sahih Tirmizi",
-      arabic:"صحيح الترميزي",
-    },
-    {
-      hadithNo:12,
-      title:"Sahih Ibn Majah",
-      arabic:"صحيح ابن ماجه",
-    },
-  ]
+  
+  const { data: response } = useGetAllBookListQuery();
+  const { data: allLanguages } = useGetAllLanguagesQuery();
+
+  console.log(response);
+  const allBookList = response?.data;
+  console.log(allLanguages);
+
   return (
     <>
       <section>
@@ -84,14 +34,14 @@ export default function HadithPage() {
           </div>
           {/* hadith List */}
           <div className="max-w-5xl mx-auto mt-10 py-8 bg-primary-foreground rounded-xl">
-            {hadith.map((hadith) => (
+            {allBookList?.map((book) => (
               <div
-                key={hadith.hadithNo}
-                onClick={() => navigate(`/hadith/${hadith.title}`)}
+                key={book._id}
+                onClick={() => navigate(`/hadith/${book.id}`)}
                 className="cursor-pointer flex justify-between items-center px-10 py-2 border-t-2 border-white"
               >
-                <p className="text-2xl text-white">{hadith.title}</p>
-                <p className="text-xl text-white">{hadith.arabic}</p>
+                <p className="text-2xl text-white">{book.nameEn}</p>
+                <p className="text-xl text-white">{book.arabic}</p>
               </div>
             ))}
           </div>
