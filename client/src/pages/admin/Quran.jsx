@@ -327,7 +327,9 @@ export default function Quran() {
                 <PaginationItem>
                   <Button
                     className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                    onClick={() => setCurrentPage(5)}
+                    onClick={() => setCurrentPage(()=>
+                      currentPage > currentPage.length ? currentPage : currentPage + 5
+                    )}
                   >
                     Skip
                   </Button>
