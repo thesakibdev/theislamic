@@ -76,7 +76,7 @@ export default function HadithReadPage() {
                       Narrated by: {hadith.narrator}
                     </h3>
                     <h2 className="text-sm capitalize">
-                      {hadith.hadithArabic}{" "}
+                      {hadith.translation}{" "}
                     </h2>
                   </div>
                   <h2 className="max-w-xl text-3xl">{hadith.hadithArabic} </h2>

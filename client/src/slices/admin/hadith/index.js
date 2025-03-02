@@ -46,6 +46,28 @@ export const hadithApi = createApi({
       }),
       providesTags: ["Hadith"], // সঠিক, কারণ এটি ডেটা ফেচ করে
     }),
+    getHadiths: builder.query({
+      query: ({ page = 1, limit = 10 }) => ({
+        url: "/admin/hadith/get/all",
+        params: { page, limit, timestamp: Date.now() },
+      }),
+      // Transform the response to handle the nested data structure
+      transformResponse: (response) => {
+        if (!response.success) {
+          throw new Error(response.message || "Error fetching hadiths");
+        }
+        return response.data;
+      },
+      // Provide better error handling
+      transformErrorResponse: (response) => {
+        return {
+          status: response.status,
+          message: response.data?.message || "Error fetching hadiths",
+        };
+      },
+      // Enable refetching on network reconnect
+      providesTags: ["Hadith"],
+    }),
   }),
 });
 
@@ -53,5 +75,6 @@ export const {
   useAddHadithMutation,
   useAddHadithOtherLanguageMutation,
   useGetAllHadithByPaginationQuery,
-  useGetAllHadithQuery, // এখানে `useGetAllHadithQuery` হবে, কারণ এটি একটি query
+  useGetAllHadithQuery,
+  useGetHadithsQuery,
 } = hadithApi;

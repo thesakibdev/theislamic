@@ -4,28 +4,20 @@ const { invalidateCache, setCache, getCache } = require("../../utils/utils");
 
 const handleImageUpload = async (req, res) => {
   try {
-    const fileBuffer = req.file.buffer; // File buffer from multer
-    const public_id = `image_${Date.now()}`; // Generate unique public_id
-    const folder = "Donor_images"; // Specify Cloudinary folder
+    const fileBuffer = req.file.buffer;
+    const public_id = `image_${Date.now()}`;
+    const folder = "Donor_images";
 
-    // Upload the image and get optimized URL and public_id
     const { optimizedUrl, public_id: uploadedPublicId } =
       await cloudinary.imageUploadUtil(fileBuffer, public_id, folder);
 
-    // Respond with the optimized URL and public_id
     res.json({
       success: true,
-      data: {
-        optimizedUrl,
-        public_id: uploadedPublicId,
-      },
+      data: { optimizedUrl, public_id: uploadedPublicId },
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      success: false,
-      message: "Image upload failed",
-    });
+    res.status(500).json({ success: false, message: "Image upload failed" });
   }
 };
 
@@ -46,12 +38,11 @@ const createDonor = async (req, res) => {
       city,
       avatar,
       avatarId,
-      TotalDonation,
+      amount,
       isDetailsVisible,
       donateDate,
     } = req.body;
 
-    // data validation
     if (!phone) {
       return res.status(400).json({
         error: true,
@@ -59,14 +50,11 @@ const createDonor = async (req, res) => {
       });
     }
 
-    const donorDoc = await Donor.findOne({
-      phone,
-      name,
-      fatherName,
-    });
+    const donorDoc = await Donor.findOne({ phone, name, fatherName });
 
     if (donorDoc) {
-      donorDoc.TotalDonation += TotalDonation;
+      donorDoc.TotalDonation += amount;
+      donorDoc.donationHistory.push({ amount, donateDate });
       await donorDoc.save();
 
       invalidateCache("donors");
@@ -78,7 +66,6 @@ const createDonor = async (req, res) => {
       });
     }
 
-    // Create new donor if not found
     const newDonor = new Donor({
       name,
       fatherName,
@@ -94,9 +81,10 @@ const createDonor = async (req, res) => {
       city,
       avatar,
       avatarId,
-      TotalDonation,
+      TotalDonation: amount,
       isDetailsVisible,
       donateDate,
+      donationHistory: [{ amount, donateDate, history: [] }],
     });
 
     const savedDonor = await newDonor.save();
@@ -116,7 +104,6 @@ const createDonor = async (req, res) => {
 const editDonor = async (req, res) => {
   try {
     const id = req.params.id;
-
     const {
       avatar,
       avatarId,
@@ -132,15 +119,14 @@ const editDonor = async (req, res) => {
       country,
       street,
       city,
-      TotalDonation,
+      amount,
       isDetailsVisible,
       donateDate,
     } = req.body;
-    console.log(req.body);
 
     const findDonor = await Donor.findById(id);
 
-    findDonor.TotalDonation = TotalDonation || findDonor.TotalDonation;
+    findDonor.TotalDonation += amount || 0;
     findDonor.isDetailsVisible = isDetailsVisible || findDonor.isDetailsVisible;
     findDonor.name = name || findDonor.name;
     findDonor.fatherName = fatherName || findDonor.fatherName;
@@ -158,45 +144,35 @@ const editDonor = async (req, res) => {
     findDonor.avatarId = avatarId || findDonor.avatarId;
     findDonor.donateDate = donateDate || findDonor.donateDate;
 
-    await findDonor.save();
-    const updatedDonor = await Donor.findOneAndUpdate(
-      { _id: id },
-      {
-        name,
-        fatherName,
-        email,
-        phone,
-        dateOfBirth,
-        typeOfDonation,
-        companyName,
-        designation,
-        profession,
-        country,
-        street,
-        city,
-        avatar:
-          avatar !== null && avatar !== undefined ? avatar : findDonor.avatar,
-        avatarId:
-          avatarId !== null && avatarId !== undefined
-            ? avatarId
-            : findDonor.avatarId,
-        TotalDonation,
-        isDetailsVisible,
-        donateDate,
-      },
-      { new: true }
-    );
-
-    if (!updatedDonor) {
-      return res.status(404).json({ error: true, message: "Donor not found." });
+    if (amount) {
+      findDonor.donationHistory.push({ amount, donateDate, history: [] });
     }
+
+    await findDonor.save();
 
     invalidateCache("donors");
 
     return res.status(200).json({
       success: true,
       message: "Donor updated successfully.",
-      findDonor,
+      data: findDonor,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: true, message: "Server error." });
+  }
+};
+
+const deleteDonor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+    const deletedDonor = await Donor.findByIdAndDelete(id);
+    invalidateCache("donors");
+    return res.status(200).json({
+      success: true,
+      message: "Donor deleted successfully.",
+      data: deletedDonor,
     });
   } catch (error) {
     console.error(error);
@@ -217,23 +193,30 @@ const getAllDonors = async (req, res) => {
       return res.status(200).json(cachedDonors);
     }
 
-    // Total number of donors
     const totalDonors = await Donor.countDocuments();
 
-    // Fetch donors with sorting & pagination
     const donors = await Donor.find({})
-      .sort({ TotalDonation: -1 }) // বেশি TotalDonation থাকলে উপরে থাকবে
+      .sort({ TotalDonation: -1 })
       .skip((currentPage - 1) * pageLimit)
-      .limit(pageLimit);
+      .limit(pageLimit)
+      .lean();
 
-    setCache(cacheKey, { donors, totalDonors }, 600);
+    const donorsWithTotalDonation = donors.map((donor) => {
+      const totalDonation = (donor.donationHistory || []).reduce(
+        (acc, curr) => acc + (curr.amount || 0),
+        0
+      );
+      return { ...donor, totalDonation };
+    });
+
+    setCache(cacheKey, { donors: donorsWithTotalDonation, totalDonors }, 600);
 
     res.status(200).json({
       success: true,
       currentPage,
-      totalPages: Math.ceil(totalDonors / pageLimit), // মোট পৃষ্ঠার সংখ্যা
+      totalPages: Math.ceil(totalDonors / pageLimit),
       totalDonors,
-      donors,
+      donors: donorsWithTotalDonation,
     });
   } catch (error) {
     console.error(error);
@@ -241,4 +224,10 @@ const getAllDonors = async (req, res) => {
   }
 };
 
-module.exports = { createDonor, handleImageUpload, getAllDonors, editDonor };
+module.exports = {
+  createDonor,
+  handleImageUpload,
+  getAllDonors,
+  editDonor,
+  deleteDonor,
+};

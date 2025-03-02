@@ -26,6 +26,13 @@ export const donorApi = createApi({
       }),
       invalidatesTags: ["Donor"],
     }),
+    deleteDonor: builder.mutation({
+      query: (id) => ({
+        url: `/donor/delete/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Donor"],
+    }),
 
     // Fetch paginated Donors
     getAllDonors: builder.query({
@@ -42,5 +49,6 @@ export const donorApi = createApi({
 export const {
   useAddDonorMutation,
   useEditDonorMutation,
+  useDeleteDonorMutation,
   useGetAllDonorsQuery,
 } = donorApi;

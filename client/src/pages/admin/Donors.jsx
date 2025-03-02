@@ -1,6 +1,7 @@
 import {
   useAddDonorMutation,
   useEditDonorMutation,
+  useDeleteDonorMutation,
   useGetAllDonorsQuery,
 } from "../../slices/admin/donor";
 import { useState } from "react";
@@ -38,7 +39,7 @@ const initialFormData = {
   city: "",
   avatar: null,
   avatarId: null,
-  TotalDonation: null,
+  amount: null,
   isDetailsVisible: true,
   donateDate: "",
 };
@@ -53,13 +54,14 @@ export default function Donors() {
   const [currentEditedId, setCurrentEditedId] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const { data, isLoading } = useGetAllDonorsQuery({
+  const { data, isLoading, refetch } = useGetAllDonorsQuery({
     page: currentPage,
     limit: 10,
   });
 
   const [addDonor] = useAddDonorMutation();
   const [editDonor] = useEditDonorMutation();
+  const [deleteDonor] = useDeleteDonorMutation();
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -71,7 +73,7 @@ export default function Donors() {
   const onSubmit = async (e) => {
     e.preventDefault();
     // Add your form submission logic here
-    const donationAmount = Number(formData.TotalDonation);
+    const donationAmount = Number(formData.amount);
     const updatedFormData = {
       name: formData.name,
       fatherName: formData.fatherName,
@@ -85,7 +87,7 @@ export default function Donors() {
       country: formData.country,
       street: formData.street,
       city: formData.city,
-      TotalDonation: donationAmount,
+      amount: donationAmount,
       isDetailsVisible: formData.isDetailsVisible,
       avatar: uploadedImageUrl,
       avatarId: imagePublicId,
@@ -136,11 +138,33 @@ export default function Donors() {
       street: donor.street,
       city: donor.city,
       country: donor.country,
-      TotalDonation: donor.TotalDonation,
+      amount: donor.TotalDonation,
       avatar: donor.avatar,
       isDetailsVisible: donor.isDetailsVisible,
       donateDate: donor.donateDate,
     });
+  };
+
+  const handleDeleteDonor = async (donorId) => {
+    console.log("Deleting Donor with ID:", donorId);
+    try {
+      // Show a confirmation dialog
+      const userConfirmed = window.confirm(
+        "Are you sure you want to delete this verse? This action cannot be undone."
+      );
+
+      // If the user clicks "OK", proceed with the delete API call
+      if (userConfirmed) {
+        const deleteResponse = await deleteDonor(donorId).unwrap();
+        refetch();
+        toast.success(deleteResponse.message || "Verse deleted successfully");
+      } else {
+        // User canceled the action
+        toast.info("Delete action canceled");
+      }
+    } catch (error) {
+      toast.error(error?.data?.message);
+    }
   };
 
   const addDonorFormElements = [
@@ -229,8 +253,8 @@ export default function Donors() {
       placeholder: "Enter Donor country",
     },
     {
-      label: "Total Donation",
-      name: "TotalDonation",
+      label: "Donation Amount",
+      name: "amount",
       componentType: "input",
       type: "text",
       placeholder: "Enter Total Donation Amount",
@@ -269,7 +293,7 @@ export default function Donors() {
 
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
-            <h1 className="text-4xl font-semibold text-center">
+            <h1 className="text-2xl md:text-4xl font-semibold text-center">
               Honorable Donor List
             </h1>
 
@@ -279,31 +303,42 @@ export default function Donors() {
               data?.donors?.map((donor) => (
                 <div
                   key={donor.name}
-                  className="border p-4 flex flex-col md:flex-row my-6 gap-5 rounded-md relative"
+                  className="border p-4 grid grid-cols-1 md:grid-cols-5 my-6 gap-5 rounded-md relative"
                 >
-                  {donor.avatar === "" ? (
-                    <div className="w-[100px] h-[100px] mx-auto bg-gray-300"></div>
-                  ) : (
-                    <img
-                      src={donor.avatar}
-                      alt={donor.name}
-                      className="rounded-md max-h-[200px] mx-auto md:mx-0"
-                    />
-                  )}
-                  <div>
-                    <div className="flex justify-between">
+                  <div className="md:col-span-1 overflow-hidden rounded-md">
+                    {donor.avatar === "" ? (
+                      <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
+                    ) : (
+                      <div className="max-h-[400px] md:max-h-[200px] w-full object-fill">
+                        <img
+                          src={donor.avatar}
+                          alt={donor.name}
+                          className="rounded-md h-full w-full object-cover mx-auto md:mx-0"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div className="md:col-span-4">
+                    <div className="flex justify-between items-center">
                       <p className="text-xl md:text-2xl font-bold mb-2">
                         Name: {donor.name}
                       </p>
-                      <div className="absolute top-4 right-4 flex justify-end">
+                      <div className="flex gap-2">
                         <Button
-                          className="bg-primary text-white hover:bg-primary/50 hover:text-black duration-500"
+                          className="bg-primary text-white"
                           onClick={() => handleEditDonor(donor)}
                         >
                           Edit
                         </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleDeleteDonor(donor._id)}
+                        >
+                          Delete
+                        </Button>
                       </div>
                     </div>
+
                     <div className="grid md:grid-cols-2 gap-y-3 gap-x-10">
                       <p className="text-lg text-black/50">
                         <span className="font-semibold text-black/60">
@@ -345,8 +380,16 @@ export default function Donors() {
                         <span className="font-semibold text-black/60">
                           Total Donation:
                         </span>{" "}
-                        Tk {donor.TotalDonation}
+                        {donor.TotalDonation}
                       </p>
+                      <div className="donation-history flex gap-2 text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Last Donation:
+                        </span>{" "}
+                        {donor?.donationHistory?.map((donation, index) => (
+                          <div key={index}>{donation.amount}</div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -355,7 +398,7 @@ export default function Donors() {
               <p>No Donors Found</p>
             )}
           </div>
-          <div className="flex justify-center px-4">
+          <div className="flex justify-center">
             <Pagination className="px-4">
               <PaginationContent>
                 <PaginationItem>
@@ -376,7 +419,11 @@ export default function Donors() {
                 <PaginationItem>
                   <Button
                     className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                    onClick={() => setCurrentPage(5)}
+                    onClick={() =>
+                      setCurrentPage(() =>
+                        currentPage > 2 ? 1 : currentPage + 2
+                      )
+                    }
                   >
                     Skip
                   </Button>
