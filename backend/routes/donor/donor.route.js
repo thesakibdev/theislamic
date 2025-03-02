@@ -6,6 +6,7 @@ const {
   createDonor,
   getAllDonors,
   editDonor,
+  deleteDonor,
 } = require("../../controllers/donor/donor.controller");
 const checkUserRole = require("../../middleware/authCheck.middleware");
 
@@ -15,5 +16,6 @@ router.post("/upload-image", upload.single("my_file"), handleImageUpload);
 router.post("/create", createDonor);
 router.get("/get", getAllDonors);
 router.put("/edit/:id", editDonor);
+router.delete("/delete/:id", deleteDonor);
 
 module.exports = router;
