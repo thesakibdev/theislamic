@@ -7,13 +7,11 @@ import {
 
 export default function HadithPage() {
   const navigate = useNavigate();
-  
+
   const { data: response } = useGetAllBookListQuery();
   const { data: allLanguages } = useGetAllLanguagesQuery();
 
-  console.log(response);
   const allBookList = response?.data;
-  console.log(allLanguages);
 
   return (
     <>

@@ -5,26 +5,26 @@ import { useGetAllBookListQuery } from "../../slices/utils";
 export default function HadithIndex() {
   const { id } = useParams();
   const navigate = useNavigate();
-  // const hadiths = Array.from({ length: 10 }, (_, index) => ({
-  //   title: "Revelation",
-  //   arabic: "كتاب بدء الوحي",
-  //   hadithNo: 1,
-  //   indexNo: index + 1,
-  // }));
 
   const { data: bookList } = useGetAllBookListQuery();
   const { data: response } = useGetAllHadithQuery();
-  const hadiths = response?.data;
-  console.log(hadiths);
+
+  // The hadiths variable is getting the array from response.data
+  // But your console shows this is an array of books, not individual hadiths
+  const books = response?.data;
+
+  console.log(response);
+  console.log(books);
   console.log(bookList);
   console.log(id);
 
   const selectedBookName = bookList?.data.find((book) => book.id === id);
   console.log(selectedBookName?.nameEn);
-  const selectedHadiths = hadiths?.filter(
-    (hadith) => hadith.bookName === selectedBookName?.nameEn
+
+  // Here's the fixed filter - we're searching for books with matching bookName
+  const selectedBook = books?.find(
+    (book) => book.bookName === selectedBookName?.nameEn
   );
-  console.log(selectedHadiths);
 
   return (
     <section>
@@ -33,7 +33,7 @@ export default function HadithIndex() {
         <div className="bg-primary-foreground flex flex-col gap-5 text-white font-serif py-5 md:py-10 px-5 md:px-16 rounded-xl my-10">
           <div className="flex justify-between">
             <h1 className="text-xl md:text-2xl font-bold">
-              {selectedHadiths?.[0]?.bookName}
+              {selectedBook?.bookName}
             </h1>
             <p className="text-xl md:text-2xl font-bold">صحيح البخاري</p>
           </div>
@@ -52,9 +52,9 @@ export default function HadithIndex() {
         {/* hadith list */}
         <div>
           <ul className="rounded-xl bg-white overflow-hidden">
-            {selectedHadiths?.map((hadith, index) => (
-              <li key={index}>
-                {hadith.parts?.map((part, index) => (
+            {selectedBook ? (
+              <li>
+                {selectedBook.parts?.map((part, index) => (
                   <div
                     className="flex justify-between bg-primary-foreground text-xl md:text-2xl font-bold py-4 px-5 text-white border-b cursor-pointer"
                     key={index}
@@ -65,7 +65,9 @@ export default function HadithIndex() {
                   </div>
                 ))}
               </li>
-            ))}
+            ) : (
+              <li className="p-5">No book selected or book not found</li>
+            )}
           </ul>
         </div>
       </div>
