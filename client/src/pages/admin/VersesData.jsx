@@ -55,6 +55,7 @@ export default function VersesOtherData() {
   const [deleteVerseOtherData] = useDeleteVerseOtherDataMutation();
 
   const [currentPage, setCurrentPage] = useState(1);
+  console.log("currentPage", currentPage);
   const {
     data: surahData,
     isLoading,
@@ -383,7 +384,9 @@ export default function VersesOtherData() {
                   <PaginationItem>
                     <Button
                       className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                      onClick={() => setCurrentPage(5)}
+                      onClick={() =>
+                        setCurrentPage(() => currentPage + 5, refetch())
+                      }
                     >
                       Skip
                     </Button>

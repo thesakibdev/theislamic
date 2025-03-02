@@ -417,21 +417,6 @@ export default function Donors() {
                   <PaginationEllipsis />
                 </PaginationItem>
                 <PaginationItem>
-                  <Button
-                    className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                    onClick={() =>
-                      setCurrentPage(() =>
-                        currentPage > 2 ? 1 : currentPage + 2
-                      )
-                    }
-                  >
-                    Skip
-                  </Button>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
                   <PaginationNext
                     aria-label="Go to next page"
                     onClick={() => setCurrentPage(currentPage + 1)}

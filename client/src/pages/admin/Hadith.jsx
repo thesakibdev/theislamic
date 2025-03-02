@@ -16,14 +16,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { useState } from "react";
 import HadithDisplay from "@/components/admin/HadithTile";
 
@@ -306,46 +298,6 @@ export default function Hadith() {
         </div> */}
 
         <HadithDisplay />
-
-        <div className=" container mx-auto p-4 flex justify-center">
-          <Pagination className="px-4">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  aria-label="Go to previous page"
-                  onClick={() =>
-                    setCurrentPage(() =>
-                      currentPage == 1 ? 1 : currentPage - 1
-                    )
-                  }
-                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                  disabled={currentPage == 1}
-                />
-              </PaginationItem>
-              {/* <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem> */}
-              {/* <PaginationItem>
-                <Button
-                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                  onClick={() => setCurrentPage(currentPage + 5)}
-                >
-                  Skip
-                </Button>
-              </PaginationItem> */}
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext
-                  aria-label="Go to next page"
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
       </div>
       <Sheet
         open={openAddHadithForm}
