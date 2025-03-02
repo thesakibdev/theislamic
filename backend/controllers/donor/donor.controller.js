@@ -136,7 +136,6 @@ const editDonor = async (req, res) => {
       isDetailsVisible,
       donateDate,
     } = req.body;
-    console.log(req.body);
 
     const findDonor = await Donor.findById(id);
 
