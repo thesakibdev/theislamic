@@ -650,7 +650,7 @@ const deleteHadithOtherLanguage = async (req, res) => {
   }
 };
 
-const getAllHadithPaginated = async (req, res) => {
+const getAllHadithsPaginated = async (req, res) => {
   const { page = 1, limit = 10, hadithPage = 1, hadithLimit = 5 } = req.query;
 
   try {
@@ -768,45 +768,211 @@ const getAllHadithPaginated = async (req, res) => {
   }
 };
 
-const getAllHadith = async (req, res) => {
-  try {
-    const hadiths = await Hadith.aggregate([
-      { 
-        $sort: { 
-          bookName: 1, 
-          "parts.partNumber": 1,
-          "parts.chapters.chapterNumber": 1,
-          "parts.chapters.hadithList.hadithNumber": 1
-        } 
-      }
-    ]);
+const getAllHadithPaginated = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
 
+  try {
+    // Validate and convert pagination parameters
+    const currentPage = Math.max(parseInt(page, 10) || 1, 1);
+    const pageLimit = Math.max(parseInt(limit, 10) || 10, 1);
+
+    // Create cache key for paginated hadiths
+    const cacheKey = `hadiths_page_${currentPage}_limit_${pageLimit}`;
+
+    // Try to get from cache
+    let cachedHadiths = null;
+    try {
+      cachedHadiths = await getCache(cacheKey);
+    } catch (cacheError) {
+      console.log("Cache error:", cacheError.message);
+      // Continue execution even if cache fails
+    }
+
+    if (cachedHadiths) {
+      return res.status(200).json(cachedHadiths);
+    }
+
+    // Count total hadiths for pagination metadata
+    const totalHadiths = await Hadith.countDocuments();
+
+    // Calculate skip value for pagination
+    const skip = (currentPage - 1) * pageLimit;
+
+    // Fetch paginated hadiths with lean() for better performance
+    const hadiths = await Hadith.find()
+      .sort({ bookName: 1 })
+      .skip(skip)
+      .limit(pageLimit)
+      .lean();
+
+    if (!hadiths || hadiths.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No hadiths found for this page",
+        data: {
+          data: [],
+          totalItems: totalHadiths,
+          currentPage,
+          totalPages: Math.ceil(totalHadiths / pageLimit),
+          limit: pageLimit,
+        },
+      });
+    }
+
+    // Fetch other language data
+    let hadithOtherLanguage = [];
+    try {
+      hadithOtherLanguage = await HadithOtherLanguage.find().lean();
+    } catch (error) {
+      console.log("Error fetching other languages:", error.message);
+      // Continue execution even if other languages fail
+    }
+
+    // Format the response with complete hadithList for this page
+    const formattedHadiths = hadiths.map((hadith) => {
+      // Make sure parts exists and is an array
+      const parts = Array.isArray(hadith.parts) ? hadith.parts : [];
+
+      return {
+        bookName: hadith.bookName || "",
+        parts: parts
+          .sort((a, b) => (a.partNumber || 0) - (b.partNumber || 0))
+          .map((part) => {
+            // Make sure chapters exists and is an array
+            const chapters = Array.isArray(part.chapters) ? part.chapters : [];
+
+            return {
+              partName: part.partName || "",
+              partNumber: part.partNumber || 0,
+              chapters: chapters
+                .sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0))
+                .map((chapter) => {
+                  // Make sure hadithList exists and is an array
+                  const hadithList = Array.isArray(chapter.hadithList)
+                    ? chapter.hadithList
+                    : [];
+
+                  const formattedHadithList = hadithList
+                    .sort(
+                      (a, b) => (a.hadithNumber || 0) - (b.hadithNumber || 0)
+                    )
+                    .map((h) => {
+                      // Find other languages for this hadith
+                      const otherLanguages = hadithOtherLanguage
+                        .filter(
+                          (hl) =>
+                            hl.bookName === hadith.bookName &&
+                            hl.partNumber === part.partNumber &&
+                            hl.chapterNumber === chapter.chapterNumber &&
+                            hl.hadithNumber === h.hadithNumber
+                        )
+                        .map(
+                          ({
+                            bookName,
+                            partNumber,
+                            chapterNumber,
+                            hadithNumber,
+                            ...rest
+                          }) => rest
+                        );
+
+                      return {
+                        hadithNumber: h.hadithNumber || 0,
+                        internationalNumber: h.internationalNumber || "",
+                        hadithArabic: h.hadithArabic || "",
+                        translation: h.translation || "",
+                        transliteration: h.transliteration || "",
+                        narrator: h.narrator || "",
+                        referenceBook: h.referenceBook || "",
+                        similarities: h.similarities || "",
+                        note: h.note || "",
+                        hadithOtherLanguage: otherLanguages || [],
+                      };
+                    });
+
+                  return {
+                    chapterName: chapter.chapterName || "",
+                    chapterNumber: chapter.chapterNumber || 0,
+                    hadithList: formattedHadithList,
+                  };
+                }),
+            };
+          }),
+        _id: hadith._id,
+        createdAt: hadith.createdAt,
+        updatedAt: hadith.updatedAt,
+        __v: hadith.__v,
+      };
+    });
+
+    const responseData = {
+      success: true,
+      message: "Hadiths fetched successfully",
+      data: {
+        data: formattedHadiths,
+        totalItems: totalHadiths,
+        currentPage,
+        totalPages: Math.ceil(totalHadiths / pageLimit),
+        limit: pageLimit,
+      },
+    };
+
+    // Cache for 10 minutes, ignoring errors
+    try {
+      await setCache(cacheKey, responseData, 600);
+    } catch (cacheError) {
+      console.log("Error setting cache:", cacheError.message);
+      // Continue even if cache setting fails
+    }
+
+    res.status(200).json(responseData);
+  } catch (error) {
+    console.error("Error fetching hadiths:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching hadiths",
+      error: error.message,
+    });
+  }
+};
+
+const getAllHadiths = async (req, res) => {
+  try {
+    // Create cache key for all hadiths
+    const cacheKey = "allHadiths";
+    const cachedHadiths = await getCache(cacheKey);
+
+    if (cachedHadiths) {
+      return res.status(200).json(cachedHadiths);
+    }
+
+    // Use lean() to get plain JavaScript objects instead of Mongoose documents
+    const hadiths = await Hadith.find().sort({ bookName: 1 }).lean();
+    const totalHadiths = hadiths.length;
     const hadithOtherLanguage = await HadithOtherLanguage.find().lean();
 
-    // সিরিয়ালাইজেশন লজিক
-    const formattedHadiths = hadiths.map((hadith, bookIndex) => ({
+    // Format the response with complete hadithList
+    const formattedHadiths = hadiths.map((hadith) => ({
       bookName: hadith.bookName,
-      serializedBookNumber: bookIndex + 1, // বই সিরিয়াল নম্বর
       parts: hadith.parts
         .sort((a, b) => a.partNumber - b.partNumber)
-        .map((part, partIndex) => ({
-          ...part,
-          serializedPartNumber: partIndex + 1, // পার্ট সিরিয়াল নম্বর
+        .map((part) => ({
+          partName: part.partName,
+          partNumber: part.partNumber,
           chapters: part.chapters
             .sort((a, b) => a.chapterNumber - b.chapterNumber)
-            .map((chapter, chapterIndex) => ({
-              ...chapter,
-              serializedChapterNumber: chapterIndex + 1, // চ্যাপ্টার সিরিয়াল নম্বর
-              hadithList: chapter.hadithList
+            .map((chapter) => {
+              // Include all hadiths without pagination
+              const hadithList = chapter.hadithList
                 .sort((a, b) => a.hadithNumber - b.hadithNumber)
-                .map((hadith, hadithIndex) => {
+                .map((h) => {
                   const otherLanguages = hadithOtherLanguage
                     .filter(
                       (hl) =>
                         hl.bookName === hadith.bookName &&
                         hl.partNumber === part.partNumber &&
                         hl.chapterNumber === chapter.chapterNumber &&
-                        hl.hadithNumber === hadith.hadithNumber
+                        hl.hadithNumber === h.hadithNumber
                     )
                     .map(
                       ({
@@ -819,26 +985,43 @@ const getAllHadith = async (req, res) => {
                     );
 
                   return {
-                    ...hadith,
-                    serializedHadithNumber: hadithIndex + 1, // হাদিস সিরিয়াল নম্বর
+                    ...h,
                     hadithOtherLanguage: otherLanguages,
                   };
-                })
-            }))
-        }))
+                });
+
+              return {
+                chapterName: chapter.chapterName,
+                chapterNumber: chapter.chapterNumber,
+                hadithList: hadithList,
+              };
+            }),
+        })),
+      _id: hadith._id,
+      createdAt: hadith.createdAt,
+      updatedAt: hadith.updatedAt,
+      __v: hadith.__v,
     }));
+
+    const responseData = {
+      data: formattedHadiths,
+      totalItems: totalHadiths,
+    };
+
+    // Cache for 10 minutes
+    setCache(cacheKey, responseData, 600);
 
     res.status(200).json({
       success: true,
-      message: "সমস্ত হাদিস সিরিয়ালাইজডভাবে fetched হয়েছে",
-      data: formattedHadiths
+      message: "Hadiths fetched successfully",
+      data: responseData,
     });
-
   } catch (error) {
-    console.error("হাদিস fetch করতে সমস্যা:", error);
+    console.error("Error fetching hadiths:", error);
     res.status(500).json({
       success: false,
-      message: "হাদিস fetch করতে সমস্যা হয়েছে",
+      message: "Error fetching hadiths",
+      error: error.message,
     });
   }
 };
@@ -851,5 +1034,5 @@ module.exports = {
   editHadithOtherLanguage,
   deleteHadithOtherLanguage,
   getAllHadithPaginated,
-  getAllHadith,
+  getAllHadiths,
 };

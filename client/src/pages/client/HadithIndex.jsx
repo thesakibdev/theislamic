@@ -33,7 +33,7 @@ export default function HadithIndex() {
         <div className="bg-primary-foreground flex flex-col gap-5 text-white font-serif py-5 md:py-10 px-5 md:px-16 rounded-xl my-10">
           <div className="flex justify-between">
             <h1 className="text-xl md:text-2xl font-bold">
-              {selectedHadiths?.[0].bookName}
+              {selectedHadiths?.[0]?.bookName}
             </h1>
             <p className="text-xl md:text-2xl font-bold">صحيح البخاري</p>
           </div>

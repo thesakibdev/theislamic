@@ -22,7 +22,6 @@ const hadithSchema = new mongoose.Schema(
           {
             chapterName: {
               type: String,
-              required: [true, "Chapter name is required"],
               trim: true,
             },
             chapterNumber: {

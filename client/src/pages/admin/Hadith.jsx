@@ -25,6 +25,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useState } from "react";
+import HadithDisplay from "@/components/admin/HadithTile";
 
 const initialFormData = {
   bookName: "",
@@ -243,7 +244,7 @@ export default function Hadith() {
           </Button>
         </div>
 
-        <div className="mt-10">
+        {/* <div className="mt-10">
           {isError ? (
             <div>Error fetching data</div>
           ) : isLoading ? (
@@ -254,7 +255,6 @@ export default function Hadith() {
             <div className="border border-gray-300 p-4">
               {hadithData.map((hadith, index) => (
                 <div className="border border-gray-300 p-4" key={index}>
-                  {/* Add optional chaining for nested data */}
                   <h2>Book Name: {hadith?.bookName}</h2>
                   <div>
                     {hadith?.parts?.map((hadithItem, index) => (
@@ -303,7 +303,9 @@ export default function Hadith() {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
+
+        <HadithDisplay />
 
         <div className=" container mx-auto p-4 flex justify-center">
           <Pagination className="px-4">
