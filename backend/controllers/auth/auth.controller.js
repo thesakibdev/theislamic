@@ -319,10 +319,6 @@ const authMiddleware = async (req, res, next) => {
 const updateUserRole = async (req, res) => {
   const { userId } = req.params;
   const { userRole } = req.body;
-
-  console.log("User ID:", userId);
-  console.log("User Role:", userRole);
-
   try {
     const normalizedUserRole = userRole.toLowerCase().trim();
 

@@ -59,8 +59,6 @@ export default function Donors() {
     limit: 10,
   });
 
-  console.log(formData)
-
   const [addDonor] = useAddDonorMutation();
   const [editDonor] = useEditDonorMutation();
   const [deleteDonor] = useDeleteDonorMutation();
@@ -76,7 +74,6 @@ export default function Donors() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    // Add your form submission logic here
     const donationAmount = Number(formData.amount);
     const updatedFormData = {
       name: formData.name,
@@ -97,7 +94,6 @@ export default function Donors() {
       avatarId: imagePublicId,
       donateDate: formData.donateDate,
     };
-    console.log(updatedFormData);
 
     try {
       if (currentEditedId !== null) {

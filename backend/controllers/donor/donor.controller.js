@@ -166,7 +166,6 @@ const editDonor = async (req, res) => {
 const deleteDonor = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id);
     const deletedDonor = await Donor.findByIdAndDelete(id);
     invalidateCache("donors");
     return res.status(200).json({
