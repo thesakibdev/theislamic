@@ -12,41 +12,30 @@ import {
   useGetAllSurahsNameQuery,
   useGetAllSurahsPaginatedQuery,
 } from "@/slices/admin/surah";
+import { useGetAllLanguagesQuery } from "@/slices/utils";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
 export default function Translation() {
-  const { title } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
   const { data: allSurahs } = useGetAllSurahsNameQuery();
-  const {
-    data: surahData,
-    isLoading,
-  } = useGetAllSurahsPaginatedQuery({
+  const { data: languages } = useGetAllLanguagesQuery();
+  const { data: surahData, isLoading } = useGetAllSurahsPaginatedQuery({
     page: currentPage,
     limit: 1,
   });
 
+  const currentSurah =
+    surahData?.surahs?.find((surah) => surah.surahNumber === currentPage) ||
+    null;
+
   useEffect(() => {
-    if (!surahData || !title) return;
-
-    const foundSurah = surahData?.surahs?.find(
-      (surah) => surah.surahName === decodeURI(title)
-    );
-
-    if (foundSurah) {
-      setCurrentPage(foundSurah.surahNumber);
+    if (currentSurah) {
+      setCurrentPage(Number(currentSurah?.surahNumber));
     }
-  }, [surahData, title]);
+  }, [currentSurah]);
 
-  const currentSurah = surahData?.surahs?.find(
-    (surah) => surah.surahNumber === currentPage
-  );
-
-  console.log("currentSurah", currentSurah);
-
-  // if (isLoading) return <Loading />;
-  // if (isError) return <p>এরর হয়েছে!</p>;
+  console.log(currentSurah);
 
   return (
     <>
@@ -54,7 +43,7 @@ export default function Translation() {
         <div className="container mx-auto">
           <div>
             <h2 className="text-4xl font-medium py-2 text-center">
-              {currentSurah?.surahNumber} {currentSurah?.surahName}
+              {currentSurah?.surahName}
             </h2>
             {/* select the surah */}
             <div className="flex flex-col items-center gap-3 mt-4 justify-center">
@@ -68,8 +57,8 @@ export default function Translation() {
                   <SelectValue
                     placeholder={
                       currentPage
-                        ? `${currentSurah?.surahNumber}`
-                        : "Select Surah"
+                        ? `${currentSurah?.surahNumber} ${currentSurah?.surahName}`
+                        : `Select a surah`
                     }
                   />
                 </SelectTrigger>
@@ -85,7 +74,7 @@ export default function Translation() {
                               key={surah.surahNumber}
                               value={surah.surahNumber.toString()}
                             >
-                              {surah.surahName}
+                              {surah.surahNumber} - {surah.surahName}
                             </SelectItem>
                           ))}
                         </>
@@ -104,68 +93,116 @@ export default function Translation() {
                   value="arabic"
                   className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
                 >
-                  Arabic / {currentSurah?.surahName}
+                  Arabic
                 </TabsTrigger>
                 <TabsTrigger
                   value="translation"
-                  className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
+                  className="h-full data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
                 >
                   Translation
                 </TabsTrigger>
+                <Select
+                  defaultValue={selectedLanguage}
+                  onValueChange={(value) => setSelectedLanguage(value)}
+                >
+                  <SelectTrigger className="max-w-[280px] outline-none text-lg py-3">
+                    <SelectValue
+                      placeholder={
+                        currentPage
+                          ? `select language- ${selectedLanguage}`
+                          : `select language- ${selectedLanguage}`
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {languages && (
+                        <>
+                          {languages?.data?.map((lang) => (
+                            <SelectItem key={lang._id} value={lang.code}>
+                              {lang.name}
+                            </SelectItem>
+                          ))}
+                        </>
+                      )}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </TabsList>
               <TabsContent
                 className="mt-0 py-5 border border-primary data-[state=active]:rounded-b-lg data-[state=active]:rounded-r-lg"
                 value="arabic"
               >
-                <div className="mt-4 px-5 text-center">
-                  <div
-                    dir="rtl"
-                    className="text-black w-full mx-auto leading-relaxed text-justify"
-                  >
-                    {Array.from({ length: 20 }).map((_, index) => (
-                      <span
-                        key={index}
-                        className="text-2xl md:text-4xl font-arabic text-justify font-medium inline rtl:mr-0 align-middle ayah"
-                      >
-                        this is arabic ayahs
-                      </span>
-                    ))}
+
+                {isLoading ? (
+                  <Loading />
+                ) : (
+                  <div className="">
+                    <div>
+                      {currentSurah?.verses?.map((verse, index) => (
+                        <div
+                          key={index}
+                          className="border-b border-primary flex flex-col gap-3 md:gap-5 py-3 px-2 md:px-5 md:py-10"
+                        >
+                          <div className="text-right text-xl md:text-4xl rtl:mr-3">
+                            <span className="">{verse.arabicAyah}</span>
+                          </div>
+
+                          {verse.verseOtherData
+                            ?.filter(
+                              (data) => data.language === selectedLanguage
+                            )
+                            .map((data) => (
+                              <p
+                                key={data._id}
+                                className="text-left text-sm sm:text-base md:text-2xl w-[90%]"
+                              >
+                                {data.translation}
+                              </p>
+                            ))}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </TabsContent>
               <TabsContent
-                className="mt-0 py-5 border border-primary data-[state=active]:rounded-lg"
+                className="mt-0 py-2 border border-primary data-[state=active]:rounded-lg"
                 value="translation"
               >
-                <div className="mt-4">
-                  {Array.from({ length: 10 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="px-5 border-b border-primary flex flex-col gap-5 py-7 md:py-10"
-                    >
-                      <div className="text-right text-3xl md:text-4xl rtl:mr-3">
-                        <span className="">this is arabic ayah</span>
-                        {/* <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
-                                    <VerseEndIcon
-                                      width={35}
-                                      height={35}
-                                      className="align-middle"
-                                    />
-                                    <span className="absolute text-xs text-center align-middle">
-                                      {convertToArabicNumber(verse.verseNumber)}
-                                    </span>
-                                  </span> */}
+                <div className="mt-4 text-center">
+                  <div
+                    className="text-black w-full mx-auto leading-relaxed text-justify"
+                  >
+                    {isLoading ? (
+                      <Loading />
+                    ) : (
+                      <div className="">
+                        <div>
+                          {currentSurah?.verses?.map((verse, index) => (
+                            <div
+                              key={index}
+                              className="border-b border-primary flex flex-col gap-3 md:gap-5 px-5 py-3 md:py-5"
+                            >
+                              {verse.verseOtherData
+                                ?.filter(
+                                  (data) => data.language === selectedLanguage
+                                )
+                                .map((data) => (
+                                  <p
+                                    key={data._id}
+                                    className="text-left text-sm sm:text-base md:text-2xl w-[90%]"
+                                  >
+                                    <span className="font-semibold mr-2">{verse.verseNumber}.</span>
+                                    {data.translation}
+                                  </p>
+                                ))}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-
-                      <p className="text-left text-base md:text-2xl w-[90%]">
-                        this is translate ayah
-                      </p>
-                      {/* {Array.from({ length: 10 })
-                                      key={i}
-                                  .map((_, i) => (
-                                  ))} */}
-                    </div>
-                  ))}
+                    )}
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>

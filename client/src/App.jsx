@@ -40,7 +40,6 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/index" element={<IndexPage />} />
         <Route path="/translation" element={<Translation />} />
-        <Route path="/translation/:title" element={<Translation />} />
         <Route path="/profile" element={<AuthProfile />} />
         <Route path="/" element={<ReciteLayout />}>
           <Route path="/recite/:number" element={<RecitePage />} />
