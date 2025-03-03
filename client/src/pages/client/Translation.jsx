@@ -43,7 +43,7 @@ export default function Translation() {
         <div className="container mx-auto">
           <div>
             <h2 className="text-4xl font-medium py-2 text-center">
-              {currentSurah?.surahName}
+              {currentSurah?.surahName || "Surah Name"}
             </h2>
             {/* select the surah */}
             <div className="flex flex-col items-center gap-3 mt-4 justify-center">

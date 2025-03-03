@@ -86,7 +86,7 @@ export default function RecitePage() {
               <Tabs defaultValue="reading" className="m-0 pt-5 overflow-auto max-h-screen px-4 md:px-10 scrollbar-custom">
                 <TabsList className="grid mx-auto max-w-[600px] grid-cols-2 justify-start">
                   <TabsTrigger
-                    className="p-0 data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
+                    className="p-0 md:w-[300px] data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
                     value="transliteration"
                   >
                     {isMobile ? (
@@ -96,7 +96,7 @@ export default function RecitePage() {
                     )}
                   </TabsTrigger>
                   <TabsTrigger
-                    className="p-0 data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
+                    className="p-0 md:w-[300px] data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
                     value="reading"
                   >
                     {isMobile ? (
