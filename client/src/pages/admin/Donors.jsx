@@ -67,12 +67,13 @@ export default function Donors() {
     setFormData(initialFormData);
     setOpenAddDonorForm(false);
     setImageFile(null);
+    setUploadedImageUrl(null);
+    setImagePublicId(null);
     setImageLoadingState(false);
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    // Add your form submission logic here
     const donationAmount = Number(formData.amount);
     const updatedFormData = {
       name: formData.name,
@@ -93,7 +94,6 @@ export default function Donors() {
       avatarId: imagePublicId,
       donateDate: formData.donateDate,
     };
-    console.log(updatedFormData);
 
     try {
       if (currentEditedId !== null) {
@@ -110,8 +110,8 @@ export default function Donors() {
         if (addResponse.error) {
           toast.error(addResponse.error.message);
         } else {
-          resetForm();
           toast.success(addResponse.message || "Donor added successfully!");
+          resetForm();
         }
       }
     } catch (error) {
@@ -146,7 +146,6 @@ export default function Donors() {
   };
 
   const handleDeleteDonor = async (donorId) => {
-    console.log("Deleting Donor with ID:", donorId);
     try {
       // Show a confirmation dialog
       const userConfirmed = window.confirm(
