@@ -14,6 +14,7 @@ const hadithRouter = require("./routes/hadith/hadith.route");
 const languageRouter = require("./routes/utils/language.route");
 const bookListRouter = require("./routes/utils/bookList.route");
 const donorRouter = require("./routes/donor/donor.route");
+const globalSearchRouter = require("./utils/search/globalSearch");
 
 dotenv.config();
 
@@ -86,7 +87,7 @@ app.use("/api/v1/admin/analytics", visitorRouter);
 // utilities route
 app.use("/api/v1/utils", languageRouter);
 app.use("/api/v1/utils", bookListRouter);
-
+app.use("/api/v1/utils", globalSearchRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);

@@ -46,10 +46,14 @@ const initialFormData = {
 
 export default function Donors() {
   const [formData, setFormData] = useState(initialFormData);
+  console.log("formData", formData);
   const [openAddDonorForm, setOpenAddDonorForm] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  console.log("imageFile", imageFile);
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+  console.log("uploadedImageUrl", uploadedImageUrl);
   const [imagePublicId, setImagePublicId] = useState(null);
+  console.log("imagePublicId", imagePublicId);
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
 
@@ -65,11 +69,12 @@ export default function Donors() {
 
   const resetForm = () => {
     setFormData(initialFormData);
-    setOpenAddDonorForm(false);
     setImageFile(null);
     setUploadedImageUrl(null);
     setImagePublicId(null);
     setImageLoadingState(false);
+    setOpenAddDonorForm(false);
+    console.log("Form Data Reset and Form Closed");
   };
 
   const onSubmit = async (e) => {

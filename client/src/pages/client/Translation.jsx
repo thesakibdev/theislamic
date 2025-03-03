@@ -13,35 +13,40 @@ import {
   useGetAllSurahsPaginatedQuery,
 } from "@/slices/admin/surah";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export default function Translation() {
   const { title } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const navigate = useNavigate();
   const { data: allSurahs } = useGetAllSurahsNameQuery();
   const {
     data: surahData,
     isLoading,
-    isError,
   } = useGetAllSurahsPaginatedQuery({
     page: currentPage,
     limit: 1,
   });
 
   useEffect(() => {
+    if (!surahData || !title) return;
+
     const foundSurah = surahData?.surahs?.find(
       (surah) => surah.surahName === decodeURI(title)
     );
-    setCurrentPage(foundSurah?.surahNumber);
-  }, []);
+
+    if (foundSurah) {
+      setCurrentPage(foundSurah.surahNumber);
+    }
+  }, [surahData, title]);
 
   const currentSurah = surahData?.surahs?.find(
-    (surah) => surah.surahName == decodeURI(title)
+    (surah) => surah.surahNumber === currentPage
   );
-  console.log(currentSurah);
-  if (isLoading) return <Loading />;
-  if (isError) return <p>এরর হয়েছে!</p>;
+
+  console.log("currentSurah", currentSurah);
+
+  // if (isLoading) return <Loading />;
+  // if (isError) return <p>এরর হয়েছে!</p>;
 
   return (
     <>
@@ -49,7 +54,7 @@ export default function Translation() {
         <div className="container mx-auto">
           <div>
             <h2 className="text-4xl font-medium py-2 text-center">
-              {currentSurah?.surahNumber} - {currentSurah?.surahName}
+              {currentSurah?.surahNumber} {currentSurah?.surahName}
             </h2>
             {/* select the surah */}
             <div className="flex flex-col items-center gap-3 mt-4 justify-center">
@@ -57,18 +62,35 @@ export default function Translation() {
                 The description of the surah
               </span>
               <Select
-                onValueChange={(surah) => navigate(`/translation/${surah}`)}
+                onValueChange={(value) => setCurrentPage(parseInt(value, 10))}
               >
-                <SelectTrigger className="max-w-[280px] focus:outline-none active:outline-none appearance-none">
-                  <SelectValue placeholder="Select Surah" />
+                <SelectTrigger className="max-w-[280px] focus:outline-none active:outline-none">
+                  <SelectValue
+                    placeholder={
+                      currentPage
+                        ? `${currentSurah?.surahNumber}`
+                        : "Select Surah"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {allSurahs?.map((surah, i) => (
-                      <SelectItem key={i} value={surah.surahName}>
-                        {surah.surahNumber} - {surah.surahName}
-                      </SelectItem>
-                    ))}
+                    {isLoading ? (
+                      <Loading />
+                    ) : (
+                      allSurahs && (
+                        <>
+                          {allSurahs?.map((surah) => (
+                            <SelectItem
+                              key={surah.surahNumber}
+                              value={surah.surahNumber.toString()}
+                            >
+                              {surah.surahName}
+                            </SelectItem>
+                          ))}
+                        </>
+                      )
+                    )}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -77,12 +99,12 @@ export default function Translation() {
           {/* main */}
           <div className="mt-10 ">
             <Tabs defaultValue="arabic">
-              <TabsList className="grid w-full grid-cols-3 gap-1 h-full max-w-[400px]">
+              <TabsList className="grid w-full grid-cols-3 gap-1 h-full max-w-4xl">
                 <TabsTrigger
                   value="arabic"
                   className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
                 >
-                  Arabic
+                  Arabic / {currentSurah?.surahName}
                 </TabsTrigger>
                 <TabsTrigger
                   value="translation"

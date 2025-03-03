@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import Banner from "../../assets/hero-banner.png";
 import Search from "../../assets/icon/search-icon.png";
 import CounterUp from "@/components/common/CounterUp";
+import SearchBar from "@/components/common/SearchBar";
 
 export default function Home() {
   return (
@@ -21,6 +22,7 @@ export default function Home() {
                 placeholder="What you want to know from Quran & Hadith?"
                 className="w-full py-5 pl-16 rounded-full placeholder:text-xs md:placeholder:text-base"
               />
+              <SearchBar />
               <img
                 src={Search}
                 alt="search"
@@ -30,7 +32,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-        <CounterUp />
+      <CounterUp />
     </>
   );
 }
