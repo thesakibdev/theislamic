@@ -134,7 +134,6 @@ export default function IndexPage() {
   const { data: surahs, isLoading } = useGetAllSurahsNameQuery();
 
   let recentSurahs = JSON.parse(localStorage.getItem("surahs")) || [];
-  console.log(recentSurahs);
 
   return (
     <main>

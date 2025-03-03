@@ -90,12 +90,6 @@ export default function Translation() {
                 >
                   Translation
                 </TabsTrigger>
-                <TabsTrigger
-                  value="language"
-                  className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
-                >
-                  Language
-                </TabsTrigger>
               </TabsList>
               <TabsContent
                 className="mt-0 py-5 border border-primary data-[state=active]:rounded-b-lg data-[state=active]:rounded-r-lg"
@@ -148,21 +142,6 @@ export default function Translation() {
                                       key={i}
                                   .map((_, i) => (
                                   ))} */}
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-              <TabsContent
-                className="mt-0 py-5 border border-primary data-[state=active]:rounded-lg"
-                value="language"
-              >
-                <div className="px-5">
-                  {Array.from({ length: 10 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="border-b border-primary flex flex-col text-2xl gap-5 py-7 md:py-10"
-                    >
-                      {index + 1}. there is all Arabic translation ayah
                     </div>
                   ))}
                 </div>
