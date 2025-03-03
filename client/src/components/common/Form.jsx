@@ -64,7 +64,7 @@ const CommonForm = memo(function CommonForm({
             onCheckedChange={(checked) =>
               setFormData({
                 ...formData,
-                [getControlItem.name]: checked, // ✅ Returns true/false correctly
+                [getControlItem.name]: checked,
               })
             }
           />

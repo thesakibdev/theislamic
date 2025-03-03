@@ -59,6 +59,8 @@ export default function Donors() {
     limit: 10,
   });
 
+  console.log(formData)
+
   const [addDonor] = useAddDonorMutation();
   const [editDonor] = useEditDonorMutation();
   const [deleteDonor] = useDeleteDonorMutation();
@@ -67,6 +69,8 @@ export default function Donors() {
     setFormData(initialFormData);
     setOpenAddDonorForm(false);
     setImageFile(null);
+    setUploadedImageUrl(null);
+    setImagePublicId(null);
     setImageLoadingState(false);
   };
 
@@ -110,8 +114,8 @@ export default function Donors() {
         if (addResponse.error) {
           toast.error(addResponse.error.message);
         } else {
-          resetForm();
           toast.success(addResponse.message || "Donor added successfully!");
+          resetForm();
         }
       }
     } catch (error) {
@@ -146,7 +150,6 @@ export default function Donors() {
   };
 
   const handleDeleteDonor = async (donorId) => {
-    console.log("Deleting Donor with ID:", donorId);
     try {
       // Show a confirmation dialog
       const userConfirmed = window.confirm(
