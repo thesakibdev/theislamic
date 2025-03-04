@@ -20,9 +20,9 @@ export default function DonorPage() {
   return (
     <section className="pt-[4.5rem] md:pt-40 pb-10">
       <div className="container mx-auto px-4">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl md:text-4xl font-semibold text-center">
-            Honorable Donor List
+            Honorable Donors
           </h1>
 
           {isLoading ? (
@@ -41,7 +41,7 @@ export default function DonorPage() {
                       <img
                         src={donor.avatar}
                         alt={donor.name}
-                        className="rounded-md h-full w-full object-cover mx-auto md:mx-0"
+                        className="rounded-md h-full w-full object-cover mx-auto md:mx-0 block"
                       />
                     </div>
                   )}
@@ -50,7 +50,7 @@ export default function DonorPage() {
                   <p className="text-xl md:text-2xl font-bold mb-2">
                     Name: {donor.name}
                   </p>
-                  <div className="grid md:grid-cols-2 gap-y-3 gap-x-10">
+                  <div className="grid md:grid-cols-2 gap-y-3 gap-x-5">
                     <p className="text-lg text-black/50">
                       <span className="font-semibold text-black/60">
                         Profession:

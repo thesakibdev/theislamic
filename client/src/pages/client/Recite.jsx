@@ -83,7 +83,10 @@ export default function RecitePage() {
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row">
             <div className="p-2 flex justify-center w-full">
-              <Tabs defaultValue="reading" className="m-0 pt-5 overflow-auto max-h-screen px-4 md:px-10 scrollbar-custom">
+              <Tabs
+                defaultValue="reading"
+                className="m-0 pt-5 overflow-auto max-h-screen px-4 md:px-10 scrollbar-custom"
+              >
                 <TabsList className="grid mx-auto max-w-[600px] grid-cols-2 justify-start">
                   <TabsTrigger
                     className="p-0 md:w-[300px] data-[state=active]:rounded-full py-1 data-[state=active]:bg-primary/70"
@@ -120,7 +123,7 @@ export default function RecitePage() {
                           Translation by
                         </h4> */}
                         <p className="text-base text-black font-normal flex gap-3">
-                          The Clear Quran Translation
+                          The Saheeh International
                           <button
                             className="ml-2 text-primary font-bold"
                             onClick={() => setOpenSheet(true)}
@@ -155,7 +158,7 @@ export default function RecitePage() {
                                     </span>
                                   </span> */}
                                 </div>
-                                
+
                                 {verse.verseOtherData
                                   ?.filter(
                                     (data) => data.language === selectedLanguage

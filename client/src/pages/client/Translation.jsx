@@ -1,4 +1,5 @@
 import Loading from "@/components/common/Loading";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -14,8 +15,15 @@ import {
 } from "@/slices/admin/surah";
 import { useGetAllLanguagesQuery } from "@/slices/utils";
 import { useEffect, useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 export default function Translation() {
+  const [openSheet, setOpenSheet] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const { data: allSurahs } = useGetAllSurahsNameQuery();
@@ -93,47 +101,25 @@ export default function Translation() {
                   value="arabic"
                   className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
                 >
-                  Arabic
+                  Arabic / {selectedLanguage}
                 </TabsTrigger>
                 <TabsTrigger
                   value="translation"
                   className="h-full data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
                 >
-                  Translation
+                  {selectedLanguage}
                 </TabsTrigger>
-                <Select
-                  defaultValue={selectedLanguage}
-                  onValueChange={(value) => setSelectedLanguage(value)}
+                <Button
+                  onClick={() => setOpenSheet(true)}
+                  className="self-right"
                 >
-                  <SelectTrigger className="max-w-[280px] outline-none text-lg py-3">
-                    <SelectValue
-                      placeholder={
-                        currentPage
-                          ? `select language- ${selectedLanguage}`
-                          : `select language- ${selectedLanguage}`
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {languages && (
-                        <>
-                          {languages?.data?.map((lang) => (
-                            <SelectItem key={lang._id} value={lang.code}>
-                              {lang.name}
-                            </SelectItem>
-                          ))}
-                        </>
-                      )}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                  Change Language
+                </Button>
               </TabsList>
               <TabsContent
                 className="mt-0 py-5 border border-primary data-[state=active]:rounded-b-lg data-[state=active]:rounded-r-lg"
                 value="arabic"
               >
-
                 {isLoading ? (
                   <Loading />
                 ) : (
@@ -171,9 +157,7 @@ export default function Translation() {
                 value="translation"
               >
                 <div className="mt-4 text-center">
-                  <div
-                    className="text-black w-full mx-auto leading-relaxed text-justify"
-                  >
+                  <div className="text-black w-full mx-auto leading-relaxed text-justify">
                     {isLoading ? (
                       <Loading />
                     ) : (
@@ -193,7 +177,9 @@ export default function Translation() {
                                     key={data._id}
                                     className="text-left text-sm sm:text-base md:text-2xl w-[90%]"
                                   >
-                                    <span className="font-semibold mr-2">{verse.verseNumber}.</span>
+                                    <span className="font-semibold mr-2">
+                                      {verse.verseNumber}.
+                                    </span>
                                     {data.translation}
                                   </p>
                                 ))}
@@ -209,6 +195,32 @@ export default function Translation() {
           </div>
         </div>
       </section>
+
+      <Sheet open={openSheet} onOpenChange={(isOpen) => setOpenSheet(isOpen)}>
+        <SheetContent className="bg-white">
+          <SheetHeader>
+            <SheetTitle>Translation</SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-col overflow-auto h-screen">
+            {languages?.data?.map((lang) => (
+              <button
+                key={lang}
+                onClick={() => {
+                  setSelectedLanguage(lang.code);
+                  setOpenSheet(false);
+                }}
+                className={`px-4 py-2 m-2 ${
+                  selectedLanguage === lang
+                    ? "bg-green-500 text-black"
+                    : "bg-gray-200"
+                }`}
+              >
+                {lang.name}
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

@@ -22,7 +22,6 @@ export default function Home() {
                 placeholder="What you want to know from Quran & Hadith?"
                 className="w-full py-5 pl-16 rounded-full placeholder:text-xs md:placeholder:text-base"
               />
-              <SearchBar />
               <img
                 src={Search}
                 alt="search"

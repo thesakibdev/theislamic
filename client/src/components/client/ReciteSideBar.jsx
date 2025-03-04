@@ -28,7 +28,7 @@ export default function ReciteSideBar() {
   useEffect(() => {
     setCurrentPage(Number(number));
   }, [number]);
-  
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -60,7 +60,7 @@ export default function ReciteSideBar() {
           </TabsList>
           <TabsContent value="surah" className="m-0">
             <div className="md:p-2 lg:p-5 flex gap-2">
-              <div className="overflow-auto max-h-[90vh] flex flex-col gap-2 w-4/5">
+              <div className="overflow-auto max-h-[90vh] flex flex-col gap-2 w-[65%]">
                 <div className="relative ">
                   <input
                     placeholder="Search Surah..."
@@ -73,18 +73,20 @@ export default function ReciteSideBar() {
                   {allSurahs?.map((surah, index) => (
                     <li
                       key={index}
-                      className=" hover:text-black/90 hover:bg-primary-foreground border-b-2 text-black text-lg md:text-xl  text-center cursor-pointer p-3"
+                      className=" hover:text-black/90 hover:bg-primary-foreground border-b-2 text-black text-lg md:text-xl text-left cursor-pointer p-3 flex gap-2"
                       onClick={() => {
                         handleGoToRecitePage(surah.surahNumber);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                     >
-                      {surah.surahName}
+                      <span>{surah.surahNumber}</span>
+                      <span>-</span>
+                      <span>{surah.surahName}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="flex flex-col gap-2 overflow-auto max-h-[90vh] w-2/6">
+              <div className="flex flex-col gap-2 overflow-auto max-h-[90vh] w-1/5">
                 <div className="relative ">
                   <input
                     placeholder="Verse"
