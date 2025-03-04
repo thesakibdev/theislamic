@@ -1,8 +1,7 @@
 import { Input } from "@/components/ui/input";
 import Banner from "../../assets/hero-banner.png";
 import Search from "../../assets/icon/search-icon.png";
-import CounterUp from "@/components/common/CounterUp";
-import SearchBar from "@/components/common/SearchBar";
+// import CounterUp from "@/components/common/CounterUp";
 
 export default function Home() {
   return (
@@ -31,7 +30,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <CounterUp />
+      {/* <CounterUp /> */}
     </>
   );
 }

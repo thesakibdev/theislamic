@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useCounterQuery } from "@/slices/utils";
 
 const CounterUp = () => {
-  const [count, setCount] = useState(67890);
+  const { data } = useCounterQuery();
+  const [count, setCount] = useState(data.data || 0);
+  console.log(data);
 
   useEffect(() => {
     const interval = setInterval(() => {

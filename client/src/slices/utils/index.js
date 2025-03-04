@@ -29,6 +29,12 @@ export const utilsApi = createApi({
         params,
       }),
     }),
+    counter: builder.query({
+      query: () => ({
+        url: "/admin/analytics/total",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -37,4 +43,5 @@ export const {
   useGetAllLanguagesQuery,
   useGetAllBookListQuery,
   useGlobalSearchQuery,
+  useCounterQuery,
 } = utilsApi;
