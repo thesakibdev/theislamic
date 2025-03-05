@@ -37,7 +37,7 @@ export default function ReciteSideBar() {
   };
   return (
     <aside
-      className={`hidden md:block bg-gray-200 w-4/12 pt-24 transition-transform duration-300 
+      className={`hidden md:block bg-gray-200 max-w-lg pt-24 transition-transform duration-300 
         ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
     >
       {/* sidebar for desktop version */}
@@ -60,7 +60,7 @@ export default function ReciteSideBar() {
           </TabsList>
           <TabsContent value="surah" className="m-0">
             <div className="md:p-2 lg:p-5 flex gap-2">
-              <div className="overflow-auto max-h-[90vh] flex flex-col gap-2 w-[65%]">
+              <div className="overflow-auto max-h-[90vh] flex flex-col gap-2">
                 <div className="relative ">
                   <input
                     placeholder="Search Surah..."
@@ -86,7 +86,7 @@ export default function ReciteSideBar() {
                   ))}
                 </ul>
               </div>
-              <div className="flex flex-col gap-2 overflow-auto max-h-[90vh] w-1/5">
+              <div className="flex flex-col gap-2 overflow-auto max-h-[90vh] max-w-28">
                 <div className="relative ">
                   <input
                     placeholder="Verse"

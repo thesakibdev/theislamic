@@ -1,5 +1,6 @@
 import Loading from "@/components/common/Loading";
 import { Button } from "@/components/ui/button";
+import WorldIcon from "@/assets/icon/world-icon.png";
 import {
   Select,
   SelectContent,
@@ -26,6 +27,7 @@ export default function Translation() {
   const [openSheet, setOpenSheet] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [selectedLanguageName, setSelectedLanguageName] = useState("English");
   const { data: allSurahs } = useGetAllSurahsNameQuery();
   const { data: languages } = useGetAllLanguagesQuery();
   const { data: surahData, isLoading } = useGetAllSurahsPaginatedQuery({
@@ -43,7 +45,7 @@ export default function Translation() {
     }
   }, [currentSurah]);
 
-  console.log(currentSurah);
+  console.log(languages);
 
   return (
     <>
@@ -96,7 +98,7 @@ export default function Translation() {
           {/* main */}
           <div className="mt-10 ">
             <Tabs defaultValue="arabic">
-              <TabsList className="grid w-full grid-cols-3 gap-1 h-full max-w-4xl">
+              <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 gap-1 h-full">
                 <TabsTrigger
                   value="arabic"
                   className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
@@ -107,14 +109,28 @@ export default function Translation() {
                   value="translation"
                   className="h-full data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
                 >
-                  {selectedLanguage}
+                  {selectedLanguageName}
                 </TabsTrigger>
-                <Button
-                  onClick={() => setOpenSheet(true)}
-                  className="self-right"
-                >
-                  Change Language
-                </Button>
+                <div className="w-full col-span-2 flex justify-end">
+                  <Button
+                    onClick={() => setOpenSheet(true)}
+                    className="group relative flex items-center gap-2 bg-opacity-50 px-2 text-white 
+             w-10 hover:w-40 transition-all duration-500 ease-in-out justify-start overflow-hidden"
+                  >
+                    <img
+                      src={WorldIcon}
+                      alt=""
+                      className="w-6 h-6 transition-all duration-500 ease-in-out"
+                    />
+                    <span
+                      className="opacity-0 scale-95 translate-x-[-5px] 
+                   group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 
+                   transition-all duration-500 whitespace-nowrap"
+                    >
+                      Change Language
+                    </span>
+                  </Button>
+                </div>
               </TabsList>
               <TabsContent
                 className="mt-0 py-5 border border-primary data-[state=active]:rounded-b-lg data-[state=active]:rounded-r-lg"
@@ -207,6 +223,7 @@ export default function Translation() {
                 key={lang}
                 onClick={() => {
                   setSelectedLanguage(lang.code);
+                  setSelectedLanguageName(lang.name);
                   setOpenSheet(false);
                 }}
                 className={`px-4 py-2 m-2 ${
