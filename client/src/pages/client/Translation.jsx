@@ -103,7 +103,7 @@ export default function Translation() {
                   value="arabic"
                   className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
                 >
-                  Arabic / {selectedLanguage}
+                  Arabic / {selectedLanguageName}
                 </TabsTrigger>
                 <TabsTrigger
                   value="translation"
