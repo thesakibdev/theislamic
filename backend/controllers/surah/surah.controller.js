@@ -432,8 +432,7 @@ const getAllSurahs = async (req, res) => {
       return res.status(200).json({ surahs: cachedData });
     }
 
-    console.log("Fetching from database");
-    const totalSurahs = await Surah.countDocuments(); // Get total count of surahs
+    const totalSurahs = await Surah.countDocuments(); 
 
     const surahs = await Surah.find()
       .select(
