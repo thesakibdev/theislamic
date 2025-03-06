@@ -10,13 +10,16 @@ const Language = mongoose.model("Language", languageSchema);
 
 // initial total 22 languages
 const languages = [
+  { name: "Arabic", code: "ar" },
   { name: "Bengali", code: "bn" },
   { name: "English", code: "en" },
+  { name: "Urdu", code: "ur" },
   { name: "Hindi", code: "hi" },
-  { name: "Portuguese", code: "pt" },
+  { name: "Tamil", code: "ta" },
   { name: "German", code: "de" },
-  { name: "French", code: "fr" },
   { name: "Spanish", code: "es" },
+  { name: "French", code: "fr" },
+  { name: "Portuguese", code: "pt" },
   { name: "Turkish", code: "tr" },
   { name: "Italian", code: "it" },
   { name: "Dutch", code: "nl" },
@@ -24,6 +27,11 @@ const languages = [
   { name: "Filipino", code: "tl" },
   { name: "Thai", code: "th" },
   { name: "Indonesian", code: "id" },
+  { name: "Japanese", code: "ja" },
+  { name: "Korean", code: "ko" },
+  { name: "Polish", code: "pl" },
+  { name: "Vietnamese", code: "vi" },
+  { name: "Mandarin Chinese", code: "zh" },
 ];
 
 // Connect to MongoDB
