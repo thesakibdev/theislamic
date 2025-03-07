@@ -1,5 +1,5 @@
-import thumbnileImage from "../../assets/auth-banner.jpg";
-import Profile from "../../assets/auth-profile-bg.png";
+import thumbnileImage from "../../../assets/auth-banner.jpg";
+import Profile from "../../../assets/auth-profile-bg.png";
 
 export default function Blogs() {
   return (

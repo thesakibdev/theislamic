@@ -7,8 +7,8 @@ import {
   Smile,
   SmilePlus,
 } from "lucide-react";
-import blogThumbnail from "../../assets/index-page-banner.png";
-import blogAvatar from "../../assets/auth-profile-bg.png";
+import blogThumbnail from "../../../assets/index-page-banner.png";
+import blogAvatar from "../../../assets/auth-profile-bg.png";
 import { FaRegCommentDots, FaRegFolder } from "react-icons/fa";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
