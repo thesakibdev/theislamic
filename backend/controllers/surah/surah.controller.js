@@ -420,41 +420,105 @@ const deleteVerseOtherData = async (req, res) => {
 // get full surah list with verses
 const getAllSurahs = async (req, res) => {
   try {
-    const surahs = await Surah.find().lean(); // Fetch Surahs with verses
-    const VerseOtherData = await verseOtherData.find().lean(); // Fetch additional verse data
+    const { page = 1, limit = 10 } = req.query; // Default to page 1, 10 items per page
+    const pageNumber = parseInt(page, 10 || 1);
+    const pageLimit = parseInt(limit, 10 || 1);
 
-    // Map Surahs to include verseOtherData without redundant fields
-    const formattedSurahs = surahs.map((surah) => {
-      return {
-        _id: surah._id,
-        surahName: surah.name,
-        surahNumber: surah.surahNumber,
-        juzNumber: surah.juzNumber,
-        verses: surah.verses.map((verse) => {
-          return {
-            _id: verse._id,
-            verseNumber: verse.verseNumber,
-            arabicAyah: verse.arabicAyah,
-            verseOtherData: VerseOtherData.filter(
-              (data) =>
-                data.surahNumber === surah.surahNumber &&
-                data.verseNumber === verse.verseNumber
-            ).map(({ surahNumber, verseNumber, ...rest }) => rest), // Remove redundant fields
-          };
-        }),
-      };
+    const cacheKey = `allSurahs-page-${pageNumber}-limit-${pageLimit}`;
+    const cachedData = getCache(cacheKey);
+
+    if (cachedData) {
+      console.log("Serving from cache");
+      return res.status(200).json({ surahs: cachedData });
+    }
+
+    console.log("Fetching from database");
+    const totalSurahs = await Surah.countDocuments(); // Get total count of surahs
+
+    const surahs = await Surah.find()
+      .select(
+        "name surahNumber juzNumber verses.verseNumber verses.arabicAyah verses.totalVerseNumber"
+      )
+      .sort({ surahNumber: 1 })
+      .skip((pageNumber - 1) * pageLimit) // Skip documents for pagination
+      .limit(pageLimit) // Limit the number of documents fetched
+      .lean();
+
+    const formattedSurahs = surahs.map((surah, index) => ({
+      _id: surah._id,
+      serializedNumber: (pageNumber - 1) * pageLimit + index + 1, // Maintain serialization across pages
+      surahName: surah.name,
+      surahNumber: surah.surahNumber,
+      juzNumber: surah.juzNumber,
+      verses: surah.verses.map((verse) => ({
+        _id: verse._id,
+        verseNumber: verse.verseNumber,
+        arabicAyah: verse.arabicAyah,
+        totalVerseNumber: verse.totalVerseNumber,
+      })),
+    }));
+
+    setCache(cacheKey, formattedSurahs);
+
+    return res.status(200).json({
+      surahs: formattedSurahs,
+      totalSurahs,
+      totalPages: Math.ceil(totalSurahs / pageLimit),
+      currentPage: pageNumber,
     });
-
-    return res.status(200).json({ surahs: formattedSurahs });
   } catch (error) {
     console.error("Error fetching surahs:", error);
     return res.status(500).json({ error: true, message: "Server error." });
   }
 };
 
+const getVerseOtherData = async (req, res) => {
+  try {
+    const result = await verseOtherData.aggregate([
+      {
+        $sort: { surahNumber: 1, verseNumber: 1 },
+      },
+      {
+        $group: {
+          _id: "$surahNumber",
+          verses: {
+            $push: {
+              verseNumber: "$verseNumber",
+              language: "$language",
+              translation: "$translation",
+              transliteration: "$transliteration",
+              note: "$note",
+              keywords: "$keywords",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          surahNumber: "$_id",
+          verses: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+    return result;
+  } catch (error) {
+    console.error("Error fetching formatted data:", error);
+    throw error;
+  }
+};
+
 // get surahs name
 const getSurahsName = async (req, res) => {
   try {
+    const cacheKey = "surahNames";
+    const cachedData = getCache(cacheKey);
+
+    if (cachedData) {
+      return res.status(200).json(cachedData);
+    }
+
     const surahs = await Surah.aggregate([{ $sort: { surahNumber: 1 } }]);
 
     const formattedSurahs = surahs.map((surah) => ({
@@ -464,6 +528,8 @@ const getSurahsName = async (req, res) => {
       juzNumber: surah.juzNumber,
       totalAyah: surah.verses.length,
     }));
+
+    setCache(cacheKey, formattedSurahs);
 
     return res.status(200).json(formattedSurahs);
   } catch (error) {
@@ -557,6 +623,7 @@ module.exports = {
   addVerseOtherData,
   editVerseOtherData,
   deleteVerseOtherData,
+  getVerseOtherData,
 
   // get main surahs
   getAllSurahs,

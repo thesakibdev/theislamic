@@ -1,4 +1,5 @@
 import Loading from "@/components/common/Loading";
+import WorldIcon from "@/assets/icon/world-icon.png";
 import {
   Select,
   SelectContent,
@@ -12,63 +13,81 @@ import {
   useGetAllSurahsNameQuery,
   useGetAllSurahsPaginatedQuery,
 } from "@/slices/admin/surah";
+import { useGetAllLanguagesQuery } from "@/slices/utils";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 export default function Translation() {
-  const { title } = useParams();
+  const [openSheet, setOpenSheet] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const navigate = useNavigate();
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [selectedLanguageName, setSelectedLanguageName] = useState("English");
   const { data: allSurahs } = useGetAllSurahsNameQuery();
-  const {
-    data: surahData,
-    isLoading,
-    isError,
-  } = useGetAllSurahsPaginatedQuery({
+  const { data: languages } = useGetAllLanguagesQuery();
+  const { data: surahData, isLoading } = useGetAllSurahsPaginatedQuery({
     page: currentPage,
     limit: 1,
   });
 
-  useEffect(() => {
-    const foundSurah = surahData?.surahs?.find(
-      (surah) => surah.surahName === decodeURI(title)
-    );
-    setCurrentPage(foundSurah?.surahNumber);
-  }, []);
+  const currentSurah =
+    surahData?.surahs?.find((surah) => surah.surahNumber === currentPage) ||
+    null;
 
-  const currentSurah = surahData?.surahs?.find(
-    (surah) => surah.surahName == decodeURI(title)
-  );
-  console.log(currentSurah);
-  if (isLoading) return <Loading />;
-  if (isError) return <p>এরর হয়েছে!</p>;
+  useEffect(() => {
+    if (currentSurah) {
+      setCurrentPage(Number(currentSurah?.surahNumber));
+    }
+  }, [currentSurah]);
+
 
   return (
     <>
-      <section className="pt-16">
-        <div className="container mx-auto">
+      <section className="py-16">
+        <div className="container mx-auto px-4">
           <div>
-            <h2 className="text-4xl font-medium py-2 text-center">
-              {currentSurah?.surahNumber} - {currentSurah?.surahName}
+            <h2 className="text-xl md:text-3xl lg:text-4xl font-medium py-2 text-center">
+              {currentSurah?.surahName || "Surah Name"}
             </h2>
             {/* select the surah */}
-            <div className="flex flex-col items-center gap-3 mt-4 justify-center">
+            <div className="flex flex-col items-center gap-3 md:mt-4 justify-center">
               <span className="text-sm text-primary font-medium">
                 The description of the surah
               </span>
               <Select
-                onValueChange={(surah) => navigate(`/translation/${surah}`)}
+                onValueChange={(value) => setCurrentPage(parseInt(value, 10))}
               >
-                <SelectTrigger className="max-w-[280px] focus:outline-none active:outline-none appearance-none">
-                  <SelectValue placeholder="Select Surah" />
+                <SelectTrigger className="max-w-[280px] focus:outline-none active:outline-none">
+                  <SelectValue
+                    placeholder={
+                      currentPage
+                        ? `${currentSurah?.surahNumber} ${currentSurah?.surahName}`
+                        : `Select a surah`
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {allSurahs?.map((surah, i) => (
-                      <SelectItem key={i} value={surah.surahName}>
-                        {surah.surahNumber} - {surah.surahName}
-                      </SelectItem>
-                    ))}
+                    {isLoading ? (
+                      <Loading />
+                    ) : (
+                      allSurahs && (
+                        <>
+                          {allSurahs?.map((surah) => (
+                            <SelectItem
+                              key={surah.surahNumber}
+                              value={surah.surahNumber.toString()}
+                            >
+                              {surah.surahNumber} - {surah.surahName}
+                            </SelectItem>
+                          ))}
+                        </>
+                      )
+                    )}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -77,79 +96,141 @@ export default function Translation() {
           {/* main */}
           <div className="mt-10 ">
             <Tabs defaultValue="arabic">
-              <TabsList className="grid w-full grid-cols-3 gap-1 h-full max-w-[400px]">
+              <TabsList className="grid w-full grid-cols-3 gap-1 h-full items-center">
                 <TabsTrigger
                   value="arabic"
-                  className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
+                  className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black text-xs sm:text-sm md:text-base lg:text-lg"
                 >
-                  Arabic
+                  Arabic / {selectedLanguageName}
                 </TabsTrigger>
                 <TabsTrigger
                   value="translation"
-                  className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
+                  className="h-full data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black text-xs sm:text-sm md:text-base lg:text-lg"
                 >
-                  Translation
+                  {selectedLanguageName}
                 </TabsTrigger>
+                <div className="flex justify-end md:mb-1">
+                  <div
+                    onClick={() => setOpenSheet(true)}
+                    className="group relative flex items-center bg-primary bg-opacity-50 px-2 py-1 md:py-2 text-white w-8 md:w-10 transition-all duration-500 ease-in-out justify-center overflow-visible rounded-lg cursor-pointer"
+                  >
+                    <img
+                      src={WorldIcon}
+                      alt="theislamics/change-language-icon"
+                      className="w-[19px] h-[19px] md:h-6 md:w-6"
+                    />
+                    <span className="absolute right-[-10px] opacity-0 bg-primary/50 px-2 py-1 rounded-md group-hover:opacity-100 group-hover:right-9 md:group-hover:right-11 transition-all duration-500 whitespace-nowrap text-[10px] sm:text-sm md:text-base lg:text-lg font-normal">
+                      Change Language
+                    </span>
+                  </div>
+                </div>
               </TabsList>
               <TabsContent
                 className="mt-0 py-5 border border-primary data-[state=active]:rounded-b-lg data-[state=active]:rounded-r-lg"
                 value="arabic"
               >
-                <div className="mt-4 px-5 text-center">
-                  <div
-                    dir="rtl"
-                    className="text-black w-full mx-auto leading-relaxed text-justify"
-                  >
-                    {Array.from({ length: 20 }).map((_, index) => (
-                      <span
-                        key={index}
-                        className="text-2xl md:text-4xl font-arabic text-justify font-medium inline rtl:mr-0 align-middle ayah"
-                      >
-                        this is arabic ayahs
-                      </span>
-                    ))}
+                {isLoading ? (
+                  <Loading />
+                ) : (
+                  <div className="">
+                    <div>
+                      {currentSurah?.verses?.map((verse, index) => (
+                        <div
+                          key={index}
+                          className="border-b border-primary flex flex-col gap-3 md:gap-5 py-3 px-2 md:px-5 md:py-10 last:border-b-0"
+                        >
+                          <div className="text-right text-xl md:text-4xl rtl:mr-3">
+                            <span className="">{verse.arabicAyah}</span>
+                          </div>
+
+                          {verse.verseOtherData
+                            ?.filter(
+                              (data) => data.language === selectedLanguage
+                            )
+                            .map((data) => (
+                              <p
+                                key={data._id}
+                                className="text-left text-sm sm:text-base md:text-2xl w-[90%]"
+                              >
+                                {data.translation}
+                              </p>
+                            ))}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </TabsContent>
               <TabsContent
-                className="mt-0 py-5 border border-primary data-[state=active]:rounded-lg"
+                className="mt-0 py-2 border border-primary data-[state=active]:rounded-lg"
                 value="translation"
               >
-                <div className="mt-4">
-                  {Array.from({ length: 10 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="px-5 border-b border-primary flex flex-col gap-5 py-7 md:py-10"
-                    >
-                      <div className="text-right text-3xl md:text-4xl rtl:mr-3">
-                        <span className="">this is arabic ayah</span>
-                        {/* <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
-                                    <VerseEndIcon
-                                      width={35}
-                                      height={35}
-                                      className="align-middle"
-                                    />
-                                    <span className="absolute text-xs text-center align-middle">
-                                      {convertToArabicNumber(verse.verseNumber)}
+                <div className="mt-4 text-center">
+                  <div className="text-black w-full mx-auto leading-relaxed text-justify">
+                    {isLoading ? (
+                      <Loading />
+                    ) : (
+                      <div>
+                        <div>
+                          {currentSurah?.verses?.map((verse, index) => (
+                            <div
+                              key={index}
+                              className="border-b border-primary flex flex-col gap-3 md:gap-5 px-5 py-3 md:py-5 last:border-b-0"
+                            >
+                              {verse.verseOtherData
+                                ?.filter(
+                                  (data) => data.language === selectedLanguage
+                                )
+                                .map((data) => (
+                                  <p
+                                    key={data._id}
+                                    className="text-left text-sm sm:text-base md:text-2xl w-[90%]"
+                                  >
+                                    <span className="font-semibold mr-2">
+                                      {verse.verseNumber}.
                                     </span>
-                                  </span> */}
+                                    {data.translation}
+                                  </p>
+                                ))}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-
-                      <p className="text-left text-base md:text-2xl w-[90%]">
-                        this is translate ayah
-                      </p>
-                      {/* {Array.from({ length: 10 })
-                                      key={i}
-                                  .map((_, i) => (
-                                  ))} */}
-                    </div>
-                  ))}
+                    )}
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
           </div>
         </div>
       </section>
+
+      <Sheet open={openSheet} onOpenChange={(isOpen) => setOpenSheet(isOpen)}>
+        <SheetContent className="bg-white">
+          <SheetHeader>
+            <SheetTitle>Translation</SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-col overflow-auto h-screen">
+            {languages?.data?.map((lang) => (
+              <button
+                key={lang}
+                onClick={() => {
+                  setSelectedLanguage(lang.code);
+                  setSelectedLanguageName(lang.name);
+                  setOpenSheet(false);
+                }}
+                className={`px-4 py-2 m-2 ${
+                  selectedLanguage === lang
+                    ? "bg-green-500 text-black"
+                    : "bg-gray-200"
+                }`}
+              >
+                {lang.name}
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

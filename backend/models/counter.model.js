@@ -1,5 +1,5 @@
 // models/Visit.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // const visitSchema = new mongoose.Schema({
 //   ip: String,
@@ -9,8 +9,8 @@ const mongoose = require('mongoose');
 // });
 
 const visitorSchema = new mongoose.Schema({
-    ip: String,
-    timestamp: { type: Date, default: Date.now }
-  });
+  ip: String,
+  timestamp: { type: Date, default: Date.now },
+});
 
-module.exports = mongoose.model('Visit', visitorSchema);
+module.exports = mongoose.model("Visit", visitorSchema);

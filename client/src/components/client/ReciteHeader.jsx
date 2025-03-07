@@ -1,4 +1,7 @@
-import { openSidebar, toggleSidebar } from "@/slices/utils/utilitySlice";
+import {
+  openSidebar,
+  toggleSidebar,
+} from "@/slices/utils/utilitySlice";
 import { useDispatch } from "react-redux";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { CiSearch } from "react-icons/ci";
@@ -9,7 +12,11 @@ import {
   useGetAllSurahsNameQuery,
   useGetAllSurahsPaginatedQuery,
 } from "@/slices/admin/surah";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import {
+  IoIosArrowBack,
+  IoIosArrowDown,
+  IoIosArrowForward,
+} from "react-icons/io";
 
 export default function ReciteHeader() {
   const { number } = useParams();
@@ -48,6 +55,20 @@ export default function ReciteHeader() {
     };
   }, [dispatch]);
 
+  const handleClick = () => {
+    dispatch(toggleSidebar());
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     if (setSidebarOpen) {
+  //       dispatch(closeSidebar());
+  //       setSidebarOpen(false);
+  //     }
+  //   }, 10000);
+  // }, []);
+
   const currentSurahName = allSurahs?.find(
     (surah) => surah.surahNumber === Number(number)
   ).surahName;
@@ -70,18 +91,12 @@ export default function ReciteHeader() {
           >
             {currentSurahName} <IoIosArrowDown className="inline" />
           </button>
-          <button
-            className="hidden md:block"
-            onClick={() => {
-              dispatch(toggleSidebar());
-              setSidebarOpen(!sidebarOpen);
-            }}
-          >
+          <button onClick={handleClick} className="hidden md:block">
             {currentSurahName}{" "}
             {sidebarOpen ? (
-              <IoIosArrowUp className="inline transition-all duration-300" />
+              <IoIosArrowBack className="inline transition-all duration-300" />
             ) : (
-              <IoIosArrowDown className="inline transition-all duration-300" />
+              <IoIosArrowForward className="inline transition-all duration-300" />
             )}
           </button>
 
@@ -140,16 +155,16 @@ export default function ReciteHeader() {
                         <div className="relative ">
                           <input
                             placeholder="Search Surah..."
-                            className="w-full border-2 border-none text-white placeholder:text-white bg-[#80BDA9] outline-none text-sm md:text-xl pl-2 rounded-md pr-8 py-1 md:py-3"
+                            className="w-full border-2 border-none text-black placeholder:text-black bg-gray-200 outline-none text-sm md:text-xl pl-2 rounded-md pr-8 py-1 md:py-3"
                             type="text"
                           />
                           <CiSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-black  text-xl lg:text-3xl" />
                         </div>
-                        <ul className="bg-[#80BDA9] rounded-md ">
+                        <ul className="bg-gray-200 rounded-md ">
                           {allSurahs?.map((surah, index) => (
                             <li
                               key={index}
-                              className="hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-lg md:text-xl  text-center cursor-pointer p-3"
+                              className="hover:bg-primary-foreground hover:text-black/90 border-b-2 text-black text-lg md:text-xl  text-center cursor-pointer p-3"
                               onClick={() =>
                                 handleGoToRecitePage(surah.surahNumber)
                               }
@@ -163,18 +178,16 @@ export default function ReciteHeader() {
                         <div className="relative ">
                           <input
                             placeholder="Verse"
-                            className="w-full border-2 border-none text-white placeholder:text-white bg-[#80BDA9] outline-none text-sm md:text-xl pl-2 rounded-md py-1 md:py-3"
+                            className="w-full border-2 border-none text-black placeholder:text-black bg-gray-200 outline-none text-sm md:text-xl pl-2 rounded-md py-1 md:py-3"
                             type="text"
                           />
                           {/* <CiSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-black  text-xl lg:text-3xl" /> */}
                         </div>
-                        <ul className="bg-[#80BDA9] rounded-md">
+                        <ul className="bg-gray-200 rounded-md">
                           {currentSurah?.verses.map((verse, index) => (
                             <li
                               key={index}
-                              // className="hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-lg md:text-xl  text-center cursor-pointer p-3"
-                              className={`hover:bg-[#80BDA9] hover:text-white/90 border-b-2 text-white text-lg md:text-xl text-center cursor-pointer p-3 `}
-                              // onClick={() => handleGoToRecitePage(verse.verseNumber)}
+                              className={`hover:bg-primary-foreground hover:text-black/90 border-b-2 text-black text-lg md:text-xl text-center cursor-pointer p-3 `}
                             >
                               {verse.verseNumber}
                             </li>

@@ -45,6 +45,18 @@ const hadithSchema = new mongoose.Schema(
                   type: String,
                   trim: true,
                 },
+                hadithBangla: {
+                  type: String,
+                  trim: true,
+                },
+                hadithEnglish: {
+                  type: String,
+                  trim: true,
+                },
+                hadithUrdu: {
+                  type: String,
+                  trim: true,
+                },
                 referenceBook: {
                   type: String,
                   trim: true,

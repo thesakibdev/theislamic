@@ -23,8 +23,25 @@ export const utilsApi = createApi({
       }),
       providesTags: ["BookList"],
     }),
+    globalSearch: builder.query({
+      query: (params) => ({
+        url: "/search",
+        params,
+      }),
+    }),
+    counter: builder.query({
+      query: () => ({
+        url: "/admin/analytics/total",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
 // Export the auto-generated hook
-export const { useGetAllLanguagesQuery, useGetAllBookListQuery } = utilsApi;
+export const {
+  useGetAllLanguagesQuery,
+  useGetAllBookListQuery,
+  useGlobalSearchQuery,
+  useCounterQuery,
+} = utilsApi;
