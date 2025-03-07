@@ -1,5 +1,4 @@
 import Loading from "@/components/common/Loading";
-import { Button } from "@/components/ui/button";
 import WorldIcon from "@/assets/icon/world-icon.png";
 import {
   Select,
@@ -45,18 +44,17 @@ export default function Translation() {
     }
   }, [currentSurah]);
 
-  console.log(languages);
 
   return (
     <>
-      <section className="pt-16">
-        <div className="container mx-auto">
+      <section className="py-16">
+        <div className="container mx-auto px-4">
           <div>
-            <h2 className="text-4xl font-medium py-2 text-center">
+            <h2 className="text-xl md:text-3xl lg:text-4xl font-medium py-2 text-center">
               {currentSurah?.surahName || "Surah Name"}
             </h2>
             {/* select the surah */}
-            <div className="flex flex-col items-center gap-3 mt-4 justify-center">
+            <div className="flex flex-col items-center gap-3 md:mt-4 justify-center">
               <span className="text-sm text-primary font-medium">
                 The description of the surah
               </span>
@@ -98,38 +96,33 @@ export default function Translation() {
           {/* main */}
           <div className="mt-10 ">
             <Tabs defaultValue="arabic">
-              <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 gap-1 h-full">
+              <TabsList className="grid w-full grid-cols-3 gap-1 h-full items-center">
                 <TabsTrigger
                   value="arabic"
-                  className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
+                  className="data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black text-xs sm:text-sm md:text-base lg:text-lg"
                 >
                   Arabic / {selectedLanguageName}
                 </TabsTrigger>
                 <TabsTrigger
                   value="translation"
-                  className="h-full data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black"
+                  className="h-full data-[state=active]:border rounded-t-lg data-[state=active]:border-b-0 py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-t-lg data-[state=active]:bg-transparent data-[state=active]:text-black text-xs sm:text-sm md:text-base lg:text-lg"
                 >
                   {selectedLanguageName}
                 </TabsTrigger>
-                <div className="w-full col-span-2 flex justify-end">
-                  <Button
+                <div className="flex justify-end md:mb-1">
+                  <div
                     onClick={() => setOpenSheet(true)}
-                    className="group relative flex items-center gap-2 bg-opacity-50 px-2 text-white 
-             w-10 hover:w-40 transition-all duration-500 ease-in-out justify-start overflow-hidden"
+                    className="group relative flex items-center bg-primary bg-opacity-50 px-2 py-1 md:py-2 text-white w-8 md:w-10 transition-all duration-500 ease-in-out justify-center overflow-visible rounded-lg cursor-pointer"
                   >
                     <img
                       src={WorldIcon}
-                      alt=""
-                      className="w-6 h-6 transition-all duration-500 ease-in-out"
+                      alt="theislamics/change-language-icon"
+                      className="w-[19px] h-[19px] md:h-6 md:w-6"
                     />
-                    <span
-                      className="opacity-0 scale-95 translate-x-[-5px] 
-                   group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 
-                   transition-all duration-500 whitespace-nowrap"
-                    >
+                    <span className="absolute right-[-10px] opacity-0 bg-primary/50 px-2 py-1 rounded-md group-hover:opacity-100 group-hover:right-9 md:group-hover:right-11 transition-all duration-500 whitespace-nowrap text-[10px] sm:text-sm md:text-base lg:text-lg font-normal">
                       Change Language
                     </span>
-                  </Button>
+                  </div>
                 </div>
               </TabsList>
               <TabsContent
@@ -144,7 +137,7 @@ export default function Translation() {
                       {currentSurah?.verses?.map((verse, index) => (
                         <div
                           key={index}
-                          className="border-b border-primary flex flex-col gap-3 md:gap-5 py-3 px-2 md:px-5 md:py-10"
+                          className="border-b border-primary flex flex-col gap-3 md:gap-5 py-3 px-2 md:px-5 md:py-10 last:border-b-0"
                         >
                           <div className="text-right text-xl md:text-4xl rtl:mr-3">
                             <span className="">{verse.arabicAyah}</span>
@@ -177,12 +170,12 @@ export default function Translation() {
                     {isLoading ? (
                       <Loading />
                     ) : (
-                      <div className="">
+                      <div>
                         <div>
                           {currentSurah?.verses?.map((verse, index) => (
                             <div
                               key={index}
-                              className="border-b border-primary flex flex-col gap-3 md:gap-5 px-5 py-3 md:py-5"
+                              className="border-b border-primary flex flex-col gap-3 md:gap-5 px-5 py-3 md:py-5 last:border-b-0"
                             >
                               {verse.verseOtherData
                                 ?.filter(
