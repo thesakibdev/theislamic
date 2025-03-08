@@ -13,7 +13,7 @@ export default function HadithPage() {
 
   const allBookList = response?.data;
 
-  console.log(allBookList);
+  // console.log(allBookList);
 
   return (
     <>

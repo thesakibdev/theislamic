@@ -23,6 +23,8 @@ import DonorPage from "./pages/client/Donor";
 import HadithReadPage from "./pages/client/hadith/HadithReadPage";
 import HadithPage from "./pages/client/hadith/HadithPage";
 import HadithIndex from "./pages/client/hadith/HadithIndex";
+import HadithThematic from "./pages/client/hadith/HadithThematic";
+import Farewell from "./pages/client/hadith/Farewell";
 import EmailVerify from "./pages/client/EmailVerify";
 import DonateCheckout from "./pages/client/DonateCheckout";
 import BlogDetails from "./pages/client/blog/BlogDetails";
@@ -48,6 +50,10 @@ export default function App() {
         <Route path="/hadith" element={<HadithPage />} />
         <Route path="/hadith/:id" element={<HadithIndex />} />
         <Route path="/hadith/:id/:number" element={<HadithReadPage />} />
+        <Route path="/hadith/thematic" element={<HadithThematic />} />
+        <Route path="/hadith/farewell" element={<Farewell />} />
+
+        {/* donor route */}
         <Route path="/donor" element={<DonorPage />} />
         <Route path="/donate-checkout" element={<DonateCheckout />} />
         {/* blogs */}

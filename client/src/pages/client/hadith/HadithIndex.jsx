@@ -7,23 +7,36 @@ export default function HadithIndex() {
   const navigate = useNavigate();
 
   const { data: bookList, isLoading } = useGetAllBookListQuery();
-  const { data: response } = useGetAllHadithQuery();
+  const { data: response, isLoading: responseLoading } = useGetAllHadithQuery();
 
-  if (isLoading) {
+  // Show loading state if either query is loading
+  if (isLoading || responseLoading) {
     return <div className="text-center text-lg">Loading...</div>;
   }
 
+  // Early return if data isn't available
   if (!bookList || !response) {
     return <div className="text-center text-lg">Fetching data...</div>;
   }
 
+  // Safely handle data with fallbacks
   const books = response?.data || [];
-  const selectedBookName = bookList?.data?.find((book) => book.id === id) || {};
-  console.log(selectedBookName?.nameEn || "Book not found");
+  
+  // Make sure to handle the case when bookList.data is undefined
+  const selectedBookName = bookList?.data?.find((book) => book?.id === id) || {};
+  
+  // Log for debugging
+  // console.log("ID:", id);
+  // console.log("Selected Book Name:", selectedBookName?.nameEn || "Book not found");
+  // console.log("Books Length:", books?.length || 0);
 
+  // Safely find the book with a fallback
   const selectedBook = books?.find(
-    (book) => book.bookName === selectedBookName?.nameEn
-  );
+    (book) => book?.bookName === selectedBookName?.nameEn
+  ) || { bookName: "No Book Selected", parts: [] }; // Provide a default object
+
+  // Log selected book for debugging
+  // console.log("Selected Book:", selectedBook?.bookName || "No book selected");
 
   return (
     <section>
@@ -48,22 +61,26 @@ export default function HadithIndex() {
           <button className="text-right text-lg">More Information...</button>
         </div>
 
-        {/* hadith list */}
+        {/* hadith list - only render if selectedBook is defined */}
         <div>
           <ul className="rounded-xl bg-white overflow-hidden">
-            {selectedBook?.parts?.length > 0 ? (
+            {selectedBook?.parts && selectedBook.parts.length > 0 ? (
               selectedBook.parts.map((part, index) => (
                 <div
                   className="flex justify-between bg-primary-foreground text-xl md:text-2xl font-bold py-4 px-5 text-white border-b cursor-pointer"
                   key={index}
-                  onClick={() => navigate(`/hadith/${id}/${part.partNumber}`)}
+                  onClick={() => part?.partNumber && navigate(`/hadith/${id}/${part.partNumber}`)}
                 >
-                  <p className="">{part.partName}</p>
-                  <p className="">{part.partNumber}</p>
+                  <p className="">{part?.partName || "Unknown Part"}</p>
+                  <p className="">{part?.partNumber || "Unknown Number"}</p>
                 </div>
               ))
             ) : (
-              <li className="p-5 font-bold text-4xl">No book found</li>
+              <li className="p-5 font-bold text-xl md:text-2xl">
+                {selectedBookName?.nameEn 
+                  ? `No parts found for ${selectedBookName.nameEn}` 
+                  : "No book selected or book not found. Please check the URL or select another book."}
+              </li>
             )}
           </ul>
         </div>
