@@ -10,7 +10,6 @@ import Donate from "../../assets/icon/donate.png";
 import Iwall from "../../assets/icon/i-wall.png";
 import Social from "../../assets/icon/social.png";
 import ManPraying from "../../assets/icon/man_praying.png";
-import ManReading from "../../assets/icon/man_reading.png";
 import ArrowDown from "../../assets/icon/arrow-down.png";
 
 // components and use state
@@ -49,13 +48,8 @@ export default function Header() {
 
   const menuItems = [
     {
-      icon: ManReading,
-      text: "Tafsir",
-      path: "/",
-    },
-    {
       icon: ManPraying,
-      text: "Salat",
+      text: "5 Pillers",
       path: "/",
     },
     {
