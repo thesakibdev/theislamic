@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import allahSymbol from "@/assets/icon/allah-symbol.png";
-import { useGetAllHadithQuery } from "../../slices/admin/hadith";
-import { useGetAllBookListQuery } from "../../slices/utils";
+import { useGetAllHadithQuery } from "../../../slices/admin/hadith";
+import { useGetAllBookListQuery } from "../../../slices/utils";
 
 export default function HadithReadPage() {
   const { number, id } = useParams();

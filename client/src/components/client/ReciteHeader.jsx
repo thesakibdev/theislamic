@@ -1,4 +1,7 @@
-import { openSidebar, toggleSidebar } from "@/slices/utils/utilitySlice";
+import {
+  openSidebar,
+  toggleSidebar,
+} from "@/slices/utils/utilitySlice";
 import { useDispatch } from "react-redux";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { CiSearch } from "react-icons/ci";
@@ -9,7 +12,11 @@ import {
   useGetAllSurahsNameQuery,
   useGetAllSurahsPaginatedQuery,
 } from "@/slices/admin/surah";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import {
+  IoIosArrowBack,
+  IoIosArrowDown,
+  IoIosArrowForward,
+} from "react-icons/io";
 
 export default function ReciteHeader() {
   const { number } = useParams();
@@ -48,6 +55,20 @@ export default function ReciteHeader() {
     };
   }, [dispatch]);
 
+  const handleClick = () => {
+    dispatch(toggleSidebar());
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     if (setSidebarOpen) {
+  //       dispatch(closeSidebar());
+  //       setSidebarOpen(false);
+  //     }
+  //   }, 10000);
+  // }, []);
+
   const currentSurahName = allSurahs?.find(
     (surah) => surah.surahNumber === Number(number)
   ).surahName;
@@ -70,18 +91,12 @@ export default function ReciteHeader() {
           >
             {currentSurahName} <IoIosArrowDown className="inline" />
           </button>
-          <button
-            className="hidden md:block"
-            onClick={() => {
-              dispatch(toggleSidebar());
-              setSidebarOpen(!sidebarOpen);
-            }}
-          >
+          <button onClick={handleClick} className="hidden md:block">
             {currentSurahName}{" "}
             {sidebarOpen ? (
-              <IoIosArrowUp className="inline transition-all duration-300" />
+              <IoIosArrowBack className="inline transition-all duration-300" />
             ) : (
-              <IoIosArrowDown className="inline transition-all duration-300" />
+              <IoIosArrowForward className="inline transition-all duration-300" />
             )}
           </button>
 

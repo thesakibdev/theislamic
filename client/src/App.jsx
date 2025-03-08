@@ -20,13 +20,13 @@ import RecitePage from "./pages/client/Recite";
 import ReciteLayout from "./layout/client/ReciteLayout";
 import AuthProfile from "./components/client/AuthProfile";
 import DonorPage from "./pages/client/Donor";
-import HadithReadPage from "./pages/client/HadithReadPage";
-import HadithPage from "./pages/client/HadithPage";
-import HadithIndex from "./pages/client/HadithIndex";
+import HadithReadPage from "./pages/client/hadith/HadithReadPage";
+import HadithPage from "./pages/client/hadith/HadithPage";
+import HadithIndex from "./pages/client/hadith/HadithIndex";
 import EmailVerify from "./pages/client/EmailVerify";
 import DonateCheckout from "./pages/client/DonateCheckout";
-import BlogDetails from "./pages/client/BlogDetails";
-import Blogs from "./pages/client/Blogs";
+import BlogDetails from "./pages/client/blog/BlogDetails";
+import Blogs from "./pages/client/blog/Blogs";
 import Translation from "./pages/client/Translation";
 import Dashboard from "./pages/admin/Dashboard";
 
