@@ -104,28 +104,16 @@ export default function Header() {
 
   const subMenuTwo = [
     {
-      text: "Sahih Al-Bukhari",
-      path: "/",
+      text: "Index",
+      path: "/hadith",
     },
     {
-      text: "Sahih Muslim",
-      path: "/",
+      text: "Thematic",
+      path: "/hadith/thematic",
     },
     {
-      text: "Jami At Tirmidhi",
-      path: "/",
-    },
-    {
-      text: "Sunan Abu Dawood",
-      path: "/",
-    },
-    {
-      text: "Sunan An Nasai",
-      path: "/",
-    },
-    {
-      text: "Sahih Ibn Majah",
-      path: "/",
+      text: "Farewell Sermon",
+      path: "/hadith/farewell",
     },
   ];
 
@@ -138,7 +126,7 @@ export default function Header() {
     .map((word) => word[0])
     .join("")
     .toUpperCase();
-    // menu action related state
+  // menu action related state
   const [openMenu, setOpenMenu] = useState(false);
   const [openDropdownMenu, setOpenDropdownMenu] = useState(false);
   const [openDropdownMenuTwo, setOpenDropdownMenuTwo] = useState(false);
@@ -221,6 +209,7 @@ export default function Header() {
                           className="flex items-center justify-center px-4 py-4 cursor-pointer hover:bg-gray-100 border-t-2 border-gray-400"
                           onClick={() =>
                             setOpenMenu(
+                              navigate(item.path),
                               !openMenu,
                               setOpenDropdownMenuTwo(!openDropdownMenuTwo)
                             )
@@ -250,13 +239,26 @@ export default function Header() {
                 ))}
               </ul>
               <div className="px-4 py-2 flex flex-col gap-2 bg-primary-foreground ">
-                <h2 className="text-xl font-semibold text-center">🕌 Become a Donor & </h2>
-                <h2 className="text-xl font-semibold text-center">Make an Impact</h2>
-                <p className="text-justify text-sm">Becoming a donor means more than just giving; it means changing lives, supporting communities, and earning endless rewards from Allah (SWT).</p>
-                <button onClick={() => {
-                  navigate("/donate-checkout")
-                  setOpenMenu(!openMenu);
-                  }} className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">Make A Donate</button>
+                <h2 className="text-xl font-semibold text-center">
+                  🕌 Become a Donor &{" "}
+                </h2>
+                <h2 className="text-xl font-semibold text-center">
+                  Make an Impact
+                </h2>
+                <p className="text-justify text-sm">
+                  Becoming a donor means more than just giving; it means
+                  changing lives, supporting communities, and earning endless
+                  rewards from Allah (SWT).
+                </p>
+                <button
+                  onClick={() => {
+                    navigate("/donate-checkout");
+                    setOpenMenu(!openMenu);
+                  }}
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+                >
+                  Make A Donate
+                </button>
               </div>
             </SheetContent>
           </Sheet>

@@ -126,7 +126,7 @@ export default function Translation() {
                 </div>
               </TabsList>
               <TabsContent
-                className="mt-0 py-5 border border-primary data-[state=active]:rounded-b-lg data-[state=active]:rounded-r-lg"
+                className="mt-0 border border-primary data-[state=active]:rounded-b-lg data-[state=active]:rounded-r-lg"
                 value="arabic"
               >
                 {isLoading ? (
@@ -137,7 +137,7 @@ export default function Translation() {
                       {currentSurah?.verses?.map((verse, index) => (
                         <div
                           key={index}
-                          className="border-b border-primary flex flex-col gap-3 md:gap-5 py-3 px-2 md:px-5 md:py-10 last:border-b-0"
+                          className="border-b border-primary flex flex-col gap-3 md:gap-5 py-2 px-2 md:px-5 md:py-5 last:border-b-0"
                         >
                           <div className="text-right text-xl md:text-4xl rtl:mr-3">
                             <span className="">{verse.arabicAyah}</span>
@@ -150,7 +150,7 @@ export default function Translation() {
                             .map((data) => (
                               <p
                                 key={data._id}
-                                className="text-left text-sm sm:text-base md:text-2xl w-[90%]"
+                                className="text-left text-sm sm:text-base md:text-2xl"
                               >
                                 {data.translation}
                               </p>
@@ -162,7 +162,7 @@ export default function Translation() {
                 )}
               </TabsContent>
               <TabsContent
-                className="mt-0 py-2 border border-primary data-[state=active]:rounded-lg"
+                className="mt-0 border border-primary data-[state=active]:rounded-lg"
                 value="translation"
               >
                 <div className="mt-4 text-center">
@@ -175,7 +175,7 @@ export default function Translation() {
                           {currentSurah?.verses?.map((verse, index) => (
                             <div
                               key={index}
-                              className="border-b border-primary flex flex-col gap-3 md:gap-5 px-5 py-3 md:py-5 last:border-b-0"
+                              className="border-b border-primary flex flex-col gap-3 md:gap-5 px-5 py-2 md:py-5 last:border-b-0"
                             >
                               {verse.verseOtherData
                                 ?.filter(
@@ -184,7 +184,7 @@ export default function Translation() {
                                 .map((data) => (
                                   <p
                                     key={data._id}
-                                    className="text-left text-sm sm:text-base md:text-2xl w-[90%]"
+                                    className="text-left text-sm sm:text-base md:text-2xl"
                                   >
                                     <span className="font-semibold mr-2">
                                       {verse.verseNumber}.

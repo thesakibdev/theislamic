@@ -10,30 +10,29 @@ const Language = mongoose.model("Language", languageSchema);
 
 // initial total 22 languages
 const languages = [
-  { name: "English", code: "en" },
-  { name: "Spanish", code: "es" },
-  { name: "French", code: "fr" },
-  { name: "German", code: "de" },
-  { name: "Mandarin Chinese", code: "zh" },
-  { name: "Hindi", code: "hi" },
   { name: "Arabic", code: "ar" },
   { name: "Bengali", code: "bn" },
-  { name: "Russian", code: "ru" },
-  { name: "Portuguese", code: "pt" },
-  { name: "Japanese", code: "ja" },
-  { name: "Italian", code: "it" },
-  { name: "Korean", code: "ko" },
-  { name: "Turkish", code: "tr" },
-  { name: "Dutch", code: "nl" },
-  { name: "Vietnamese", code: "vi" },
-  { name: "Tamil", code: "ta" },
+  { name: "English", code: "en" },
   { name: "Urdu", code: "ur" },
-  { name: "Polish", code: "pl" },
+  { name: "Hindi", code: "hi" },
+  { name: "Tamil", code: "ta" },
+  { name: "German", code: "de" },
+  { name: "Spanish", code: "es" },
+  { name: "French", code: "fr" },
+  { name: "Portuguese", code: "pt" },
+  { name: "Turkish", code: "tr" },
+  { name: "Italian", code: "it" },
+  { name: "Dutch", code: "nl" },
+  { name: "Russian", code: "ru" },
+  { name: "Filipino", code: "tl" },
   { name: "Thai", code: "th" },
   { name: "Indonesian", code: "id" },
-  { name: "Filipino", code: "tl" },
+  { name: "Japanese", code: "ja" },
+  { name: "Korean", code: "ko" },
+  { name: "Polish", code: "pl" },
+  { name: "Vietnamese", code: "vi" },
+  { name: "Mandarin Chinese", code: "zh" },
 ];
-
 
 // Connect to MongoDB
 // mongoose
