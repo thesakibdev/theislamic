@@ -44,12 +44,21 @@ const hadithSchema = new mongoose.Schema(
                 hadithArabic: {
                   type: String,
                   trim: true,
+                  required: true,
                 },
                 hadithBangla: {
                   type: String,
                   trim: true,
                 },
                 hadithEnglish: {
+                  type: String,
+                  trim: true,
+                },
+                hadithHindi: {
+                  type: String,
+                  trim: true,
+                },
+                hadithIndonesia: {
                   type: String,
                   trim: true,
                 },
