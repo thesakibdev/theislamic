@@ -1,42 +1,51 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetAllHadithQuery } from "../../../slices/admin/hadith";
-import { useGetAllBookListQuery } from "../../../slices/utils";
+import { useGetHadithsQuery } from "../../../slices/admin/hadith";
+import { booksList } from "../../../constant";
 
 export default function HadithIndex() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { data: bookList, isLoading } = useGetAllBookListQuery();
-  const { data: response, isLoading: responseLoading } = useGetAllHadithQuery();
+  const bookName = booksList?.find((book) => book.id === id);
 
-  // Show loading state if either query is loading
-  if (isLoading || responseLoading) {
-    return <div className="text-center text-lg">Loading...</div>;
+  const { data, error, isLoading, refetch } = useGetHadithsQuery({
+    bookName: bookName?.nameEn,
+    language: "en",
+  });
+
+  const selectedBook = data?.data || [];
+
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 sm:px-0">
+        <div className="flex justify-center items-center h-40">
+          <div className="text-center">
+            <div className="spinner-border" role="status">
+              <span className="sr-only">Loading...</span>
+            </div>
+            <p className="mt-2">Loading hadiths...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // Early return if data isn't available
-  if (!bookList || !response) {
-    return <div className="text-center text-lg">Fetching data...</div>;
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 sm:px-0">
+        <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded mt-10">
+          <p>Error loading hadith data: {error.message}</p>
+          <button
+            onClick={() => refetch()}
+            className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
-
-  // Safely handle data with fallbacks
-  const books = response?.data || [];
-  
-  // Make sure to handle the case when bookList.data is undefined
-  const selectedBookName = bookList?.data?.find((book) => book?.id === id) || {};
-  
-  // Log for debugging
-  // console.log("ID:", id);
-  // console.log("Selected Book Name:", selectedBookName?.nameEn || "Book not found");
-  // console.log("Books Length:", books?.length || 0);
-
-  // Safely find the book with a fallback
-  const selectedBook = books?.find(
-    (book) => book?.bookName === selectedBookName?.nameEn
-  ) || { bookName: "No Book Selected", parts: [] }; // Provide a default object
-
-  // Log selected book for debugging
-  // console.log("Selected Book:", selectedBook?.bookName || "No book selected");
 
   return (
     <section>
@@ -69,7 +78,10 @@ export default function HadithIndex() {
                 <div
                   className="flex justify-between bg-primary-foreground text-xl md:text-2xl font-bold py-4 px-5 text-white border-b cursor-pointer"
                   key={index}
-                  onClick={() => part?.partNumber && navigate(`/hadith/${id}/${part.partNumber}`)}
+                  onClick={() =>
+                    part?.partNumber &&
+                    navigate(`/hadith/${id}/${part.partNumber}`)
+                  }
                 >
                   <p className="">{part?.partName || "Unknown Part"}</p>
                   <p className="">{part?.partNumber || "Unknown Number"}</p>
@@ -77,8 +89,8 @@ export default function HadithIndex() {
               ))
             ) : (
               <li className="p-5 font-bold text-xl md:text-2xl">
-                {selectedBookName?.nameEn 
-                  ? `No parts found for ${selectedBookName.nameEn}` 
+                {bookName
+                  ? `No parts found for ${bookName}`
                   : "No book selected or book not found. Please check the URL or select another book."}
               </li>
             )}

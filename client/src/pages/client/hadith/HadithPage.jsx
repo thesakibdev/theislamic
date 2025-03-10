@@ -1,19 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import {
-  useGetAllBookListQuery,
-  // useGetAllLanguagesQuery,
-} from "../../../slices/utils";
 import RubAlHizb from "@/assets/icon/RubAlHizb";
+import { booksList } from "../../../constant";
 
 export default function HadithPage() {
   const navigate = useNavigate();
-
-  const { data: response } = useGetAllBookListQuery();
-  // const { data: allLanguages } = useGetAllLanguagesQuery();
-
-  const allBookList = response?.data;
-
-  // console.log(allBookList);
 
   return (
     <>
@@ -24,7 +14,7 @@ export default function HadithPage() {
           </h1>
           {/* hadith List */}
           <div className="grid md:grid-cols-2 justify-between gap-5 w-full">
-            {allBookList?.map((book, index) => (
+            {booksList?.map((book, index) => (
               <div
                 key={book._id}
                 onClick={() => navigate(`/hadith/${book.id}`)}
