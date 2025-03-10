@@ -13,6 +13,8 @@ const HadithDisplay = () => {
     limit,
   });
 
+  console.log(data);
+
   // Extract data and pagination info
   const hadithData = data?.data || [];
   const totalItems = data?.totalItems || 0;
