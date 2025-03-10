@@ -1,53 +1,55 @@
 const Report = require("../../models/report.model");
 
-const sendReport = async (res, req) => {
+const mongoose = require("mongoose");
+
+const sendReport = async (req, res) => {
   const { sender, errorType, additionalDetails, senderEmail } = req.body;
+
+  console.log(sender, errorType, additionalDetails, senderEmail);
+
   try {
-    const normalizedSender = sender.trim();
-    const normalizedErrorType = errorType.trim();
-    const normalizedAdditionalDetails = additionalDetails.trim();
-    const normalizedSenderEmail = senderEmail.trim();
-
-    if (!normalizedSenderEmail) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid sender email.",
-      });
+    if (!senderEmail?.trim()) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Invalid sender email." });
+    }
+    if (!sender?.trim()) {
+      return res.status(400).json({ error: true, message: "Invalid sender." });
+    }
+    if (!errorType?.trim()) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Invalid error type." });
+    }
+    if (!additionalDetails?.trim()) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Invalid additional details." });
     }
 
-    if (!normalizedSender) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid sender.",
-      });
+    // MongoDB ObjectId ভ্যালিড কিনা চেক করা
+    if (!mongoose.Types.ObjectId.isValid(sender)) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Invalid sender ID format." });
     }
 
-    if (!normalizedErrorType) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid error type.",
-      });
-    }
-
-    if (!normalizedAdditionalDetails) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid additional details.",
-      });
-    }
+    // ObjectId তে কনভার্ট করা
+    const senderObjectId = new mongoose.Types.ObjectId(sender);
 
     const newReport = new Report({
-      sender: normalizedSender,
-      errorType: normalizedErrorType,
-      additionalDetails: normalizedAdditionalDetails,
+      sender: senderObjectId, // এখানে ObjectId দেওয়া হচ্ছে
+      errorType: errorType.trim(),
+      additionalDetails: additionalDetails.trim(),
+      senderEmail: senderEmail.trim(),
     });
 
     await newReport.save();
     res
       .status(200)
-      .json({ error: false, message: "Report sent successfully." });
+      .json({ success: true, message: "Report sent successfully." });
   } catch (error) {
-    console.error("Error:", err);
+    console.error("Error:", error);
     res.status(500).json({ error: true, message: "Internal Server Error" });
   }
 };
