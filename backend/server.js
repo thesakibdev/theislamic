@@ -17,6 +17,7 @@ const languageRouter = require("./routes/utils/language.route");
 const bookListRouter = require("./routes/utils/bookList.route");
 const donorRouter = require("./routes/donor/donor.route");
 const globalSearchRouter = require("./utils/search/globalSearch");
+const reportRouter = require("./routes/report/report.route");
 
 dotenv.config();
 
@@ -92,6 +93,10 @@ app.use("/api/v1/analytics", counterRouter);
 app.use("/api/v1/utils", languageRouter);
 app.use("/api/v1/utils", bookListRouter);
 app.use("/api/v1/utils", globalSearchRouter);
+
+// report route
+app.use("/api/v1/report", reportRouter);
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);

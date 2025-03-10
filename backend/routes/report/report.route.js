@@ -10,17 +10,17 @@ const {
   deleteReport,
 } = require("../../controllers/report/report.controller");
 
-router.post("/report", sendReport);
+router.post("/post", sendReport);
 
-router.get("/reports", getAllReports);
+router.get("/get", getAllReports);
 
 router.put(
-  "/reports/update-status/:reportId",
+  "/update-status/:reportId",
   checkUserRole(["admin", "creator", "editor"]),
   updateReportStatus
 );
 router.delete(
-  "/reports/delete/:reportId",
+  "/delete/:reportId",
   checkUserRole(["admin", "creator", "editor"]),
   deleteReport
 );
