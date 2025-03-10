@@ -167,7 +167,7 @@ export default function Header() {
                       {subMenuOne.map((item, index) => (
                         <li
                           key={index}
-                          className="flex items-center justify-center px-4 py-4 cursor-pointer hover:bg-gray-100 border-t-2 border-gray-400"
+                          className="flex items-center px-4 py-4 cursor-pointer hover:bg-gray-100 border-t-2 border-gray-400 text-left"
                           onClick={() => {
                             navigate(item.path);
                             setOpenMenu(
@@ -176,7 +176,7 @@ export default function Header() {
                             );
                           }}
                         >
-                          <span>{item.text}</span>
+                          <span className="pl-[85px]">{item.text}</span>
                         </li>
                       ))}
                     </ul>
@@ -200,7 +200,7 @@ export default function Header() {
                       {subMenuTwo.map((item, index) => (
                         <li
                           key={index}
-                          className="flex items-center justify-center px-4 py-4 cursor-pointer hover:bg-gray-100 border-t-2 border-gray-400"
+                          className="flex items-center px-4 py-4 cursor-pointer hover:bg-gray-100 border-t-2 border-gray-400"
                           onClick={() =>
                             setOpenMenu(
                               navigate(item.path),
@@ -209,7 +209,7 @@ export default function Header() {
                             )
                           }
                         >
-                          <span>{item.text}</span>
+                          <span className="pl-[85px]">{item.text}</span>
                         </li>
                       ))}
                     </ul>

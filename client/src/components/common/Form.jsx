@@ -59,7 +59,7 @@ const CommonForm = memo(function CommonForm({
         element = (
           <Checkbox
             id={getControlItem.name}
-            checked={!!formData[getControlItem.name]} 
+            checked={!!formData[getControlItem.name]}
             className={allClasses.checkBoxClass}
             onCheckedChange={(checked) =>
               setFormData({
@@ -346,6 +346,11 @@ const CommonForm = memo(function CommonForm({
                     "hadithNumber",
                     "internationalNumber",
                     "hadithArabic",
+                    "hadithHindi",
+                    "hadithUrdu",
+                    "hadithEnglish",
+                    "hadithBangla",
+                    "hadithIndonesia",
                     "hadithText",
                     "referenceBook",
                     "similarities",

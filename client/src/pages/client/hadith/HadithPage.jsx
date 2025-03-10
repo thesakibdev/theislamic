@@ -17,18 +17,18 @@ export default function HadithPage() {
 
   return (
     <>
-      <section>
-        <div className="container mx-auto py-16">
+      <section className="bg-gray-200">
+        <div className="container mx-auto py-16 px-4">
           <h1 className="text-xl px-3 md:text-2xl font-medium text-center text-black my-10">
             The Hadith Of the power muhammad At your Fingertips
           </h1>
           {/* hadith List */}
-          <div className="grid grid-cols-2 justify-between gap-10 w-full">
+          <div className="grid md:grid-cols-2 justify-between gap-5 w-full">
             {allBookList?.map((book, index) => (
               <div
                 key={book._id}
                 onClick={() => navigate(`/hadith/${book.id}`)}
-                className="flex gap-5 items-center border cursor-pointer border-gray-200 p-5 rounded-lg hover:border-primary group w-full"
+                className="flex gap-5 items-center border cursor-pointer border-gray-200 bg-white p-4 rounded-lg hover:border-primary group w-full"
               >
                 <div className="relative flex items-center justify-center max-w-[22%]">
                   <span className="absolute text-black text-sm font-medium group-hover:text-primary">
