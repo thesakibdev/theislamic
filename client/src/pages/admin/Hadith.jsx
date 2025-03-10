@@ -26,6 +26,11 @@ const initialFormData = {
   hadithNumber: "",
   internationalNumber: "",
   hadithArabic: "",
+  hadithBangla: "",
+  hadithEnglish: "",
+  hadithHindi: "",
+  hadithIndonesia: "",
+  hadithUrdu: "",
   referenceBook: "",
   similarities: "",
   translation: "",
@@ -64,6 +69,11 @@ export default function Hadith() {
         hadithNumber: formData.hadithNumber,
         internationalNumber: formData.internationalNumber,
         hadithArabic: formData.hadithArabic,
+        hadithBangla: formData.hadithBangla,
+        hadithEnglish: formData.hadithEnglish,
+        hadithHindi: formData.hadithHindi,
+        hadithIndonesia: formData.hadithIndonesia,
+        hadithUrdu: formData.hadithUrdu,
         referenceBook: formData.referenceBook,
         similarities: formData.similarities,
         translation: formData.translation,
@@ -73,6 +83,8 @@ export default function Hadith() {
         keywords: formData.keywords,
       },
     };
+
+    console.log(updatedFormData);
 
     try {
       const addResponse = await addHadith(updatedFormData).unwrap();

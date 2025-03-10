@@ -7,11 +7,8 @@ const HadithDisplay = ({ bookName, language }) => {
     language: language,
   });
 
-  console.log(data);
-
   // Extract data and pagination info
   const hadithData = data?.data || [];
-  console.log("hadithData", hadithData);
 
   if (isLoading) {
     return (
@@ -109,7 +106,9 @@ const HadithDisplay = ({ bookName, language }) => {
                             )}
                             {hadithItem?.hadithText && (
                               <div className="col-span-2 mt-2 mb-2 p-2 bg-blue-50 rounded text-left">
-                                <span className="font-semibold text-base uppercase">{language}:</span>
+                                <span className="font-semibold text-base uppercase">
+                                  {language}:
+                                </span>
                                 <p className="text-lg">
                                   {hadithItem.hadithText}
                                 </p>
