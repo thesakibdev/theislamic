@@ -47,9 +47,9 @@ export const hadithApi = createApi({
       providesTags: ["Hadith"], // সঠিক, কারণ এটি ডেটা ফেচ করে
     }),
     getHadiths: builder.query({
-      query: ({ page = 1, limit = 10 }) => ({
+      query: ({ bookName, language = "en" }) => ({
         url: "/admin/hadith/get/all",
-        params: { page, limit, timestamp: Date.now() },
+        params: { bookName, language, timestamp: Date.now() },
       }),
       // Transform the response to handle the nested data structure
       transformResponse: (response) => {

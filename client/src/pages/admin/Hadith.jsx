@@ -2,10 +2,7 @@
 // import { RiDeleteBinLine } from "react-icons/ri";
 
 import { useGetAllBookListQuery } from "../../slices/utils";
-import {
-  useAddHadithMutation,
-  useGetAllHadithByPaginationQuery,
-} from "../../slices/admin/hadith";
+import { useAddHadithMutation } from "../../slices/admin/hadith";
 
 import CommonForm from "@/components/common/Form";
 import { toast } from "react-toastify";
@@ -18,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import HadithDisplay from "@/components/admin/HadithTile";
+import { languagesList, booksList } from "../../constant";
 
 const initialFormData = {
   bookName: "",
@@ -41,25 +39,12 @@ export default function Hadith() {
   const [openAddHadithForm, setOpenAddHadithForm] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hadithPage, setHadithPage] = useState(1);
+  const [bookName, setBookName] = useState("Sahih Al-Bukhari");
+  const [language, setLanguage] = useState("en");
 
   const [addHadith] = useAddHadithMutation();
 
   const { data: allBookList } = useGetAllBookListQuery();
-  const {
-    data: response,
-    isLoading,
-    isError,
-  } = useGetAllHadithByPaginationQuery({
-    page: currentPage,
-    limit: 1,
-    hadithPage: hadithPage,
-    hadithLimit: 5,
-  });
-
-  // Extract data from the response
-  const hadithData = response?.data || [];
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -258,12 +243,47 @@ export default function Hadith() {
   return (
     <>
       <div className="mt-12">
-        <div className="flex justify-end">
+        <div className="flex justify-between container mx-auto px-4 sm:px-0">
+          <div className="flex gap-3">
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
+            >
+              {languagesList &&
+                languagesList.map((language) => (
+                  <option
+                    className="bg-primary/50 text-white"
+                    key={language?.code}
+                    value={language?.code}
+                  >
+                    {language?.name}
+                  </option>
+                ))}
+            </select>
+
+            <select
+              value={bookName}
+              onChange={(e) => setBookName(e.target.value)}
+              className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
+            >
+              {booksList &&
+                booksList.map((book, index) => (
+                  <option
+                    className="bg-primary/50 text-white"
+                    key={index}
+                    value={book?.nameEn}
+                  >
+                    {book?.nameEn}
+                  </option>
+                ))}
+            </select>
+          </div>
           <Button
-            className="bg-primary text-white mr-10"
+            className="bg-primary text-white"
             onClick={() => {
               setOpenAddHadithForm(true);
-              setCurrentEditedId(null); // Ensure we're in "Add" mode
+              setCurrentEditedId(null);
               setFormData(initialFormData);
             }}
           >
@@ -271,68 +291,7 @@ export default function Hadith() {
           </Button>
         </div>
 
-        {/* <div className="mt-10">
-          {isError ? (
-            <div>Error fetching data</div>
-          ) : isLoading ? (
-            <div>Loading...</div>
-          ) : hadithData.length === 0 ? (
-            <div>No hadiths found</div>
-          ) : (
-            <div className="border border-gray-300 p-4">
-              {hadithData.map((hadith, index) => (
-                <div className="border border-gray-300 p-4" key={index}>
-                  <h2>Book Name: {hadith?.bookName}</h2>
-                  <div>
-                    {hadith?.parts?.map((hadithItem, index) => (
-                      <div key={index}>
-                        <p>Part Name: {hadithItem?.partName}</p>
-                        <p>Part Number: {hadithItem?.partNumber}</p>
-
-                        <div>
-                          {hadithItem?.chapters?.map((chapter, index) => (
-                            <div key={index}>
-                              <p>Chapter Name: {chapter?.chapterName}</p>
-                              <p>Chapter Number: {chapter?.chapterNumber}</p>
-
-                              <div>
-                                {chapter?.hadithList?.map((hadith, index) => (
-                                  <div
-                                    className="border border-gray-300 p-4 my-3 grid grid-cols-3 gap-5"
-                                    key={index}
-                                  >
-                                    <p>Hadith Number: {hadith?.hadithNumber}</p>
-                                    <p>
-                                      International Hadith Number:{" "}
-                                      {hadith?.internationalNumber}
-                                    </p>
-                                    <p>Hadith Arabic: {hadith?.hadithArabic}</p>
-                                    <p>
-                                      Reference Book: {hadith?.referenceBook}
-                                    </p>
-                                    <p>Similarities: {hadith?.similarities}</p>
-                                    <p>Translation: {hadith?.translation}</p>
-                                    <p>
-                                      Transliteration: {hadith?.transliteration}
-                                    </p>
-                                    <p>Narrator: {hadith?.narrator}</p>
-                                    <p>Note: {hadith?.note}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div> */}
-
-        <HadithDisplay />
+        <HadithDisplay bookName={bookName} language={language} />
       </div>
       <Sheet
         open={openAddHadithForm}
