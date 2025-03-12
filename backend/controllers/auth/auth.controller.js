@@ -88,7 +88,7 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password, phone } = req.body;
 
-  if (!email || !password || !phone) {
+  if (!email || !password) {
     return res
       .status(400)
       .json({ success: false, message: "Missing email or password" });
@@ -133,10 +133,9 @@ const loginUser = async (req, res) => {
         success: true,
         message: "Login successful",
         user: {
-          email: checkUser.email,
-          role: checkUser.role,
           id: checkUser._id,
           name: checkUser.name,
+          role: checkUser.role,
         },
       });
   } catch (e) {
@@ -291,6 +290,7 @@ const updateUserRole = async (req, res) => {
 const getUserDetails = async (req, res) => {
   try {
     const id = req.params.id;
+    console.log(id);
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({
@@ -306,11 +306,10 @@ const getUserDetails = async (req, res) => {
       phone: user.phone,
       companyName: user.companyName,
       designation: user.designation,
-      country: user.country,
+      profession: user.profession,
       address: user.address,
       totalDonation: user.totalDonation,
-      avatar: user.profileImage,
-      isVerified: user.isVerified,
+      avatar: user.avatar,
     };
 
     res.status(200).json({
