@@ -84,14 +84,14 @@ export default function ReciteHeader() {
       <div className="container mx-auto px-3 py-1 text-xl">
         <div className="flex">
           <button
-            className="md:hidden"
+            className="lg:hidden"
             onClick={() => {
               setOpenMobileSidebar(true);
             }}
           >
             {currentSurahName} <IoIosArrowDown className="inline" />
           </button>
-          <button onClick={handleClick} className="hidden md:block">
+          <button onClick={handleClick} className="hidden lg:block">
             {currentSurahName}{" "}
             {sidebarOpen ? (
               <IoIosArrowBack className="inline transition-all duration-300" />
@@ -101,7 +101,7 @@ export default function ReciteHeader() {
           </button>
 
           {/* sidebar for mobile version */}
-          <div className="md:hidden pt-7 flex items-center ">
+          <div className="lg:hidden pt-7 flex items-center ">
             <Sheet
               open={openMobileSidebar}
               onOpenChange={(isOpen) => setOpenMobileSidebar(isOpen)}
