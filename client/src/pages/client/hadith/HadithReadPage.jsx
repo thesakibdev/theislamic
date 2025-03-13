@@ -13,6 +13,12 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useGetAllLanguagesQuery } from "@/slices/utils";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function HadithReadPage() {
   const { number, id } = useParams();
@@ -21,6 +27,11 @@ export default function HadithReadPage() {
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [selectedLanguageName, setSelectedLanguageName] = useState("English");
   const shareLink = window.location.href;
+
+  // report error
+  const [showErrorForm, setShowErrorForm] = useState(false);
+  const [otherError, setOtherError] = useState(false);
+
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(shareLink);
@@ -108,65 +119,7 @@ export default function HadithReadPage() {
           </div>
         </div>
 
-        {/* {selectedPart?.chapters?.map((chapter, index) => (
-          <div key={index} className="my-10">
-            <div className="bg-gray-200 py-10">
-              <div className="container px-4  mx-auto flex flex-col md:flex-row justify-between gap-5 text-xl text-black md:text-2xl font-medium">
-                <h1 className="max-w-xl">
-                  {chapter.chapterName}{" "}
-                  <span className="text-primary font-bold">
-                    Chapter no. {chapter.chapterNumber}{" "}
-                  </span>{" "}
-                </h1>
-                <h1 className="max-w-xl text-3xl">
-                  {hadith.hadithChapterArabic}{" "}
-                </h1>
-              </div>
-            </div>
-            {chapter.hadithList?.map((hadith, index) => (
-              <div
-                className="my-10 py-5 bg-gray-200 px-2 md:px-0 text-xl text-black md:text-2xl font-medium"
-                key={index}
-              >
-                <div className="container px-4 mx-auto flex flex-col md:flex-row justify-between gap-5">
-                  <div className="max-w-xl">
-                    <h3 className="text-sm font-bold capitalize md:text-base mb-2">
-                      Narrated by: {hadith.narrator}
-                    </h3>
-                    <h2 className="text-sm capitalize">
-                      {hadith.translation}{" "}
-                    </h2>
-                  </div>
-                  <h2 className="max-w-xl text-3xl " dir="rtl">{hadith.hadithArabic} </h2>
-                </div>
-                <div className="container px-4 mx-auto flex flex-col md:flex-row justify-between gap-5 mt-5">
-                  <div className="text-xs md:text-sm">
-                    <p>
-                      Rrference :{" "}
-                      <span className="text-primary">
-                        {hadith.referenceBook}
-                      </span>
-                    </p>
-                    <p>
-                      In-book reference :{" "}
-                      <span>Book {selectedPart?.partNumber}</span>{" "}
-                      <span>Hadith {hadith.hadithNumber}</span>
-                    </p>
-                  </div>
-                  <div className="flex gap-2 text-xs md:text-sm">
-                    <p>Report Error |</p>
-                    <p
-                      onClick={copyToClipboard}
-                      className="cursor-pointer hover:text-primary duration-500 transition-all ease-linear"
-                    >
-                      Share
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ))} */}
+        {/* hadith */}
 
         <div className="mt-10 ">
           <Tabs defaultValue="arabic">
@@ -270,7 +223,7 @@ export default function HadithReadPage() {
                           </p>
                         </div>
                         <div className="flex absolute right-0 bottom-0 gap-2 text-xs md:text-sm">
-                          <p className="cursor-pointer border-black border border-b-0 p-2 hover:border-primary hover:text-primary duration-500 transition-all ease-linear">
+                          <p   onClick={() => setShowErrorForm(!showErrorForm)} className="cursor-pointer border-black border border-b-0 p-2 hover:border-primary hover:text-primary duration-500 transition-all ease-linear">
                             Report Error
                           </p>
                           <p
@@ -279,6 +232,85 @@ export default function HadithReadPage() {
                           >
                             Share
                           </p>
+                        </div>
+                      </div>
+                      <div
+                        className={cn(
+                          " transition-all duration-500 ease-in-out",
+                          showErrorForm
+                            ? "h-[400px] opacity-100 py-5"
+                            : "h-0 opacity-0 py-0"
+                        )}
+                      >
+                        <div className="border border-black rounded-md p-5 mt-3">
+                          <h3 className="text-xl font-bold mb-4">
+                            Report an Error
+                          </h3>
+
+                          {/* Error Types */}
+                          <div className="space-y-3">
+                            <Label>
+                              Type of error:{" "}
+                              <span className="text-red-500">*</span>
+                            </Label>
+                            {[
+                              "Mismatched translation",
+                              "Spelling mistake",
+                              "Incomplete text",
+                              "Mistranslation",
+                            ].map((error, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center space-x-2"
+                              >
+                                <input
+                                  type="radio"
+                                  name="errorType"
+                                  className="accent-gray-700"
+                                />
+                                <Label>{error}</Label>
+                              </div>
+                            ))}
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="radio"
+                                name="errorType"
+                                className="accent-gray-700"
+                                onChange={() => setOtherError(true)}
+                              />
+                              <Label>Other (please specify)</Label>
+                            </div>
+                            {otherError && (
+                              <Input
+                                type="text"
+                                placeholder="Specify other error"
+                              />
+                            )}
+                          </div>
+
+                          {/* Additional Details */}
+                          <div className="mt-4">
+                            <Label>Additional details:</Label>
+                            <Textarea placeholder="Describe the issue..." />
+                          </div>
+
+                          {/* Email Notify */}
+                          <div className="flex items-center space-x-2 mt-4">
+                            <Checkbox id="email_notify" />
+                            <Label htmlFor="email_notify">
+                              Yes, email me when the error is corrected
+                            </Label>
+                          </div>
+                          <Input
+                            type="email"
+                            placeholder="Email address"
+                            disabled
+                          />
+
+                          {/* Submit Button */}
+                          <Button className="w-full text-black mt-4 bg-green-600 hover:bg-green-500">
+                            SUBMIT
+                          </Button>
                         </div>
                       </div>
                     </div>
