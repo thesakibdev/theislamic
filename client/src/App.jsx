@@ -8,7 +8,6 @@ import Quran from "./pages/admin/Quran";
 import NotFound from "./pages/404";
 import Tafsir from "./pages/admin/Tafsir";
 import Hadith from "./pages/admin/Hadith";
-import HadithOther from "./pages/admin/HadithOther";
 import Donors from "./pages/admin/Donors";
 import CheckAuth from "./middleware/CheckAuth";
 import { useDispatch, useSelector } from "react-redux";
@@ -91,7 +90,6 @@ export default function App() {
         <Route path="quran" element={<Quran />} />
         <Route path="verses-other-data" element={<VersesOtherData />} />
         <Route path="hadith" element={<Hadith />} />
-        <Route path="hadith-other" element={<HadithOther />} />
         <Route path="tafsir" element={<Tafsir />} />
         <Route path="donors" element={<Donors />} />
         <Route path="i-wall" element={<Blog />} />

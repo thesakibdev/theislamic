@@ -816,18 +816,36 @@ const getHadithByBook = async (req, res) => {
       });
     }
 
-    // Map language code to field name
-    const languageFieldMap = {
-      ar: "hadithArabic",
-      en: "hadithEnglish",
-      bn: "hadithBangla",
-      hi: "hadithHindi",
-      id: "hadithIndonesia",
-      ur: "hadithUrdu",
+    // Map language code to field names (both text and transliteration)
+    const languageMap = {
+      ar: {
+        text: "hadithArabic",
+        transliteration: null, // Arabic doesn't have transliteration
+      },
+      en: {
+        text: "hadithEnglish",
+        transliteration: "englishTransliteration",
+      },
+      bn: {
+        text: "hadithBangla",
+        transliteration: "banglaTransliteration",
+      },
+      hi: {
+        text: "hadithHindi",
+        transliteration: "hindiTransliteration",
+      },
+      id: {
+        text: "hadithIndonesia",
+        transliteration: "indonesiaTransliteration",
+      },
+      ur: {
+        text: "hadithUrdu",
+        transliteration: "urduTransliteration",
+      },
     };
 
     // Default to English if language code is not supported
-    const languageField = languageFieldMap[language] || "hadithEnglish";
+    const selectedLanguage = languageMap[language] || languageMap["en"];
 
     // Format the response with the selected language
     const formattedBook = {
@@ -857,20 +875,28 @@ const getHadithByBook = async (req, res) => {
                                     (b.hadithNumber || 0)
                                 )
                                 .map((h) => {
-                                  return {
+                                  const result = {
                                     hadithNumber: h.hadithNumber || 0,
                                     internationalNumber:
                                       h.internationalNumber || "",
                                     narrator: h.narrator || "",
-                                    hadithText: h[languageField] || "", // Use selected language
+                                    hadithText: h[selectedLanguage.text] || "", // Selected language text
                                     hadithArabic: h.hadithArabic || "", // Always include Arabic
-                                    translation: h.translation || "",
-                                    transliteration: h.transliteration || "",
                                     referenceBook: h.referenceBook || "",
                                     similarities: h.similarities || "",
                                     note: h.note || "",
-                                    keywords: h.keywords || [],
                                   };
+
+                                  // Add transliteration if available for the selected language
+                                  if (
+                                    selectedLanguage.transliteration &&
+                                    h[selectedLanguage.transliteration]
+                                  ) {
+                                    result.transliteration =
+                                      h[selectedLanguage.transliteration];
+                                  }
+
+                                  return result;
                                 })
                             : [],
                         };
@@ -891,7 +917,7 @@ const getHadithByBook = async (req, res) => {
         data: formattedBook,
         selectedBook: bookName,
         language,
-        availableLanguages: Object.keys(languageFieldMap),
+        availableLanguages: Object.keys(languageMap),
       },
     };
 

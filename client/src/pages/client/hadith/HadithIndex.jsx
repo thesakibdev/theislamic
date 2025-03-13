@@ -15,35 +15,38 @@ export default function HadithIndex() {
 
   const selectedBook = data?.data || [];
 
-
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 sm:px-0">
-        <div className="flex justify-center items-center h-40">
-          <div className="text-center">
-            <div className="spinner-border" role="status">
-              <span className="sr-only">Loading...</span>
+      <section className="pt-[4.5rem] pb-[4.5rem]">
+        <div className="container mx-auto px-4 sm:px-0">
+          <div className="flex justify-center items-center h-40">
+            <div className="text-center">
+              <div className="spinner-border" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+              <p className="mt-2">Loading hadiths...</p>
             </div>
-            <p className="mt-2">Loading hadiths...</p>
           </div>
         </div>
-      </div>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 sm:px-0">
-        <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded mt-10">
-          <p>Error loading hadith data: {error.message}</p>
-          <button
-            onClick={() => refetch()}
-            className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Retry
-          </button>
+      <section className="pt-[4.5rem] pb-[4.5rem]">
+        <div className="container mx-auto px-4 sm:px-0">
+          <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded mt-10">
+            <p>Error loading hadith data: {error.message}</p>
+            <button
+              onClick={() => refetch()}
+              className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Retry
+            </button>
+          </div>
         </div>
-      </div>
+      </section>
     );
   }
 
