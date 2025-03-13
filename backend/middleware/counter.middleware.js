@@ -3,6 +3,7 @@ const Counter = require("../models/visit.model");
 const express = require("express");
 const router = express.Router();
 
+// Middleware function to track visits
 const trackCounter = async (req, res, next) => {
   if (!req.path.startsWith("/admin")) {
     try {
@@ -19,23 +20,24 @@ const trackCounter = async (req, res, next) => {
   next();
 };
 
-module.exports = trackCounter;
-
+// Controller function to get total visits
 const getTotalVisits = async (req, res) => {
   try {
     const counter = await Counter.findOne({ name: "visits" });
     const result = counter ? counter.value : 0;
-    if (counter) {
-      res.status(200).json({ error: false, data: result });
-    }
+
+    res.status(200).json({ error: false, data: result });
   } catch (error) {
     console.error("Counter error:", error);
     res.status(500).json({ error: true, message: "Server error." });
   }
 };
 
-module.exports = { getTotalVisits };
-
+// Define route
 router.get("/total/counter", getTotalVisits);
 
-module.exports = router;
+// Export both the middleware and router
+module.exports = {
+  trackCounter,
+  counterRouter: router,
+};

@@ -4,13 +4,15 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const connectDB = require("./lib/db");
 const trackVisits = require("./middleware/visitor.middleware");
-const trackCounter = require("./middleware/counter.middleware");
+const {
+  trackCounter,
+  counterRouter,
+} = require("./middleware/counter.middleware");
 
 // import router here
 const authRouter = require("./routes/auth/auth.route");
 const surahRouter = require("./routes/surah/surah.route");
 const visitorRouter = require("./routes/visit/visitor.route");
-const counterRouter = require("./middleware/counter.middleware");
 const blogRouter = require("./routes/blog/blog.route");
 const hadithRouter = require("./routes/hadith/hadith.route");
 const languageRouter = require("./routes/utils/language.route");
@@ -68,6 +70,8 @@ app.get("/robots.txt", (req, res) => {
 });
 
 app.use(trackVisits);
+
+// Apply the middleware for all routes
 app.use(trackCounter);
 
 // auth route
@@ -87,7 +91,7 @@ app.use("/api/v1/donor", donorRouter);
 
 // visitor route
 app.use("/api/v1/admin/analytics", visitorRouter);
-app.use("/api/v1/analytics", counterRouter);
+app.use("/api/v1/admin/analytics", counterRouter);
 
 // utilities route
 app.use("/api/v1/utils", languageRouter);
@@ -96,7 +100,6 @@ app.use("/api/v1/utils", globalSearchRouter);
 
 // report route
 app.use("/api/v1/report", reportRouter);
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
