@@ -31,23 +31,23 @@ export default function DonorPage() {
             data?.donors?.map((donor) => (
               <div
                 key={donor.name}
-                className="border p-4 grid grid-cols-1 md:grid-cols-5 my-6 gap-5 rounded-md relative"
+                className="border p-4 flex flex-col md:flex-row my-6 gap-5 rounded-md relative"
               >
-                <div className="md:col-span-1 overflow-hidden rounded-md">
+                <div className="w-full md:max-w-[190px] md:w-1/4 overflow-hidden rounded-md">
                   {donor.avatar === "" ? (
                     <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
                   ) : (
                     <div
-                      className="h-[220px] w-full bg-cover bg-center rounded-md"
+                      className="h-96 md:h-[220px] w-full bg-cover bg-center rounded-md"
                       style={{ backgroundImage: `url(${donor.avatar})` }}
                     ></div>
                   )}
                 </div>
-                <div className="md:col-span-4">
-                  <p className="text-xl md:text-2xl font-bold mb-2">
+                <div className="w-full md:w-3/4">
+                  <p className="text-xl md:text-2xl font-bold mb-2 md:mt-5">
                     Name: {donor.name}
                   </p>
-                  <div className="flex gap-y-3 gap-x-5">
+                  <div className="flex gap-y-3 gap-x-5 ">
                     <div className="w-1/2 flex flex-col gap-y-3">
                       <p className="text-lg text-black/50">
                         <span className="font-semibold text-black/60">
