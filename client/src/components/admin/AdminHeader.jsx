@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { checkAuth } from "@/slices/authslice";
+import { useEffect, useState } from "react";
 import { FaBell, FaSearch } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 export default function AdminHeader() {
-  const { user } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
   const [isProfileOpen, setisProfileOpen] = useState(false);
   const [isNotificationOpen, setisNotificationOpen] = useState(false);
   const toggleProfile = () => {

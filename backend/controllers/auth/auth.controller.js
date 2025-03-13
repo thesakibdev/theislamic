@@ -10,9 +10,19 @@ dotenv.config();
 
 //register
 const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const {
+    name,
+    phone,
+    password,
+    email,
+    avatar,
+    profession,
+    companyName,
+    designation,
+    address,
+  } = req.body;
 
-  if (!name || !email || !password) {
+  if (!name || !phone || !password) {
     return res.status(400).json({
       success: false,
       message: "Missing required fields in request body",
@@ -36,7 +46,7 @@ const registerUser = async (req, res) => {
   }
 
   try {
-    const checkUser = await User.findOne({ email });
+    const checkUser = await User.findOne({ phone: phone });
     if (checkUser) {
       return res.status(409).json({
         success: false,
@@ -44,59 +54,27 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const hashPassword = await bcrypt.hash(password, 10);
-
-    // ভেরিফিকেশন টোকেন জেনারেট
-    const verificationToken = crypto.randomBytes(20).toString("hex");
-    const verificationTokenExpires = Date.now() + 3600000; // ১ ঘন্টা
+    const hashPassword = await bcrypt.hash(password, 16);
 
     const newUser = new User({
       name,
-      email,
+      phone,
       password: hashPassword,
-      verificationToken,
-      verificationTokenExpires,
+      email,
+      avatar,
+      profession,
+      companyName,
+      designation,
+      address,
     });
     await newUser.save();
 
-    // ভেরিফিকেশন ইমেইল পাঠানো
-    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
-
-    const mailOptions = {
-      from: `"The Islamic Center"" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "ইমেইল ভেরিফিকেশন",
-      html: `
-        <h2>আপনার ইমেইল ভেরিফাই করুন</h2>
-        <p>অ্যাকাউন্ট এক্টিভেট করতে নিচের বাটনে ক্লিক করুন:</p>
-        <a href="${verificationLink}">
-          <button style="padding: 12px 24px; background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer;">
-            ভেরিফাই করুন
-          </button>
-        </a>
-        <p>লিঙ্কটি ১ ঘন্টার মধ্যে এক্সপায়ার হবে</p>
-      `,
-    };
-
-    // ইমেইল সেন্ডিং এর চেষ্টা
-    try {
-      await transporter.sendMail(mailOptions);
-    } catch (emailError) {
-      console.error("ইমেইল পাঠানোতে সমস্যা:", emailError);
-      await User.deleteOne({ _id: newUser._id }); // রোলব্যাক
-      return res.status(500).json({
-        success: false,
-        message: "ভেরিফিকেশন ইমেইল পাঠানো যায়নি। পরে আবার চেষ্টা করুন।",
-      });
-    }
-
     res.status(201).json({
       success: true,
-      message:
-        "Registration successful! Please check your email for verification.",
+      message: "Registration successful!",
       user: {
-        id: newUser._id,
         name: newUser.name,
+        phone: newUser.phone,
         email: newUser.email,
       },
     });
@@ -106,51 +84,9 @@ const registerUser = async (req, res) => {
   }
 };
 
-// verify email
-const verifyEmail = async (req, res) => {
-  const { token } = req.query;
-
-  if (!token) {
-    return res.status(400).json({
-      success: false,
-      message: "ভেরিফিকেশন টোকেন প্রয়োজন",
-    });
-  }
-
-  try {
-    const user = await User.findOne({
-      verificationToken: token,
-      verificationTokenExpires: { $gt: Date.now() },
-    });
-
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "অবৈধ বা এক্সপায়ার্ড টোকেন",
-      });
-    }
-
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    user.verificationTokenExpires = undefined;
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: "ইমেইল সফলভাবে ভেরিফাই করা হয়েছে!",
-    });
-  } catch (error) {
-    console.error("ভেরিফিকেশনে ত্রুটি:", error);
-    res.status(500).json({
-      success: false,
-      message: "ইন্টারনাল সার্ভার এরর",
-    });
-  }
-};
-
 //login
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, phone } = req.body;
 
   if (!email || !password) {
     return res
@@ -197,10 +133,9 @@ const loginUser = async (req, res) => {
         success: true,
         message: "Login successful",
         user: {
-          email: checkUser.email,
-          role: checkUser.role,
           id: checkUser._id,
           name: checkUser.name,
+          role: checkUser.role,
         },
       });
   } catch (e) {
@@ -355,6 +290,7 @@ const updateUserRole = async (req, res) => {
 const getUserDetails = async (req, res) => {
   try {
     const id = req.params.id;
+    console.log(id);
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({
@@ -370,11 +306,10 @@ const getUserDetails = async (req, res) => {
       phone: user.phone,
       companyName: user.companyName,
       designation: user.designation,
-      country: user.country,
+      profession: user.profession,
       address: user.address,
       totalDonation: user.totalDonation,
-      avatar: user.profileImage,
-      isVerified: user.isVerified,
+      avatar: user.avatar,
     };
 
     res.status(200).json({
@@ -389,7 +324,6 @@ const getUserDetails = async (req, res) => {
 
 module.exports = {
   registerUser,
-  verifyEmail,
   loginUser,
   logoutUser,
   authMiddleware,

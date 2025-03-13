@@ -1,12 +1,11 @@
 import { FaUser } from "react-icons/fa";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { useLoginMutation } from "@/slices/authslice";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/slices/authslice/userSlice";
+import { loginUser } from "@/slices/authslice";
 
 const initialFormData = {
   email: "",
@@ -14,34 +13,30 @@ const initialFormData = {
 };
 
 export default function Login() {
-  const [login] = useLoginMutation();
   const [formData, setFormData] = useState(initialFormData);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    try {
-      const loginResponse = await login(formData).unwrap();
-      dispatch(setUser(loginResponse.user));
-      console.log(loginResponse.user);
-      setFormData(initialFormData);
-      navigate("/");
-      toast.success(loginResponse.message);
-    } catch (error) {
-      toast.error(error?.data?.message);
-    }
+    dispatch(loginUser(formData)).then((data) => {
+      if (data?.payload?.success) {
+        toast.success(data?.payload?.message);
+        navigate("/");
+      } else {
+        toast.error(data?.payload?.message);
+      }
+    });
   };
   return (
-    <div className="p-[50px] text-center flex flex-col items-center bg-white/30 backdrop:blur-lg rounded-md">
+    <div className="p-[50px] text-center flex flex-col items-center bg-white/40 backdrop:blur-lg rounded-md">
       <div className="flex flex-col gap-4 items-center justify-center mb-10">
         <FaUser className="w-[80px] h-[80px] bg-primary text-white p-[6.5px] rounded-full" />
         <h1 className="text-5xl font-semibold">Login</h1>
-        <p>
+        <p className="text-lg text-white">
           {`Don't have an account?`}{" "}
           <span
-            className="text-blue-500 cursor-pointer"
+            className="text-blue-600 cursor-pointer"
             onClick={() => navigate("/signup")}
           >
             Register

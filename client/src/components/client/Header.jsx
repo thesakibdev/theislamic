@@ -13,7 +13,7 @@ import ManPraying from "../../assets/icon/man_praying.png";
 import ArrowDown from "../../assets/icon/arrow-down.png";
 
 // components and use state
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import {
@@ -23,6 +23,9 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { checkAuth } from "@/slices/authslice";
+import { loginUser } from "@/slices/authslice";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -112,7 +115,13 @@ export default function Header() {
   ];
 
   // user related state
-  const { user, isAuthenticated } = useSelector((state) => state.user);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
   const roles = ["admin", "creator", "editor"];
   const initialAvatar = user?.name
     .split(" ")
@@ -127,7 +136,8 @@ export default function Header() {
 
   // all function
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    dispatch(loginUser({ user: null, isAuthenticated: false }));
+    navigate("/login");
   };
   return (
     <header className={`bg-white shadow-md fixed w-full left-0 top-0 z-50`}>
@@ -281,7 +291,10 @@ export default function Header() {
                 <DropdownMenuContent className="w-56">
                   {isAuthenticated ? (
                     <>
-                      <DropdownMenuItem onClick={() => navigate("/profile")}>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => navigate("/profile")}
+                      >
                         {user?.avatar ? (
                           <img
                             src="https://images.unsplash.com/photo-1612766959025-ac18e2b3bb96?crop=entropy&cs=srgb&fm=jpg&ixid=M3w2NjMyNTh8MHwxfHNlYXJjaHw5fHxmb3JtYWx8ZW58MHx8fHwxNzM3MjI5NzMyfDA&ixlib=rb-4.0.3&q=85"
