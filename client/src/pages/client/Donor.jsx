@@ -37,54 +37,59 @@ export default function DonorPage() {
                   {donor.avatar === "" ? (
                     <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
                   ) : (
-                    <div className="max-h-[400px] md:max-h-[200px] w-full object-fill">
-                      <img
-                        src={donor.avatar}
-                        alt={donor.name}
-                        className="rounded-md h-full w-full object-cover mx-auto md:mx-0 block"
-                      />
-                    </div>
+                    <div
+                      className="h-[220px] w-full bg-cover bg-center rounded-md"
+                      style={{ backgroundImage: `url(${donor.avatar})` }}
+                    ></div>
                   )}
                 </div>
                 <div className="md:col-span-4">
                   <p className="text-xl md:text-2xl font-bold mb-2">
                     Name: {donor.name}
                   </p>
-                  <div className="grid md:grid-cols-2 gap-y-3 gap-x-5">
-                    <p className="text-lg text-black/50">
-                      <span className="font-semibold text-black/60">
-                        Profession:
-                      </span>{" "}
-                      {donor.profession}
-                    </p>
-                    <p className="text-lg text-black/50">
-                      <span className="font-semibold text-black/60">
-                        Company:
-                      </span>{" "}
-                      {donor.companyName}
-                    </p>
-                    <p className="text-lg text-black/50">
-                      <span className="font-semibold text-black/60">
-                        Designation:{" "}
-                      </span>
-                      {donor.designation}
-                    </p>
-                    <p className="text-lg text-black/50">
-                      <span className="font-semibold text-black/60">
-                        Street:
-                      </span>{" "}
-                      {donor.street}
-                    </p>
-                    <p className="text-lg text-black/50">
-                      <span className="font-semibold text-black/60">City:</span>{" "}
-                      {donor.city}
-                    </p>
-                    <p className="text-lg text-black/50">
-                      <span className="font-semibold text-black/60">
-                        Country:
-                      </span>{" "}
-                      {donor.country}
-                    </p>
+                  <div className="flex gap-y-3 gap-x-5">
+                    <div className="w-1/2 flex flex-col gap-y-3">
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Profession:
+                        </span>{" "}
+                        {donor.profession}
+                      </p>
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Designation:{" "}
+                        </span>
+                        {donor.designation}
+                      </p>
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          City:
+                        </span>{" "}
+                        {donor.city}
+                      </p>
+                    </div>
+                    <div className="w-1/2 flex flex-col gap-y-3">
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Company:
+                        </span>{" "}
+                        {donor.companyName}
+                      </p>
+
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Street:
+                        </span>{" "}
+                        {donor.street}
+                      </p>
+
+                      <p className="text-lg text-black/50">
+                        <span className="font-semibold text-black/60">
+                          Country:
+                        </span>{" "}
+                        {donor.country}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -114,9 +119,11 @@ export default function DonorPage() {
               <PaginationItem>
                 <Button
                   className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                  onClick={() => setCurrentPage(() => 
-                    currentPage > 2 ? 1 : currentPage + 2
-                  )}
+                  onClick={() =>
+                    setCurrentPage(() =>
+                      currentPage > 2 ? 1 : currentPage + 2
+                    )
+                  }
                 >
                   Skip
                 </Button>
