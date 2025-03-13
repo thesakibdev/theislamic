@@ -37,11 +37,11 @@ export default function ReciteSideBar() {
   };
   return (
     <aside
-      className={`hidden md:block bg-gray-200 max-w-lg pt-24 transition-transform duration-300 
+      className={`hidden lg:block bg-gray-200 max-w-lg pt-24 transition-transform duration-300 
         ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
     >
       {/* sidebar for desktop version */}
-      <div className="hidden md:block border-r-2">
+      <div className="hidden lg:block border-r-2">
         <Tabs defaultValue="surah" className="m-0">
           <TabsList className="grid grid-cols-2 relative px-10 rounded-full m-0 mt-2">
             <TabsTrigger
