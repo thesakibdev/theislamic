@@ -23,10 +23,10 @@ export default function AdminSidebar() {
     //   name: "Salat",
     //   link: "salat",
     // },
-    // {
-    //   name: "I-Wall",
-    //   link: "i-wall",
-    // },
+    {
+      name: "I-Wall",
+      link: "i-wall",
+    },
     {
       name: "Donors",
       link: "donors",

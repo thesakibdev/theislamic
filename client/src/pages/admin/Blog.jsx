@@ -1,13 +1,9 @@
 import ImageUploader from "@/components/common/imageUploader";
-
-import { useState, useRef, useEffect } from "react";
-
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "../../components/ui/button";
 import { toast } from "react-toastify";
-
 import RTE from "../../components/common/RTE";
 import { Input } from "@/components/ui/input";
-
 import {
   useAddBlogMutation,
   useEditBlogMutation,
@@ -15,6 +11,15 @@ import {
   useGetAllBlogsQuery,
 } from "../../slices/admin/blog";
 import { useSelector } from "react-redux";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
 
 const initialFormData = {
   title: "",
@@ -35,300 +40,386 @@ export default function Blog() {
   const [imagePublicId, setImagePublicId] = useState("");
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  
-  const { user } = useSelector((state) => state.user);
-  
-  const [addBlog] = useAddBlogMutation();
-  const [editBlog] = useEditBlogMutation();
-  const [deleteBlog] = useDeleteBlogMutation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { user } = useSelector((state) => state.auth);
+  const RTERef = useRef(null);
+
+  const [addBlog, { isLoading: isAddingBlog }] = useAddBlogMutation();
+  const [editBlog, { isLoading: isEditingBlog }] = useEditBlogMutation();
+  const [deleteBlog, { isLoading: isDeletingBlog }] = useDeleteBlogMutation();
   const {
-    data: blogs,
+    data: blogsData,
     isLoading,
     error,
   } = useGetAllBlogsQuery({
     page: currentPage,
     limit: 6,
   });
-  
-  const [imageLoadingState, setImageLoadingState] = useState(isLoading);
-  console.log("isLoading", isLoading);
-  console.log("uploadedImageUrl", uploadedImageUrl);
-  console.log("imagePublicId", imagePublicId);
 
-  const RTERef = useRef(null);
+  console.log("blogsData", blogsData);
 
+  const blogs = useMemo(() => blogsData || [], [blogsData]);
+  console.log("blogs", blogs);
+
+  const totalPages = useMemo(() => blogsData?.totalPages || 1, [blogsData]);
+  console.log("totalPages", totalPages);
+
+  const [imageLoadingState, setImageLoadingState] = useState(false);
+
+  // Handle form field changes
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Reset form to initial state
   const resetForm = () => {
     setFormData(initialFormData);
     setImageFile(null);
-    setUploadedImageUrl(null);
-    setImagePublicId(null);
+    setUploadedImageUrl("");
+    setImagePublicId("");
     setImageLoadingState(false);
     setCurrentEditedId(null);
-    RTERef.current.setContent("");
+    if (RTERef.current) {
+      RTERef.current.setContent("");
+    }
   };
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    const RTEContent = RTERef.current.getContent();
 
-    const updatedFormData = {
-      ...formData,
-      description: RTEContent,
-      thumbnail: uploadedImageUrl,
-      thumbnailId: imagePublicId,
-      author: user.id,
-    };
+    if (!isFormValid()) {
+      toast.error("Please fill all required fields");
+      return;
+    }
 
-    console.log("Updated Form Data:", updatedFormData);
+    setIsSubmitting(true);
 
     try {
+      const RTEContent = RTERef.current?.getContent() || "";
+
+      const updatedFormData = {
+        ...formData,
+        description: RTEContent,
+        thumbnail: uploadedImageUrl,
+        thumbnailId: imagePublicId,
+        author: user?.id,
+      };
+
+      console.log(updatedFormData);
+
       if (currentEditedId !== null) {
         const editResponse = await editBlog({
           id: currentEditedId,
           ...updatedFormData,
         }).unwrap();
         toast.success(editResponse.message || "Blog updated successfully!");
-        setCurrentEditedId(null);
         resetForm();
       } else {
         const addResponse = await addBlog(updatedFormData).unwrap();
-        if (addResponse.error) {
-          toast.error(addResponse.error.message);
-          setImageLoadingState(false);
-        } else {
-          toast.success(addResponse.message || "Blog added successfully!");
-          resetForm();
-        }
+        toast.success(addResponse.message || "Blog added successfully!");
+        resetForm();
       }
     } catch (error) {
-      // Extract and display server error message or default message
       const errorMessage = error.data?.message || "Error submitting data!";
-      console.error("Error submitting data:", error);
       toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const isFormValid = () => {
-    const RTEContent = RTERef.current?.getContent().trim();
-    return (
-      formData.title.trim() !== "" &&
-      formData.shortDesc.trim() !== "" &&
-      formData.slug.trim() !== "" &&
-      formData.metaDesc.trim() !== "" &&
-      formData.metaKeyword.trim() !== "" &&
-      RTEContent !== "" &&
-      RTEContent.length > 0 // Additional check for content length
-    );
+    if (!RTERef.current) return false;
+
+    const RTEContent = RTERef.current.getContent().trim();
+    const requiredFields = [
+      formData.title.trim(),
+      formData.shortDesc.trim(),
+      formData.slug.trim(),
+      formData.metaDesc.trim(),
+      formData.metaKeyword.trim(),
+      RTEContent,
+    ];
+
+    return requiredFields.every((field) => field !== "" && field.length > 0);
   };
 
+  // Set RTE content when editing a blog
   useEffect(() => {
-    if (RTERef.current) {
-      RTERef.current.setContent(formData.description || "");
+    if (RTERef.current && formData.description) {
+      RTERef.current.setContent(formData.description);
     }
   }, [formData.description]);
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
+  const handleEditBlog = (blog) => {
+    if (!blog) return;
+
+    setCurrentEditedId(blog._id);
+    setFormData({
+      title: blog.title || "",
+      shortDesc: blog.shortDesc || "",
+      slug: blog.slug || "",
+      metaDesc: blog.metaDesc || "",
+      metaKeyword: blog.metaKeyword || "",
+      description: blog.description || "",
+    });
+
+    // Set image data if available
+    if (blog.thumbnail) {
+      setUploadedImageUrl(blog.thumbnail);
+    }
+    if (blog.thumbnailId) {
+      setImagePublicId(blog.thumbnailId);
+    }
+
+    // Scroll to form
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  };
+
   const handleDeleteBlog = async (id) => {
+    if (!id) return;
+
     try {
-      // Show a confirmation dialog
       const userConfirmed = window.confirm(
-        "Are you sure you want to delete this verse? This action cannot be undone."
+        "Are you sure you want to delete this blog? This action cannot be undone."
       );
 
-      // If the user clicks "OK", proceed with the delete API call
       if (userConfirmed) {
-        const deleteResponse = await deleteBlog({
-          id,
-        }).unwrap();
+        const deleteResponse = await deleteBlog({ id }).unwrap();
         toast.success(deleteResponse.message || "Blog deleted successfully");
-      } else {
-        // User canceled the action
-        toast.info("Delete action canceled");
       }
     } catch (error) {
-      toast.error(error?.data?.message);
+      toast.error(error?.data?.message || "Failed to delete blog");
     }
   };
 
-  useEffect(() => {
-    console.log("Blogs Data:", blogs);
-  }, [blogs]);
-
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Failed to load blogs.</p>;
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
-    <div className="container mx-auto">
-      <h1 className="text-3xl font-semibold text-center my-5">Blog</h1>
+    <div className="container mx-auto px-4">
+      <h1 className="text-3xl font-semibold text-center my-8">
+        Blog Management
+      </h1>
 
-      <div className="my-10 flex gap-3">
-        {blogs?.map((blog) => (
-          <div className="border rounded-md p-6" key={blog._id}>
-            <h1>{blog.title}</h1>
-            <h2>{blog.shortDesc}</h2>
-            <h3>{blog.slug}</h3>
-            <h4>{blog.metaDesc}</h4>
-
-            <div className="flex justify-between">
-              <Button
-                onClick={() => {
-                  setCurrentEditedId(blog._id);
-                  setFormData({
-                    title: blog.title || "",
-                    shortDesc: blog.shortDesc || "",
-                    slug: blog.slug || "",
-                    metaDesc: blog.metaDesc || "",
-                    metaKeyword: blog.metaKeyword || "",
-                    metaUrl: blog.metaUrl || "",
-                    description: blog.description || "",
-                  });
-                }}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => handleDeleteBlog(blog._id)}
-              >
-                Delete
-              </Button>
-            </div>
+      {/* Blog Cards */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, index) => (
+            <Card key={index} className="h-64">
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-2/3" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="p-4 border rounded-md bg-red-50 text-red-500">
+          Failed to load blogs. {error.message || "Please try again later."}
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-10">
+            {blogs.length > 0 ? (
+              blogs.map((blog) => (
+                <Card key={blog._id} className="overflow-hidden border">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xl font-bold">
+                      {blog.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {blog.thumbnail && (
+                      <img
+                        src={blog.thumbnail}
+                        alt={blog.title}
+                        className="w-full h-32 object-cover rounded-md mb-2"
+                      />
+                    )}
+                    <p className="text-sm text-gray-600">{blog.shortDesc}</p>
+                    <div className="text-xs text-gray-500">
+                      <p>Slug: {blog.slug}</p>
+                      <p>Meta: {blog.metaDesc?.substring(0, 60)}...</p>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <Button
+                      onClick={() => handleEditBlog(blog)}
+                      disabled={isEditingBlog || isAddingBlog}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDeleteBlog(blog._id)}
+                      disabled={isDeletingBlog}
+                    >
+                      Delete
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-10">
+                <p className="text-gray-500">
+                  No blogs found. Create your first blog below.
+                </p>
+              </div>
+            )}
           </div>
-        ))}
-      </div>
 
-      <ImageUploader
-        uploadEndpoint={`${baseUrl}/admin/blog/upload-image`}
-        imageFile={imageFile}
-        setImageFile={setImageFile}
-        imageLoadingState={imageLoadingState}
-        uploadedImageUrl={uploadedImageUrl}
-        setImagePublicId={setImagePublicId}
-        setUploadedImageUrl={setUploadedImageUrl}
-        setImageLoadingState={setImageLoadingState}
-        isEditMode={currentEditedId !== null}
-      />
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center my-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
+      )}
 
-      <div className="py-6 mt-5">
-        <form onSubmit={onSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="">
-              <label htmlFor="title" className="text-lg text-semibold">
-                Title
+      {/* Blog Form */}
+      <div className="my-10 p-6 border rounded-lg shadow-sm">
+        <h2 className="text-2xl font-medium mb-6">
+          {currentEditedId ? "Edit Blog" : "Add New Blog"}
+        </h2>
+
+        <ImageUploader
+          uploadEndpoint={`${baseUrl}/admin/blog/upload-image`}
+          imageFile={imageFile}
+          setImageFile={setImageFile}
+          imageLoadingState={imageLoadingState}
+          uploadedImageUrl={uploadedImageUrl}
+          setImagePublicId={setImagePublicId}
+          setUploadedImageUrl={setUploadedImageUrl}
+          setImageLoadingState={setImageLoadingState}
+          isEditMode={currentEditedId !== null}
+        />
+
+        <form onSubmit={onSubmit} className="mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label htmlFor="title" className="block text-sm font-medium">
+                Title <span className="text-red-500">*</span>
               </label>
               <Input
-                className="w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary"
                 type="text"
                 name="title"
-                placeholder="Title"
                 id="title"
+                placeholder="Blog Title"
                 value={formData.title}
-                onChange={(event) =>
-                  setFormData({
-                    ...formData,
-                    [event.target.name]: event.target.value,
-                  })
-                }
+                onChange={handleInputChange}
               />
             </div>
 
-            <div className="">
-              <label htmlFor="shortDesc" className="text-lg text-semibold">
-                Short Description
+            <div className="space-y-2">
+              <label htmlFor="shortDesc" className="block text-sm font-medium">
+                Short Description <span className="text-red-500">*</span>
               </label>
               <Input
-                className="w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary"
                 type="text"
                 name="shortDesc"
-                placeholder="Short Description"
                 id="shortDesc"
+                placeholder="Brief summary of the blog"
                 value={formData.shortDesc}
-                onChange={(event) =>
-                  setFormData({
-                    ...formData,
-                    [event.target.name]: event.target.value,
-                  })
-                }
+                onChange={handleInputChange}
               />
             </div>
 
-            <div className="">
-              <label htmlFor="slug" className="text-lg text-semibold">
-                Slug
+            <div className="space-y-2">
+              <label htmlFor="slug" className="block text-sm font-medium">
+                Slug <span className="text-red-500">*</span>
               </label>
               <Input
-                className="w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary"
                 type="text"
                 name="slug"
-                placeholder="Slug"
                 id="slug"
+                placeholder="URL-friendly name (e.g., my-blog-post)"
                 value={formData.slug}
-                onChange={(event) =>
-                  setFormData({
-                    ...formData,
-                    [event.target.name]: event.target.value,
-                  })
-                }
+                onChange={handleInputChange}
               />
             </div>
 
-            <div className="">
-              <label htmlFor="metaDesc" className="text-lg text-semibold">
-                Meta Description
+            <div className="space-y-2">
+              <label htmlFor="metaDesc" className="block text-sm font-medium">
+                Meta Description <span className="text-red-500">*</span>
               </label>
               <Input
-                className="w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary"
                 type="text"
                 name="metaDesc"
-                placeholder="Meta Description"
                 id="metaDesc"
+                placeholder="SEO description"
                 value={formData.metaDesc}
-                onChange={(event) =>
-                  setFormData({
-                    ...formData,
-                    [event.target.name]: event.target.value,
-                  })
-                }
+                onChange={handleInputChange}
               />
             </div>
 
-            <div className="">
-              <label htmlFor="metaKeyword" className="text-lg text-semibold">
-                Meta Keyword
+            <div className="space-y-2">
+              <label
+                htmlFor="metaKeyword"
+                className="block text-sm font-medium"
+              >
+                Meta Keywords <span className="text-red-500">*</span>
               </label>
               <Input
-                className="w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary"
                 type="text"
                 name="metaKeyword"
-                placeholder="Meta Keyword"
                 id="metaKeyword"
+                placeholder="Comma-separated keywords"
                 value={formData.metaKeyword}
-                onChange={(event) =>
-                  setFormData({
-                    ...formData,
-                    [event.target.name]: event.target.value,
-                  })
-                }
+                onChange={handleInputChange}
               />
             </div>
           </div>
 
-          <div className="mt-10">
-            <label htmlFor="title">Description</label>
-
+          <div className="mt-8 space-y-2">
+            <label htmlFor="description" className="block text-sm font-medium">
+              Blog Content <span className="text-red-500">*</span>
+            </label>
             <RTE
-              onInit={(evt, editor) => (RTERef.current = editor)}
+              onInit={(_, editor) => (RTERef.current = editor)}
               initialValue={formData.description}
             />
           </div>
-          <Button
-            type="submit"
-            className="mt-5 w-full"
-            disabled={!isFormValid()}
-          >
-            {currentEditedId !== null ? "Edit Blog" : "Add Blog"}
-          </Button>
+
+          <div className="mt-8 flex space-x-4">
+            <Button
+              type="submit"
+              className="px-6"
+              disabled={isSubmitting || imageLoadingState}
+            >
+              {isSubmitting
+                ? "Saving..."
+                : currentEditedId
+                ? "Update Blog"
+                : "Publish Blog"}
+            </Button>
+
+            {currentEditedId && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={resetForm}
+                disabled={isSubmitting}
+              >
+                Cancel Edit
+              </Button>
+            )}
+          </div>
         </form>
       </div>
     </div>
