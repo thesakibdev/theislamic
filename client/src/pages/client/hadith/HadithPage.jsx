@@ -18,7 +18,7 @@ export default function HadithPage() {
               <div
                 key={book._id}
                 onClick={() => navigate(`/hadith/${book.id}`)}
-                className="flex gap-5 items-center border cursor-pointer border-gray-200 bg-white p-4 rounded-lg hover:border-primary group w-full"
+                className="flex gap-5 items-center border cursor-pointer border-gray-200 bg-white/60 p-4 rounded-lg hover:border-primary group w-full"
               >
                 <div className="relative flex items-center justify-center max-w-[22%]">
                   <span className="absolute text-black text-sm font-medium group-hover:text-primary">
@@ -31,10 +31,17 @@ export default function HadithPage() {
                   />
                 </div>
                 <div className="max-w-[78%]">
-                  <div className="flex gap-5 justify-between">
-                    <p className="text-2xl text-black group-hover:text-primary">
-                      {book?.nameEn}
-                    </p>
+                  <div className="grid grid-cols-2 gap-5 justify-between">
+                    <div className="">
+                      <p className="text-lg md:text-xl text-black group-hover:text-primary">
+                        {book?.nameEn}
+                      </p>
+                    </div>
+                    <div dir="rtl" className="">
+                      <p className="text-2xl text-black group-hover:text-primary text-right">
+                        {book?.nameAr}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

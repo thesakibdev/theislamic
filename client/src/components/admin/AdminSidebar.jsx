@@ -3,16 +3,18 @@ import { FaTachometerAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import ArrowDown from "../../assets/icon/arrow-down.png";
 import OpenBook from "../../assets/icon/open_book.png";
-import Book from "../../assets/icon/book.png";
 
 export default function AdminSidebar() {
   const navigate = useNavigate();
   const activePath = window.location.pathname.split("/")[2];
 
   const [openQuran, setOpenQuran] = useState(false);
-  const [openHadith, setOpenHadith] = useState(false);
 
   const headerMenu = [
+    {
+      name: "Hadith",
+      link: "hadith",
+    },
     // {
     //   name: "Tafsir",
     //   link: "tafsir",
@@ -21,10 +23,10 @@ export default function AdminSidebar() {
     //   name: "Salat",
     //   link: "salat",
     // },
-    // {
-    //   name: "I-Wall",
-    //   link: "i-wall",
-    // },
+    {
+      name: "I-Wall",
+      link: "i-wall",
+    },
     {
       name: "Donors",
       link: "donors",
@@ -71,7 +73,7 @@ export default function AdminSidebar() {
             <div>
               <div
                 className="flex items-center justify-between pr-4 my-4 cursor-pointer"
-                onClick={() => setOpenQuran(!openQuran, setOpenHadith(false))}
+                onClick={() => setOpenQuran(!openQuran)}
               >
                 <img src={OpenBook} alt="Open Book" />
                 <span className="text-lg font-semibold">Quran</span>
@@ -106,48 +108,6 @@ export default function AdminSidebar() {
                       } rounded-full`}
                     ></div>
                     <span>Verses-Other-Data</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* hadith menu list */}
-            <div>
-              <div
-                className="flex items-center justify-between pr-4 my-4 cursor-pointer"
-                onClick={() => setOpenHadith(!openHadith, setOpenQuran(false))}
-              >
-                <img src={Book} alt="Open Book" />
-                <span className="text-lg font-semibold">Hadith</span>
-                <img src={ArrowDown} alt="Arrow Down" />
-              </div>
-              <div className={openHadith ? "block" : "hidden"}>
-                <ul className="flex flex-col gap-5">
-                  <li
-                    className="flex items-center space-x-2 text-md cursor-pointer pl-4 border-b pb-4"
-                    onClick={() => {
-                      navigate("hadith");
-                    }}
-                  >
-                    <div
-                      className={`w-4 h-4 ${
-                        activePath === "hadith" ? "bg-black" : "bg-white"
-                      } rounded-full`}
-                    ></div>
-                    <span>Hadith</span>
-                  </li>
-                  <li
-                    className="flex items-center space-x-2 text-md cursor-pointer pl-4 border-b pb-4"
-                    onClick={() => {
-                      navigate("hadith-other");
-                    }}
-                  >
-                    <div
-                      className={`w-4 h-4 ${
-                        activePath === "hadith-other" ? "bg-black" : "bg-white"
-                      } rounded-full`}
-                    ></div>
-                    <span>Hadith Other</span>
                   </li>
                 </ul>
               </div>

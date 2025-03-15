@@ -35,6 +35,12 @@ export const utilsApi = createApi({
         method: "GET",
       }),
     }),
+    visitor: builder.query({
+      query: () => ({
+        url: "/admin/analytics/total/counter",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -44,4 +50,5 @@ export const {
   useGetAllBookListQuery,
   useGlobalSearchQuery,
   useCounterQuery,
+  useVisitorQuery,
 } = utilsApi;

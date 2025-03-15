@@ -50,7 +50,15 @@ const hadithSchema = new mongoose.Schema(
                   type: String,
                   trim: true,
                 },
+                banglaTransliteration: {
+                  type: String,
+                  trim: true,
+                },
                 hadithEnglish: {
+                  type: String,
+                  trim: true,
+                },
+                englishTransliteration: {
                   type: String,
                   trim: true,
                 },
@@ -58,11 +66,23 @@ const hadithSchema = new mongoose.Schema(
                   type: String,
                   trim: true,
                 },
+                hindiTransliteration: {
+                  type: String,
+                  trim: true,
+                },
                 hadithIndonesia: {
                   type: String,
                   trim: true,
                 },
+                indonesiaTransliteration: {
+                  type: String,
+                  trim: true,
+                },
                 hadithUrdu: {
+                  type: String,
+                  trim: true,
+                },
+                urduTransliteration: {
                   type: String,
                   trim: true,
                 },
@@ -71,14 +91,6 @@ const hadithSchema = new mongoose.Schema(
                   trim: true,
                 },
                 similarities: {
-                  type: String,
-                  trim: true,
-                },
-                translation: {
-                  type: String,
-                  trim: true,
-                },
-                transliteration: {
                   type: String,
                   trim: true,
                 },

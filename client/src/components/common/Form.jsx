@@ -355,8 +355,11 @@ const CommonForm = memo(function CommonForm({
                     "referenceBook",
                     "similarities",
                     "narrator",
-                    "translation",
-                    "transliteration",
+                    "banglaTransliteration",
+                    "englishTransliteration",
+                    "hindiTransliteration",
+                    "indonesiaTransliteration",
+                    "urduTransliteration",
                     "note",
                   ].includes(controlItem.name)
                 )

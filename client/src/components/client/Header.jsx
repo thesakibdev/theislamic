@@ -24,8 +24,8 @@ import {
 } from "../ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { checkAuth } from "@/slices/authslice";
-import { loginUser } from "@/slices/authslice";
+import { checkAuth, logoutUser } from "@/slices/authslice";
+import { toast } from "react-toastify";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -122,6 +122,8 @@ export default function Header() {
     dispatch(checkAuth());
   }, [dispatch]);
 
+  console.log(user);
+
   const roles = ["admin", "creator", "editor"];
   const initialAvatar = user?.name
     .split(" ")
@@ -136,8 +138,9 @@ export default function Header() {
 
   // all function
   const handleLogout = () => {
-    dispatch(loginUser({ user: null, isAuthenticated: false }));
+    dispatch(logoutUser({ user: null, isAuthenticated: false }));
     navigate("/login");
+    toast.success("Logout successfully!");
   };
   return (
     <header className={`bg-white shadow-md fixed w-full left-0 top-0 z-50`}>

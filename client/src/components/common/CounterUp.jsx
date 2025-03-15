@@ -1,32 +1,26 @@
-import { useEffect, useState } from "react";
-import { useCounterQuery } from "@/slices/utils";
+// import { useEffect } from "react";
+const CounterUp = ({ data = "100", title }) => {
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     data?.data;
+  //   }, 5000);
 
-const CounterUp = () => {
-  const { data } = useCounterQuery();
-  const [count, setCount] = useState(data.data || 0);
-  console.log(data);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prev) => prev + 1);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, [data?.data]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-primary-foreground py-10">
-      <h2 className="text-white font-mono text-2xl md:text-5xl font-semibold mb-5">
-        The Islamics Visitor Count
+    <div className="bg-primary-foreground py-10 w-full">
+      <h2 className="text-white font-mono text-2xl md:text-5xl font-semibold mb-5 w-full text-center">
+        {title}
       </h2>
-      <div className="flex px-5 py-3">
-        {count
+      <div className="flex px-5 py-3 items-center justify-center w-full">
+        {data
           .toString()
           .split("")
           .map((num, index) => (
             <div
               key={index}
-              className="w-16 h-28 md:w-36 md:h-52 flex items-center justify-center text-6xl md:text-9xl font-bold bg-primary text-white rounded-lg mx-1 shadow-md"
+              className=" flex items-center justify-center text-6xl md:text-9xl font-bold bg-primary text-white rounded-lg mx-1 shadow-md"
             >
               {num}
             </div>
