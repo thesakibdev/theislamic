@@ -4,7 +4,6 @@ import { pokemonApi } from "./slices/pokemon";
 import { adminApi } from "./slices/admin/surah";
 import { blogApi } from "./slices/admin/blog";
 import { utilsApi } from "./slices/utils";
-import { userDataApi } from "./slices/authslice/userData";
 import { hadithApi } from "./slices/admin/hadith";
 import { donorApi } from "./slices/admin/donor";
 import utilityReducer from "./slices/utils/utilitySlice";
@@ -16,7 +15,6 @@ export const store = configureStore({
     utility: utilityReducer,
     [pokemonApi.reducerPath]: pokemonApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
-    [userDataApi.reducerPath]: userDataApi.reducer,
     [blogApi.reducerPath]: blogApi.reducer,
     [utilsApi.reducerPath]: utilsApi.reducer,
     [hadithApi.reducerPath]: hadithApi.reducer,
@@ -26,7 +24,6 @@ export const store = configureStore({
     getDefaultMiddleware()
       .concat(pokemonApi.middleware)
       .concat(adminApi.middleware)
-      .concat(userDataApi.middleware)
       .concat(blogApi.middleware)
       .concat(utilsApi.middleware)
       .concat(hadithApi.middleware)

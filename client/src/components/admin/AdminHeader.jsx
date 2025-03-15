@@ -102,7 +102,7 @@ export default function AdminHeader() {
                 {initialAvatar}
               </div>
             )}
-            <span>{user.name}</span>
+            <span>{user?.name}</span>
             <IoMdArrowDropdown className="text-2xl" />
           </div>
           {isProfileOpen && (

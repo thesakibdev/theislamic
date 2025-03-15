@@ -2,30 +2,22 @@ import { MdOutlineModeEdit } from "react-icons/md";
 import authProfileBg from "../../assets/auth-profile-bg.png";
 import authProfileImg from "../../assets/auth-profile-default.png";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { checkAuth } from "@/slices/authslice";
-import { useGetUserDetailsQuery } from "@/slices/authslice/userData";
+import { getUserDetails } from "../../slices/authslice";
 
 export default function AuthProfile() {
-  const { user } = useSelector((state) => state.auth);
+  const { user, userDetails } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const [userId, setUserId] = useState(null);
-  console.log(userId);
-
   useEffect(() => {
-    if (user?.id) {
-      setUserId(user?.id);
-    }
-  }, [user]);
+    const Id = user?.id;
+    dispatch(getUserDetails(Id));
+  }, [dispatch, user?.id]);
 
   useEffect(() => {
     dispatch(checkAuth());
   }, [dispatch]);
-
-  const { data } = useGetUserDetailsQuery({ id: userId });
-
-  const userData = data?.userDetails;
 
   return (
     <section className="bg-primary min-h-screen pb-10">
@@ -40,7 +32,7 @@ export default function AuthProfile() {
         <div className="flex relative justify-end py-3 items-center w-full">
           <div className="w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-full -z- bg-violet-400 absolute left-0 transform -translate-y-1/2">
             <img
-              src={userData?.profileImage || authProfileImg}
+              src={userDetails?.profileImage || authProfileImg}
               alt="Auth Profile Image"
               className="w-full h-full object-center object-cover "
             />
@@ -52,29 +44,29 @@ export default function AuthProfile() {
         <div className=" rounded-2xl py-10 bg-white">
           <ul className="text-xl md:text-4xl text-black">
             <li className="px-5 cursor-pointer md:px-10 border-b-2 border-t-2 border-black py-4">
-              Name: {userData?.name}
+              Name: {userDetails?.name}
             </li>
             <li className="px-5 cursor-pointer md:px-10 border-b-2 border-black py-4">
-              Phone: {userData?.phone}
+              Phone: {userDetails?.phone}
             </li>
             <li className="px-5 cursor-pointer md:px-10 border-b-2 border-black py-4">
-              Email: {userData?.email}
+              Email: {userDetails?.email}
             </li>
             <li className="px-5 cursor-pointer md:px-10 border-b-2 border-black py-4">
-              Profession: {userData?.profession}
+              Profession: {userDetails?.profession}
             </li>
             <li className="px-5 cursor-pointer md:px-10 border-b-2 border-black py-4">
-              Designation: {userData?.designation}
+              Designation: {userDetails?.designation}
             </li>
             <li className="px-5 cursor-pointer md:px-10 border-b-2 border-black py-4">
-              Company Name: {userData?.companyName}
+              Company Name: {userDetails?.companyName}
             </li>
             <li className="px-5 cursor-pointer md:px-10 border-b-2 border-black py-4">
-              Total Donation: {userData?.totalDonation}
+              Total Donation: {userDetails?.totalDonation}
             </li>
             <li className="px-5 cursor-pointer md:px-10 border-b-2 border-black py-4">
               Address:{" "}
-              {userData?.address?.map((address, index) => (
+              {userDetails?.address?.map((address, index) => (
                 <div className="" key={index}>
                   <p>{address.street}</p>
                   <p>{address.city}</p>

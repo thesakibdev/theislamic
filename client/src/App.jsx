@@ -10,7 +10,7 @@ import Tafsir from "./pages/admin/Tafsir";
 import Hadith from "./pages/admin/Hadith";
 import Donors from "./pages/admin/Donors";
 import CheckAuth from "./middleware/CheckAuth";
-import { useDispatch, useSelector } from "react-redux";
+// import { useDispatch, useSelector } from "react-redux";
 import ClientLayout from "./layout/client/ClientLayout";
 import VersesOtherData from "./pages/admin/VersesData";
 import Blog from "./pages/admin/Blog";
@@ -30,21 +30,29 @@ import BlogDetails from "./pages/client/blog/BlogDetails";
 import Blogs from "./pages/client/blog/Blogs";
 import Translation from "./pages/client/Translation";
 import Dashboard from "./pages/admin/Dashboard";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { checkAuth } from "./slices/authslice";
 // import { Skeleton } from "./components/ui/skeleton";
 
 export default function App() {
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { user, isAuthenticated, isLoading } = useSelector(
+    (state) => state.auth
+  );
   const dispatch = useDispatch();
-
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isLoading) {
       dispatch(checkAuth());
     }
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch]);
 
-  // console.log(isLoading, user);
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <Routes>
