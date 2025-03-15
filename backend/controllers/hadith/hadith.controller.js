@@ -876,6 +876,7 @@ const getHadithByBook = async (req, res) => {
                                 )
                                 .map((h) => {
                                   const result = {
+                                    id: h._id,
                                     hadithNumber: h.hadithNumber || 0,
                                     internationalNumber:
                                       h.internationalNumber || "",
