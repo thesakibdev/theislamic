@@ -54,7 +54,7 @@ export default function HadithIndex() {
     <section>
       <div className="container mx-auto py-16 px-2">
         {/* hadith heading */}
-        <div className="bg-primary-foreground flex flex-col gap-5 text-white font-serif py-5 md:py-10 px-5 md:px-16 rounded-xl my-10">
+        <div className="bg-white border border-black rounded-md flex flex-col gap-5 text-black font-serif py-5 md:py-10 px-5 md:px-16  my-10">
           <div className="flex justify-between">
             <h1 className="text-xl md:text-2xl font-bold">
               {selectedBook?.bookName || "No Book Selected"}
@@ -75,11 +75,11 @@ export default function HadithIndex() {
 
         {/* hadith list - only render if selectedBook is defined */}
         <div>
-          <ul className="rounded-xl bg-white overflow-hidden">
+          <ul className="rounded-md bg-white overflow-hidden">
             {selectedBook?.parts && selectedBook.parts.length > 0 ? (
               selectedBook.parts.map((part, index) => (
                 <div
-                  className="flex justify-between bg-primary-foreground text-xl md:text-2xl font-bold py-4 px-5 text-white border-b cursor-pointer"
+                  className="flex justify-between bg-white border border-black rounded-md  text-xl md:text-2xl font-bold py-4 px-5 text-black cursor-pointer"
                   key={index}
                   onClick={() =>
                     part?.partNumber &&

@@ -182,11 +182,11 @@ export default function IndexPage() {
             </TabsList>
             <TabsContent value="recent">
               {recentSurahs.length > 0 ? (
-                <div className="flex  gap-2 overflow-x-auto">
+                <div className="flex justify-around gap-2 overflow-x-auto">
                   {recentSurahs.map((surah) => (
                     <p
                       key={surah.surahNumber}
-                      className="text-md font-bold cursor-pointer hover:text-primary-foreground"
+                      className="text-md font-bold cursor-pointer hover:text-primary-foreground w-1/4"
                       onClick={() => navigate(`/recite/${surah.surahNumber}`)}
                     >
                       `{surah.surahName}`

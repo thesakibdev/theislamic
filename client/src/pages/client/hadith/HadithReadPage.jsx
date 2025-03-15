@@ -30,7 +30,6 @@ export default function HadithReadPage() {
 
   // report error
   const [showErrorForm, setShowErrorForm] = useState(null);
-  console.log("showErrorForm", showErrorForm);
   const [otherError, setOtherError] = useState(false);
 
   const copyToClipboard = async () => {
@@ -48,15 +47,13 @@ export default function HadithReadPage() {
   // const { data: bookList } = useGetAllBookListQuery();
   const { data, error, isLoading, refetch } = useGetHadithsQuery({
     bookName: selectedBookName?.nameEn,
-    language: "en",
+    language: selectedLanguage,
   });
   const hadiths = data?.data || [];
 
   const selectedPart = hadiths?.parts?.find(
     (part) => part.partNumber === Number(number)
   );
-
-  console.log("Hadiths Parts:", hadiths?.parts);
 
   if (isLoading) {
     return (
@@ -174,7 +171,7 @@ export default function HadithReadPage() {
                   {selectedPart?.chapters?.map((chapter, index) => (
                     <div key={index} className="my-7">
                       {/* chapter title */}
-                      <div className="border-black rounded-md border py-5">
+                      <div className="border-black rounded-md border py-5 mb-5">
                         <div className="px-4 flex flex-col md:flex-row justify-between gap-5 text-xl text-black md:text-2xl font-medium">
                           <h1 className="w-full md:w-1/2 text-justify">
                             {chapter.chapterName}{" "}
@@ -192,15 +189,24 @@ export default function HadithReadPage() {
                           </h1>
                         </div>
                       </div>
-                      <div className="border-black rounded-md border py-5 my-5 px-3">
-                        <h2 className="text-2xl font-bold">Quranic:</h2>
-                      </div>
                       {/* hadith list */}
                       {chapter.hadithList?.map((hadith, index) => (
                         <div
                           className="text-xl text-black md:text-2xl font-medium"
                           key={index}
                         >
+                          {/* quranic data */}
+                          {hadith?.quranic?.trim() && (
+                            <div className="border-black rounded-md border py-5 my-5 px-3">
+                              <p className="">
+                                <span className="text-2xl font-bold">
+                                  Quranic:
+                                </span>{" "}
+                                {hadith?.quranic}
+                              </p>
+                            </div>
+                          )}
+
                           <div className="border-black rounded-md border px-4 py-5 flex flex-col md:flex-row justify-between gap-5">
                             <div className="w-full md:w-1/2">
                               <h3 className="text-sm font-bold capitalize md:text-base mb-2">
@@ -218,121 +224,134 @@ export default function HadithReadPage() {
                               {hadith.hadithArabic}{" "}
                             </h2>
                           </div>
-                          <div className="border-black rounded-md border py-5 my-5 px-3">
-                            <h2 className="text-2xl font-bold">Note:</h2>
-                            <p>{hadith.note}</p>
-                          </div>
-                          <div className="relative border-black rounded-md border flex px-4 py-5 pb-10 md:pb-5 flex-col md:flex-row justify-between items-end gap-5 my-5">
-                            <div className="text-lg md:text-xl flex flex-col gap-2">
-                              <p>
-                                Rrference :{" "}
-                                <span className="text-primary">
-                                  {hadith.referenceBook}
-                                </span>
-                              </p>
-                              <p>
-                                In-book reference :{" "}
-                                <span>Book {selectedPart?.partNumber}</span>{" "}
-                                <span>Hadith {hadith.hadithNumber}</span>
-                              </p>
-                            </div>
-                            {/* error report */}
-                            <div className="flex absolute right-0 bottom-0 gap-2 text-xs md:text-sm">
-                              <p
-                                onClick={() => toggleErrorForm(hadith?.id)}
-                                className="cursor-pointer border-black border border-b-0 p-2 hover:border-primary hover:text-primary duration-500 transition-all ease-linear"
-                              >
-                                Report Error
-                              </p>
-                              <p
-                                onClick={copyToClipboard}
-                                className="cursor-pointer border-black border border-b-0 border-r-0 p-2 hover:border-primary hover:text-primary duration-500 transition-all ease-linear"
-                              >
-                                Share
-                              </p>
-                            </div>
-                          </div>
-                          {/* report form  */}
-                          <div
-                            className={cn(
-                              " transition-all duration-500 ease-in-out",
-                              showErrorForm === hadith?.id
-                                ? "h-auto opacity-100 my-5 mb-10 visible"
-                                : "h-0 opacity-0 my-0 py-0 hidden"
-                            )}
-                          >
-                            <div className="border border-black rounded-md p-5 mt-3">
-                              <h3 className="text-xl font-bold mb-4">
-                                Report an Error
-                              </h3>
 
-                              {/* Error Types */}
-                              <div className="space-y-3">
-                                <Label>
-                                  Type of error:{" "}
-                                  <span className="text-red-500">*</span>
-                                </Label>
-                                {[
-                                  "Mismatched translation",
-                                  "Spelling mistake",
-                                  "Incomplete text",
-                                  "Mistranslation",
-                                ].map((error, index) => (
-                                  <div
-                                    key={index}
-                                    className="flex items-center space-x-2"
-                                  >
+                          {/* note */}
+                          {hadith?.note.trim() && (
+                            <div className="border-black rounded-md border py-5 my-5 px-3">
+                              <h2 className="text-2xl font-bold">Note:</h2>
+                              <p>{hadith.note}</p>
+                            </div>
+                          )}
+
+                          {/* reference  */}
+                          <div className="border-black rounded-md border my-5">
+                            <div
+                              className={cn(
+                                "relative flex px-4 py-5 pb-10 md:pb-5 flex-col md:flex-row justify-between items-end gap-5",
+                                showErrorForm === hadith?.id &&
+                                  "border-b border-black rounded-md"
+                              )}
+                            >
+                              <div className="text-lg md:text-xl flex flex-col gap-2">
+                                <p>
+                                  Rrference :{" "}
+                                  <span className="text-primary">
+                                    {hadith.referenceBook}
+                                  </span>
+                                </p>
+                                <p>
+                                  In-book reference :{" "}
+                                  <span>Book {selectedPart?.partNumber}</span>{" "}
+                                  <span>Hadith {hadith.hadithNumber}</span>
+                                </p>
+                              </div>
+                              {/* error report */}
+                              <div className="flex absolute right-0 bottom-0 gap-2 text-xs md:text-sm">
+                                <p
+                                  onClick={() => toggleErrorForm(hadith?.id)}
+                                  className="cursor-pointer border-black border border-b-0 p-2 hover:border-primary hover:text-primary duration-500 transition-all ease-linear"
+                                >
+                                  Report Error
+                                </p>
+                                <p
+                                  onClick={copyToClipboard}
+                                  className="cursor-pointer border-black border border-b-0 border-r-0 p-2 hover:border-primary hover:text-primary duration-500 transition-all ease-linear"
+                                >
+                                  Share
+                                </p>
+                              </div>
+                            </div>
+                            {/* report form  */}
+                            <div
+                              className={cn(
+                                " transition-all duration-500 ease-in-out px-5",
+                                showErrorForm === hadith?.id
+                                  ? "h-auto opacity-100 my-5 visible"
+                                  : "h-0 opacity-0 my-0 py-0 hidden"
+                              )}
+                            >
+                              <div className="border border-black rounded-md p-5 mt-3">
+                                <h3 className="text-xl font-bold mb-4">
+                                  Report an Error
+                                </h3>
+
+                                {/* Error Types */}
+                                <div className="space-y-3">
+                                  <Label>
+                                    Type of error:{" "}
+                                    <span className="text-red-500">*</span>
+                                  </Label>
+                                  {[
+                                    "Mismatched translation",
+                                    "Spelling mistake",
+                                    "Incomplete text",
+                                    "Mistranslation",
+                                  ].map((error, index) => (
+                                    <div
+                                      key={index}
+                                      className="flex items-center space-x-2"
+                                    >
+                                      <input
+                                        type="radio"
+                                        name="errorType"
+                                        className="accent-gray-700"
+                                      />
+                                      <Label>{error}</Label>
+                                    </div>
+                                  ))}
+                                  <div className="flex items-center space-x-2">
                                     <input
                                       type="radio"
                                       name="errorType"
                                       className="accent-gray-700"
+                                      onChange={() => setOtherError(true)}
                                     />
-                                    <Label>{error}</Label>
+                                    <Label>Other (please specify)</Label>
                                   </div>
-                                ))}
-                                <div className="flex items-center space-x-2">
-                                  <input
-                                    type="radio"
-                                    name="errorType"
-                                    className="accent-gray-700"
-                                    onChange={() => setOtherError(true)}
-                                  />
-                                  <Label>Other (please specify)</Label>
+                                  {otherError && (
+                                    <Input
+                                      type="text"
+                                      placeholder="Specify other error"
+                                    />
+                                  )}
                                 </div>
-                                {otherError && (
-                                  <Input
-                                    type="text"
-                                    placeholder="Specify other error"
-                                  />
-                                )}
-                              </div>
 
-                              {/* Additional Details */}
-                              <div className="mt-4">
-                                <Label>Additional details:</Label>
-                                <Textarea placeholder="Describe the issue..." />
-                              </div>
+                                {/* Additional Details */}
+                                <div className="mt-4">
+                                  <Label>Additional details:</Label>
+                                  <Textarea placeholder="Describe the issue..." />
+                                </div>
 
-                              {/* Email Notify */}
-                              <div className="flex items-center space-x-2 mt-4">
-                                <Checkbox id="email_notify" />
-                                <Label htmlFor="email_notify">
-                                  Yes, email me when the error is corrected
-                                </Label>
-                              </div>
-                              <Input
-                                type="email"
-                                placeholder="Email address"
-                                className="mt-4"
-                              />
+                                {/* Email Notify */}
+                                <div className="flex items-center space-x-2 mt-4">
+                                  <Checkbox id="email_notify" />
+                                  <Label htmlFor="email_notify">
+                                    Yes, email me when the error is corrected
+                                  </Label>
+                                </div>
+                                <Input
+                                  type="email"
+                                  placeholder="Email address"
+                                  className="mt-4"
+                                />
 
-                              {/* Submit Button */}
-                              <Button className="w-full text-black mt-4 bg-green-600 hover:bg-green-500">
-                                SUBMIT
-                              </Button>
+                                {/* Submit Button */}
+                                <Button className="w-full text-black mt-4 bg-green-600 hover:bg-green-500">
+                                  SUBMIT
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                          
                         </div>
                       ))}
                     </div>
@@ -355,11 +374,11 @@ export default function HadithReadPage() {
                             className="my-10 py-5 px-2 md:px-0 text-xl text-black md:text-2xl font-medium"
                             key={index}
                           >
-                            <div className=" py-5 px-4 mx-auto gap-5">
+                            <div className="py-5 px-4 mx-auto gap-5">
                               <h3 className="text-sm font-bold capitalize md:text-base mb-2">
                                 Narrated by: {hadith.narrator}
                               </h3>
-                              <h2 className="text-2xl capitalize">
+                              <h2 className="text-base md:text-xl capitalize">
                                 {hadith.hadithText}{" "}
                               </h2>
                             </div>
@@ -388,9 +407,9 @@ export default function HadithReadPage() {
                   setSelectedLanguageName(lang.name);
                   setOpenSheet(false);
                 }}
-                className={`px-4 py-2 m-2 ${
+                className={`px-4 py-2 m-2 hover:bg-primary hover:text-black rounded-md duration-500 transition-all ease-linear ${
                   selectedLanguage === lang
-                    ? "bg-green-500 text-black"
+                    ? "bg-primary text-black"
                     : "bg-gray-200"
                 }`}
               >
