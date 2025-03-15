@@ -222,7 +222,7 @@ export default function HadithReadPage() {
                             <h2 className="text-2xl font-bold">Note:</h2>
                             <p>{hadith.note}</p>
                           </div>
-                          <div className="relative border-black rounded-md border flex px-4 py-5 flex-col md:flex-row justify-between items-end gap-5 my-5">
+                          <div className="relative border-black rounded-md border flex px-4 py-5 pb-10 md:pb-5 flex-col md:flex-row justify-between items-end gap-5 my-5">
                             <div className="text-lg md:text-xl flex flex-col gap-2">
                               <p>
                                 Rrference :{" "}
@@ -257,8 +257,8 @@ export default function HadithReadPage() {
                             className={cn(
                               " transition-all duration-500 ease-in-out",
                               showErrorForm === hadith?.id
-                                ? "h-[400px] opacity-100 my-5 mb-[124px]"
-                                : "h-0 opacity-0 py-0"
+                                ? "h-auto opacity-100 my-5 mb-10 visible"
+                                : "h-0 opacity-0 my-0 py-0 hidden"
                             )}
                           >
                             <div className="border border-black rounded-md p-5 mt-3">
@@ -323,7 +323,7 @@ export default function HadithReadPage() {
                               <Input
                                 type="email"
                                 placeholder="Email address"
-                                disabled
+                                className="mt-4"
                               />
 
                               {/* Submit Button */}
@@ -332,6 +332,7 @@ export default function HadithReadPage() {
                               </Button>
                             </div>
                           </div>
+                          
                         </div>
                       ))}
                     </div>
