@@ -237,13 +237,13 @@ export default function RecitePage() {
                         <div className="flex gap-3 mt-5 justify-center">
                           <button
                             onClick={handlePreviousSurah}
-                            className="bg-primary hover:bg-primary-foreground hover:text-black transition-all duration-200 ease-in-out text-white px-6 py-2 rounded-lg"
+                            className="bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary"
                           >
                             Prev
                           </button>
                           <button
                             onClick={handleNextSurah}
-                            className="bg-primary hover:bg-primary-foreground hover:text-black transition-all duration-200 ease-in-out text-white px-6 py-2 rounded-lg"
+                            className="bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary"
                           >
                             Next
                           </button>
@@ -272,9 +272,9 @@ export default function RecitePage() {
                       setSelectedLanguage(lang.code);
                       setOpenSheet(false);
                     }}
-                    className={`px-4 py-2 m-2 ${
+                    className={`px-4 py-2 m-2 hover:bg-primary hover:text-black rounded-md duration-500 transition-all ease-linear ${
                       selectedLanguage === lang
-                        ? "bg-green-500 text-black"
+                        ? "bg-primary text-black"
                         : "bg-gray-200"
                     }`}
                   >

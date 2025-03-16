@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/pagination";
 import { useGetAllDonorsQuery } from "../../slices/admin/donor";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 
 export default function DonorPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -116,24 +115,10 @@ export default function DonorPage() {
                 <PaginationPrevious
                   aria-label="Go to previous page"
                   onClick={handlePaginationPrev}
-                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                  className="bg-white hover:bg-primary hover:border-primary
+                  duration-500 hover:text-white cursor-pointer text-black border border-black"
                   disabled={currentPage == 1}
                 />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <Button
-                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                  onClick={() =>
-                    setCurrentPage(() =>
-                      currentPage > 2 ? 1 : currentPage + 2
-                    )
-                  }
-                >
-                  Skip
-                </Button>
               </PaginationItem>
               <PaginationItem>
                 <PaginationEllipsis />
@@ -142,7 +127,8 @@ export default function DonorPage() {
                 <PaginationNext
                   aria-label="Go to next page"
                   onClick={handlePaginationNext}
-                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                  className="bg-white hover:bg-primary hover:border-primary
+                  duration-500 hover:text-white cursor-pointer text-black border border-black"
                 />
               </PaginationItem>
             </PaginationContent>

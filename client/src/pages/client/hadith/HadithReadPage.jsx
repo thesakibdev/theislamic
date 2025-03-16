@@ -212,7 +212,7 @@ export default function HadithReadPage() {
                               <h3 className="text-sm font-bold capitalize md:text-base mb-2">
                                 Narrated by: {hadith.narrator}
                               </h3>
-                              <h2 className="text-2xl text-justify capitalize">
+                              <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl text-justify capitalize">
                                 {hadith.hadithText}{" "}
                               </h2>
                             </div>
@@ -228,8 +228,10 @@ export default function HadithReadPage() {
                           {/* note */}
                           {hadith?.note.trim() && (
                             <div className="border-black rounded-md border py-5 my-5 px-3">
-                              <h2 className="text-2xl font-bold">Note:</h2>
-                              <p>{hadith.note}</p>
+                              <h2 className="text-xl md:text-2xl font-semibold">Note:</h2>
+                              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-justify capitalize">
+                                {hadith.note}
+                              </p>
                             </div>
                           )}
 
@@ -371,14 +373,14 @@ export default function HadithReadPage() {
                       >
                         {chapter.hadithList?.map((hadith, index) => (
                           <div
-                            className="my-10 py-5 px-2 md:px-0 text-xl text-black md:text-2xl font-medium"
+                            className=" px-2 md:px-0 text-xl text-black md:text-2xl font-medium"
                             key={index}
                           >
-                            <div className="py-5 px-4 mx-auto gap-5">
+                            <div className="p-4 md:py-6 px-4 mx-auto gap-2 md:gap-5">
                               <h3 className="text-sm font-bold capitalize md:text-base mb-2">
                                 Narrated by: {hadith.narrator}
                               </h3>
-                              <h2 className="text-base md:text-xl capitalize">
+                              <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl text-justify capitalize">
                                 {hadith.hadithText}{" "}
                               </h2>
                             </div>
