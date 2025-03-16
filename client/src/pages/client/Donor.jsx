@@ -17,6 +17,16 @@ export default function DonorPage() {
     limit: 10,
   });
 
+  const handlePaginationNext = () => {
+    setCurrentPage(currentPage + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handlePaginationPrev = () => {
+    setCurrentPage(() => (currentPage == 1 ? 1 : currentPage - 1));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <section className="pt-[4.5rem] md:pt-40 pb-10">
       <div className="container mx-auto px-4">
@@ -30,6 +40,7 @@ export default function DonorPage() {
           ) : data?.donors?.length > 0 ? (
             data?.donors?.map((donor) => (
               <div
+                id="Donor"
                 key={donor.name}
                 className="border p-4 flex flex-col md:flex-row my-6 gap-5 rounded-md relative"
               >
@@ -104,11 +115,7 @@ export default function DonorPage() {
               <PaginationItem>
                 <PaginationPrevious
                   aria-label="Go to previous page"
-                  onClick={() =>
-                    setCurrentPage(() =>
-                      currentPage == 1 ? 1 : currentPage - 1
-                    )
-                  }
+                  onClick={handlePaginationPrev}
                   className="bg-primary hover:bg-green-400 cursor-pointer text-white"
                   disabled={currentPage == 1}
                 />
@@ -134,7 +141,7 @@ export default function DonorPage() {
               <PaginationItem>
                 <PaginationNext
                   aria-label="Go to next page"
-                  onClick={() => setCurrentPage(currentPage + 1)}
+                  onClick={handlePaginationNext}
                   className="bg-primary hover:bg-green-400 cursor-pointer text-white"
                 />
               </PaginationItem>

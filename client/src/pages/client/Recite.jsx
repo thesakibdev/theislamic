@@ -8,7 +8,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Loading from "@/components/common/Loading";
 import { useGetAllLanguagesQuery } from "@/slices/utils";
 import { useSelector } from "react-redux";
@@ -22,6 +22,7 @@ export default function RecitePage() {
   const isOpen = useSelector((state) => state.utility.isOpenSidebar);
   const [isMobile, setIsMobile] = useState(false);
   const [bismillahValid, setBismillahValid] = useState(true);
+  const navigate = useNavigate();
 
   // Detect if device is mobile
   useEffect(() => {
@@ -61,7 +62,23 @@ export default function RecitePage() {
   const currentSurah = surahData?.surahs?.find(
     (surah) => surah.surahNumber === Number(number)
   );
+  console.log(surahData?.totalSurahs);
 
+  const handleNextSurah = () => {
+    if (currentSurah?.surahNumber < surahData?.totalSurahs) {
+      navigate(`/recite/${currentSurah?.surahNumber + 1}`);
+    } else {
+      console.log("last surah");
+    }
+  };
+
+  const handlePreviousSurah = () => {
+    if (currentSurah?.surahNumber > 1) {
+      navigate(`/recite/${currentSurah?.surahNumber - 1}`);
+    } else {
+      console.log("first surah");
+    }
+  };
   if (isLoading) return <Loading />;
   if (isError) return <p>এরর হয়েছে!</p>;
 
@@ -215,6 +232,21 @@ export default function RecitePage() {
                               </span>
                             </span>
                           ))}
+                        </div>
+                        {/*  next & prev button */}
+                        <div className="flex gap-3 mt-5 justify-center">
+                          <button
+                            onClick={handlePreviousSurah}
+                            className="bg-primary hover:bg-primary-foreground hover:text-black transition-all duration-200 ease-in-out text-white px-6 py-2 rounded-lg"
+                          >
+                            Prev
+                          </button>
+                          <button
+                            onClick={handleNextSurah}
+                            className="bg-primary hover:bg-primary-foreground hover:text-black transition-all duration-200 ease-in-out text-white px-6 py-2 rounded-lg"
+                          >
+                            Next
+                          </button>
                         </div>
                       </div>
                     )}
