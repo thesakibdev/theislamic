@@ -1,6 +1,7 @@
 const Donor = require("../../models/donor.model");
 const cloudinary = require("../../lib/cloudinary");
 const { invalidateCache, setCache, getCache } = require("../../utils/utils");
+const ResponseHandler = require("../../helper/ResponseHandler");
 
 const handleImageUpload = async (req, res) => {
   try {
@@ -44,10 +45,7 @@ const createDonor = async (req, res) => {
     } = req.body;
 
     if (!phone) {
-      return res.status(400).json({
-        error: true,
-        message: "Phone number is required.",
-      });
+      return ResponseHandler.error(res, "Phone number is required.", 404);
     }
 
     const donorDoc = await Donor.findOne({ phone, name, fatherName });
@@ -59,11 +57,11 @@ const createDonor = async (req, res) => {
 
       invalidateCache("donors");
 
-      return res.status(200).json({
-        success: true,
-        message: "Donor updated successfully.",
-        data: donorDoc,
-      });
+      return ResponseHandler.success(
+        res,
+        "Donor updated successfully.",
+        donorDoc
+      );
     }
 
     const newDonor = new Donor({
@@ -90,14 +88,15 @@ const createDonor = async (req, res) => {
     const savedDonor = await newDonor.save();
     invalidateCache("donors");
 
-    return res.status(201).json({
-      success: true,
-      message: "Donor created successfully.",
-      data: savedDonor,
-    });
+    return ResponseHandler.success(
+      res,
+      "Donor created successfully.",
+      savedDonor,
+      201
+    );
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: true, message: "Server error." });
+    return ResponseHandler.error(res, "Server error.");
   }
 };
 
@@ -119,14 +118,11 @@ const editDonor = async (req, res) => {
       country,
       street,
       city,
-      amount,
       isDetailsVisible,
-      donateDate,
     } = req.body;
 
     const findDonor = await Donor.findById(id);
 
-    findDonor.TotalDonation += amount || 0;
     findDonor.isDetailsVisible = isDetailsVisible || findDonor.isDetailsVisible;
     findDonor.name = name || findDonor.name;
     findDonor.fatherName = fatherName || findDonor.fatherName;
@@ -142,24 +138,58 @@ const editDonor = async (req, res) => {
     findDonor.city = city || findDonor.city;
     findDonor.avatar = avatar || findDonor.avatar;
     findDonor.avatarId = avatarId || findDonor.avatarId;
-    findDonor.donateDate = donateDate || findDonor.donateDate;
-
-    if (amount) {
-      findDonor.donationHistory.push({ amount, donateDate, history: [] });
-    }
 
     await findDonor.save();
 
     invalidateCache("donors");
 
-    return res.status(200).json({
-      success: true,
-      message: "Donor updated successfully.",
-      data: findDonor,
-    });
+    return ResponseHandler.success(res, "Donor updated successfully.");
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: true, message: "Server error." });
+    return ResponseHandler.error(res, "Server error.");
+  }
+};
+
+const editDonationHistory = async (req, res) => {
+  const { historyId, donorId } = req.params;
+  const { amount, donateDate } = req.body;
+
+  try {
+    const donor = await Donor.findById(donorId);
+    if (!donor) {
+      return ResponseHandler.error(res, "Donor not found.", 404);
+    }
+
+    // Find the specific donation history entry
+    const historyIndex = donor.donationHistory.findIndex(
+      (item) => item._id.toString() === historyId
+    );
+
+    if (historyIndex === -1) {
+      return ResponseHandler.error(res, "Donation history not found.", 404);
+    }
+
+    // Step 1: Push new updated donation entry
+    donor.donationHistory.push({ amount, donateDate });
+
+    // Step 2: Remove old donation history entry
+    donor.donationHistory.splice(historyIndex, 1);
+
+    // Step 3: Recalculate TotalDonation
+    donor.TotalDonation = donor.donationHistory.reduce(
+      (total, entry) => total + entry.amount,
+      0
+    );
+
+    // Step 4: Save the donor
+    await donor.save();
+
+    invalidateCache("donors");
+
+    return ResponseHandler.success(res, "Donation history updated.", donor);
+  } catch (error) {
+    console.error(error);
+    return ResponseHandler.error(res, "Server error.");
   }
 };
 
@@ -229,4 +259,5 @@ module.exports = {
   getAllDonors,
   editDonor,
   deleteDonor,
+  editDonationHistory,
 };
