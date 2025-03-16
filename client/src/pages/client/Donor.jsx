@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/pagination";
 import { useGetAllDonorsQuery } from "../../slices/admin/donor";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 
 export default function DonorPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,6 +15,16 @@ export default function DonorPage() {
     page: currentPage,
     limit: 10,
   });
+
+  const handlePaginationNext = () => {
+    setCurrentPage(currentPage + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handlePaginationPrev = () => {
+    setCurrentPage(() => (currentPage == 1 ? 1 : currentPage - 1));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <section className="pt-[4.5rem] md:pt-40 pb-10">
@@ -30,6 +39,7 @@ export default function DonorPage() {
           ) : data?.donors?.length > 0 ? (
             data?.donors?.map((donor) => (
               <div
+                id="Donor"
                 key={donor.name}
                 className="border p-4 flex flex-col md:flex-row my-6 gap-5 rounded-md relative"
               >
@@ -104,12 +114,9 @@ export default function DonorPage() {
               <PaginationItem>
                 <PaginationPrevious
                   aria-label="Go to previous page"
-                  onClick={() =>
-                    setCurrentPage(() =>
-                      currentPage == 1 ? 1 : currentPage - 1
-                    )
-                  }
-                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                  onClick={handlePaginationPrev}
+                  className="bg-white hover:bg-primary hover:border-primary
+                  duration-500 hover:text-white cursor-pointer text-black border border-black"
                   disabled={currentPage == 1}
                 />
               </PaginationItem>
@@ -117,25 +124,11 @@ export default function DonorPage() {
                 <PaginationEllipsis />
               </PaginationItem>
               <PaginationItem>
-                <Button
-                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                  onClick={() =>
-                    setCurrentPage(() =>
-                      currentPage > 2 ? 1 : currentPage + 2
-                    )
-                  }
-                >
-                  Skip
-                </Button>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
                 <PaginationNext
                   aria-label="Go to next page"
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  className="bg-primary hover:bg-green-400 cursor-pointer text-white"
+                  onClick={handlePaginationNext}
+                  className="bg-white hover:bg-primary hover:border-primary
+                  duration-500 hover:text-white cursor-pointer text-black border border-black"
                 />
               </PaginationItem>
             </PaginationContent>

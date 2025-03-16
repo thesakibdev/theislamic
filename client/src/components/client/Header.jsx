@@ -62,8 +62,8 @@ export default function Header() {
     },
     {
       icon: Iwall,
-      text: "I-Wall",
-      path: "/",
+      text: "Blogs",
+      path: "/blogs",
     },
     {
       icon: Social,

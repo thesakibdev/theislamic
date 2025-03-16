@@ -8,7 +8,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Loading from "@/components/common/Loading";
 import { useGetAllLanguagesQuery } from "@/slices/utils";
 import { useSelector } from "react-redux";
@@ -22,6 +22,7 @@ export default function RecitePage() {
   const isOpen = useSelector((state) => state.utility.isOpenSidebar);
   const [isMobile, setIsMobile] = useState(false);
   const [bismillahValid, setBismillahValid] = useState(true);
+  const navigate = useNavigate();
 
   // Detect if device is mobile
   useEffect(() => {
@@ -61,7 +62,23 @@ export default function RecitePage() {
   const currentSurah = surahData?.surahs?.find(
     (surah) => surah.surahNumber === Number(number)
   );
+  console.log(surahData?.totalSurahs);
 
+  const handleNextSurah = () => {
+    if (currentSurah?.surahNumber < surahData?.totalSurahs) {
+      navigate(`/recite/${currentSurah?.surahNumber + 1}`);
+    } else {
+      console.log("last surah");
+    }
+  };
+
+  const handlePreviousSurah = () => {
+    if (currentSurah?.surahNumber > 1) {
+      navigate(`/recite/${currentSurah?.surahNumber - 1}`);
+    } else {
+      console.log("first surah");
+    }
+  };
   if (isLoading) return <Loading />;
   if (isError) return <p>এরর হয়েছে!</p>;
 
@@ -216,6 +233,21 @@ export default function RecitePage() {
                             </span>
                           ))}
                         </div>
+                        {/*  next & prev button */}
+                        <div className="flex gap-3 mt-5 justify-center">
+                          <button
+                            onClick={handlePreviousSurah}
+                            className="bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary"
+                          >
+                            Prev
+                          </button>
+                          <button
+                            onClick={handleNextSurah}
+                            className="bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary"
+                          >
+                            Next
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -240,9 +272,9 @@ export default function RecitePage() {
                       setSelectedLanguage(lang.code);
                       setOpenSheet(false);
                     }}
-                    className={`px-4 py-2 m-2 ${
+                    className={`px-4 py-2 m-2 hover:bg-primary hover:text-black rounded-md duration-500 transition-all ease-linear ${
                       selectedLanguage === lang
-                        ? "bg-green-500 text-black"
+                        ? "bg-primary text-black"
                         : "bg-gray-200"
                     }`}
                   >

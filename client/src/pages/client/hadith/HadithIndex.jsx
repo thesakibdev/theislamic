@@ -70,16 +70,16 @@ export default function HadithIndex() {
             repetitions) in 97 books. The translation provided here is by Dr. M.
             Muhsin Khan.
           </p>
-          <button className="text-right text-lg">More Information...</button>
+          <button className="text-right text-base md:text-lg font-bold hover:text-primary duration-300 transition-colors ease-linear">More Information...</button>
         </div>
 
-        {/* hadith list - only render if selectedBook is defined */}
+        {/* hadith list - only render if selectedBook is defined and has parts */}
         <div>
           <ul className="rounded-md bg-white overflow-hidden">
             {selectedBook?.parts && selectedBook.parts.length > 0 ? (
               selectedBook.parts.map((part, index) => (
                 <div
-                  className="flex justify-between bg-white border border-black rounded-md  text-xl md:text-2xl font-bold py-4 px-5 text-black cursor-pointer"
+                  className="flex justify-between bg-white border border-black rounded-md  text-xl md:text-2xl font-bold py-4 px-5 text-black cursor-pointer hover:bg-primary hover:text-white hover:border-primary duration-300 transition-all ease-linear"
                   key={index}
                   onClick={() =>
                     part?.partNumber &&
