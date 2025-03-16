@@ -1,12 +1,18 @@
-// import { useEffect } from "react";
 const CounterUp = ({ data = "100", title }) => {
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     data?.data;
-  //   }, 5000);
+  const stringValue = data.toString();
+  const numericValue = Number(stringValue.replace(/,/g, ""));
+  let displayValue = stringValue;
 
-  //   return () => clearInterval(interval);
-  // }, [data?.data]);
+  if (!isNaN(numericValue)) {
+    if (numericValue >= 1000) {
+      const inK = numericValue / 1000;
+      let formattedK = inK.toFixed(1);
+      if (formattedK.endsWith(".0")) {
+        formattedK = formattedK.slice(0, -2);
+      }
+      displayValue = `${formattedK}k`;
+    }
+  }
 
   return (
     <div className="bg-primary-foreground py-10 w-full">
@@ -14,17 +20,18 @@ const CounterUp = ({ data = "100", title }) => {
         {title}
       </h2>
       <div className="flex px-5 py-3 items-center justify-center w-full">
-        {data
-          .toString()
-          .split("")
-          .map((num, index) => (
-            <div
-              key={index}
-              className=" flex items-center justify-center text-6xl md:text-9xl font-bold bg-primary text-white rounded-lg mx-1 shadow-md"
-            >
-              {num}
-            </div>
-          ))}
+        {displayValue.split("").map((char, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-center text-6xl md:text-9xl font-bold bg-primary text-white rounded-lg mx-1 shadow-md animate-fade-in-up"
+            style={{
+              opacity: 0, // Initial state for animation
+              animationDelay: `${index * 0.1}s`, // Stagger animation
+            }}
+          >
+            {char}
+          </div>
+        ))}
       </div>
     </div>
   );
