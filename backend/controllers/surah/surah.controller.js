@@ -432,7 +432,7 @@ const getAllSurahs = async (req, res) => {
       return res.status(200).json({ surahs: cachedData });
     }
 
-    const totalSurahs = await Surah.countDocuments(); 
+    const totalSurahs = await Surah.countDocuments();
 
     const surahs = await Surah.find()
       .select(
@@ -473,9 +473,33 @@ const getAllSurahs = async (req, res) => {
 
 const getVerseOtherData = async (req, res) => {
   try {
+    const { surahNumber: surahNumberParam, language } = req.query;
+
+    // Validate required parameters
+    if (!surahNumberParam || !language) {
+      return res.status(400).json({
+        error: "Both surahNumber and language parameters are required",
+      });
+    }
+
+    const surahNumber = parseInt(surahNumberParam, 10);
+
+    // Validate number conversion
+    if (isNaN(surahNumber)) {
+      return res.status(400).json({
+        error: "Invalid surahNumber format. Must be a number",
+      });
+    }
+
     const result = await verseOtherData.aggregate([
       {
-        $sort: { surahNumber: 1, verseNumber: 1 },
+        $match: {
+          surahNumber: surahNumber,
+          language: language.toString(),
+        },
+      },
+      {
+        $sort: { verseNumber: 1 },
       },
       {
         $group: {
@@ -483,31 +507,31 @@ const getVerseOtherData = async (req, res) => {
           verses: {
             $push: {
               verseNumber: "$verseNumber",
-              language: "$language",
               translation: "$translation",
               transliteration: "$transliteration",
               note: "$note",
-              keywords: "$keywords",
+              keyword: { $ifNull: [{ $arrayElemAt: ["$keywords", 0] }, ""] },
             },
           },
         },
       },
       {
         $project: {
-          surahNumber: "$_id",
-          verses: 1,
           _id: 0,
+          surahName: "", // Add surah name if available
+          surahNumber: "$_id",
+          language: language.toString(),
+          verses: 1,
         },
       },
     ]);
 
-    return result;
+    return res.status(200).json(result.length > 0 ? result[0] : {});
   } catch (error) {
     console.error("Error fetching formatted data:", error);
-    throw error;
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
-
 // get surahs name
 const getSurahsName = async (req, res) => {
   try {
