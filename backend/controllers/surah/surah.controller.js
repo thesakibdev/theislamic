@@ -518,7 +518,6 @@ const getVerseOtherData = async (req, res) => {
       {
         $project: {
           _id: 0,
-          surahName: "", // Add surah name if available
           surahNumber: "$_id",
           language: language.toString(),
           verses: 1,
@@ -561,80 +560,156 @@ const getSurahsName = async (req, res) => {
   }
 };
 
+// const getAllSurahsPaginated = async (req, res) => {
+//   const { page = 1, limit = 1, language = "en" } = req.query;
+
+//   try {
+//     const currentPage = parseInt(page, 10) || 1;
+//     const pageLimit = parseInt(limit, 10) || 1;
+
+//     const cacheKey = `surahsPage_${currentPage}_limit_${pageLimit}_lang_${language}`;
+//     const cachedSurahs = getCache(cacheKey);
+
+//     if (cachedSurahs) {
+//       return res.status(200).json(cachedSurahs);
+//     }
+
+//     // Fetch Surahs with verses sorted in-memory
+//     const surahs = await Surah.aggregate([
+//       { $sort: { surahNumber: 1 } },
+//       { $skip: (currentPage - 1) * pageLimit },
+//       { $limit: pageLimit },
+//       // Unwind and sort verses here
+//       { $unwind: "$verses" },
+//       { $sort: { "verses.verseNumber": 1 } },
+//       {
+//         $group: {
+//           _id: "$_id",
+//           surahNumber: { $first: "$surahNumber" },
+//           name: { $first: "$name" },
+//           juzNumber: { $first: "$juzNumber" },
+//           verses: { $push: "$verses" },
+//         },
+//       },
+//     ]);
+
+//     // Fetch translations for the language
+//     const verseOtherDataByLanguage = await verseOtherData
+//       .find({ language: language })
+//       .lean();
+
+//     const formattedSurahs = surahs.map((surah) => ({
+//       _id: surah._id,
+//       surahName: surah.name,
+//       surahNumber: surah.surahNumber,
+//       juzNumber: surah.juzNumber,
+//       verses: surah.verses.map((verse) => ({
+//         _id: verse._id,
+//         verseNumber: verse.verseNumber,
+//         arabicAyah: verse.arabicAyah,
+//         totalVerseNumber: verse.totalVerseNumber,
+//         verseOtherData: verseOtherDataByLanguage
+//           .filter((data) => data.surahNumber === surah.surahNumber)
+//           .flatMap((data) =>
+//             data.verses
+//               .filter((v) => v.verseNumber === verse.verseNumber)
+//               .map(({ verseNumber, ...rest }) => ({
+//                 language: language,
+//                 ...rest,
+//               }))
+//           ),
+//       })),
+//     }));
+
+//     const count = await Surah.countDocuments();
+
+//     const paginatedData = {
+//       surahs: formattedSurahs,
+//       totalSurahs: count,
+//       totalPages: Math.ceil(count / pageLimit),
+//       currentPage,
+//       language: language,
+//     };
+
+//     setCache(cacheKey, paginatedData, 600);
+//     res.status(200).json(paginatedData);
+//   } catch (err) {
+//     console.error("Error in getAllSurahsPaginated:", err); // Enhanced logging
+//     res.status(500).json({ error: "Server error." });
+//   }
+// };
+
 const getAllSurahsPaginated = async (req, res) => {
-  const { page = 1, limit = 1 } = req.query;
+  const { surahNumber, language = "en" } = req.query;
 
   try {
-    const currentPage = parseInt(page, 10) || 1;
-    const pageLimit = parseInt(limit, 10) || 1;
-
-    const cacheKey = `surahsPage_${currentPage}_limit_${pageLimit}`;
-    const cachedSurahs = getCache(cacheKey);
-
-    if (cachedSurahs) {
-      return res.status(200).json(cachedSurahs);
+    if (!surahNumber) {
+      return res.status(400).json({ error: "Surah number is required." });
     }
 
-    // First, fetch only the Surahs (without unwinding verses)
-    const surahs = await Surah.aggregate([
-      { $sort: { surahNumber: 1 } },
-      { $skip: (currentPage - 1) * pageLimit },
-      { $limit: pageLimit },
-    ]);
+    const cacheKey = `surah_${surahNumber}_lang_${language}`;
+    const cachedSurah = getCache(cacheKey);
 
-    // Then, for each Surah, fetch its sorted verses separately
-    for (let surah of surahs) {
-      const verses = await Surah.aggregate([
-        { $match: { _id: surah._id } },
-        { $unwind: "$verses" },
-        { $sort: { "verses.verseNumber": 1 } },
-        {
-          $group: {
-            _id: "$_id",
-            verses: { $push: "$verses" },
-          },
-        },
-      ]);
-
-      surah.verses = verses.length > 0 ? verses[0].verses : [];
+    if (cachedSurah) {
+      return res.status(200).json(cachedSurah);
     }
 
-    const VerseOtherData = await verseOtherData.find().lean();
+    // Fetch Surah without using $unwind
+    const surah = await Surah.findOne(
+      { surahNumber: parseInt(surahNumber, 10) },
+      "surahNumber name juzNumber verses.verseNumber verses.arabicAyah verses.totalVerseNumber"
+    ).lean();
 
-    const formattedSurahs = surahs.map((surah) => ({
+    if (!surah) {
+      return res.status(404).json({ error: "Surah not found." });
+    }
+
+    // Fetch translations only for the requested language
+    const verseOtherDataByLanguage = await verseOtherData.findOne(
+      { language, surahNumber: parseInt(surahNumber, 10) },
+      "verses.verseNumber verses.translation verses.transliteration verses.note verses.keywords"
+    ).lean();
+
+    // Map verses and attach translations, sorted by verseNumber
+    const formattedSurah = {
       _id: surah._id,
       surahName: surah.name,
       surahNumber: surah.surahNumber,
       juzNumber: surah.juzNumber,
-      verses: surah.verses.map((verse) => ({
-        _id: verse._id,
-        verseNumber: verse.verseNumber,
-        arabicAyah: verse.arabicAyah,
-        totalVerseNumber: verse.totalVerseNumber,
-        verseOtherData: VerseOtherData.filter(
-          (data) =>
-            data.surahNumber === surah.surahNumber &&
-            data.verseNumber === verse.verseNumber
-        ).map(({ surahNumber, verseNumber, ...rest }) => rest),
-      })),
-    }));
+      verses: surah.verses
+        .map((verse) => {
+          const translationData = verseOtherDataByLanguage?.verses?.find(
+            (v) => v.verseNumber === verse.verseNumber
+          );
 
-    const count = await Surah.countDocuments();
-
-    const paginatedData = {
-      surahs: formattedSurahs,
-      totalSurahs: count,
-      totalPages: Math.ceil(count / pageLimit),
-      currentPage,
+          return {
+            _id: verse._id,
+            verseNumber: verse.verseNumber,
+            arabicAyah: verse.arabicAyah,
+            totalVerseNumber: verse.totalVerseNumber,
+            verseOtherData: translationData
+              ? {
+                  language,
+                  translation: translationData.translation,
+                  transliteration: translationData.transliteration,
+                  note: translationData.note,
+                  keywords: translationData.keywords || [],
+                }
+              : null,
+          };
+        })
+        .sort((a, b) => a.verseNumber - b.verseNumber), // Sorting verses by verseNumber
     };
 
-    setCache(cacheKey, paginatedData, 600);
-    res.status(200).json(paginatedData);
+    // Cache the response
+    setCache(cacheKey, formattedSurah, 600);
+    res.status(200).json(formattedSurah);
   } catch (err) {
-    console.error(err);
+    console.error("Error in getSurahsByNumberAndLanguage:", err);
     res.status(500).json({ error: "Server error." });
   }
 };
+
 
 module.exports = {
   // main verses
