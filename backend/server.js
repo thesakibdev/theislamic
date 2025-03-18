@@ -18,7 +18,7 @@ const hadithRouter = require("./routes/hadith/hadith.route");
 const languageRouter = require("./routes/utils/language.route");
 const bookListRouter = require("./routes/utils/bookList.route");
 const donorRouter = require("./routes/donor/donor.route");
-const globalSearchRouter = require("./utils/search/globalSearch");
+const globalSearchRouter = require("./routes/utils/search.route");
 const reportRouter = require("./routes/report/report.route");
 
 dotenv.config();
