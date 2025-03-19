@@ -20,14 +20,12 @@ export const adminApi = createApi({
 
     // Edit Arabic text of a specific verse
     editArabicVerse: builder.mutation({
-      query: ({ surahNumber, verseNumber, ...formData }) => (
-        {
-          url: `/admin/surahs/${surahNumber}/verses/${verseNumber}/edit-arabic`,
-          method: "PUT",
-          body: formData,
-          headers: { "Content-Type": "application/json" },
-        }
-      ),
+      query: ({ surahNumber, verseNumber, ...formData }) => ({
+        url: `/admin/surahs/${surahNumber}/verses/${verseNumber}/edit-arabic`,
+        method: "PUT",
+        body: formData,
+        headers: { "Content-Type": "application/json" },
+      }),
       invalidatesTags: ["Surah", "Verse"],
     }),
 
@@ -90,8 +88,8 @@ export const adminApi = createApi({
 
     // Fetch paginated Surahs
     getAllSurahsPaginated: builder.query({
-      query: ({ page, limit }) => ({
-        url: `/admin/surah/paginated?page=${page}&limit=${limit}`,
+      query: ({ language, surahNumber }) => ({
+        url: `/admin/surah/paginated?language=${language}&surahNumber=${surahNumber}`,
         method: "GET",
       }),
       providesTags: ["Surah", "Verse"],

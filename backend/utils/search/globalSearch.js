@@ -1,76 +1,66 @@
-const express = require("express");
-const router = express.Router();
+const ResponseHandler = require("../../helper/ResponseHandler");
 const Hadith = require("../../models/hadith.model");
-const VerseOtherData = require("../../models/verseOther.model");
-const Surah = require("../../models/surah.model");
 
-// Search Controller
-router.get("/search", async (req, res) => {
+const search = async (req, res) => {
+  const {
+    bookName,
+    partNumber,
+    chapterNumber,
+    hadithNumber,
+    note,
+    keywords,
+    ...rest
+  } = filters;
+
   try {
-    const { query } = req;
-    const hadithConditions = [];
-    const verseConditions = [];
-    const surahConditions = {};
+    const searchQuery = {
+      $text: { $search: query },
+      ...rest,
+      // $or: [
+      //   { bookName: { $regex: query, $options: 'i' } },
+      //   { partNumber: { $regex: query, $options: 'i' } },
+      //   { chapterNumber: { $regex: query, $options: 'i' } },
+      //   { hadithNumber: { $regex: query, $options: 'i' } },
+      //   { note: { $regex: query, $options: 'i' } },
+      //   { keywords: { $regex: query, $options: 'i' } },
+      //   { hadithText: { $regex: query, $options: 'i' } },
+      // ]
+    };
 
-    // Build search conditions for Hadith
-    if (query.note) {
-      hadithConditions.push({
-        "parts.chapters.hadithList.note": { $regex: query.note, $options: "i" },
-      });
+    if (bookName) {
+      searchQuery["bookName"] = { $regex: bookName, $options: "i" };
     }
-    if (query.keywords) {
-      hadithConditions.push({
-        "parts.chapters.hadithList.keywords": {
-          $in: query.keywords.split(","),
-        },
-      });
+    if (partNumber) {
+      searchQuery["bookName"] = { $regex: bookName, $options: "i" };
     }
-    if (query.hadithInternationalNumber) {
-      hadithConditions.push({
-        "parts.chapters.hadithList.internationalNumber": parseInt(
-          query.hadithInternationalNumber
-        ),
-      });
+    if (chapterNumber) {
+      searchQuery["chapterNumber) "] = { $regex: chapterNumber, $options: "i" };
     }
-
-    // Build search conditions for VerseOtherData
-    if (query.totalVerseNumber) {
-      verseConditions.push({ verseNumber: parseInt(query.totalVerseNumber) });
+    if (hadithNumber) {
+      searchQuery["hadithNumber"] = { $regex: hadithNumber, $options: "i" };
     }
-    if (query.note) {
-      verseConditions.push({ note: { $regex: query.note, $options: "i" } });
+    if (note) {
+      searchQuery["note"] = { $regex: note, $options: "i" };
     }
-    if (query.keywords) {
-      verseConditions.push({ keywords: { $in: query.keywords.split(",") } });
+    if (keywords) {
+      searchQuery["keywords"] = { $regex: keywords, $options: "i" };
     }
 
-    // Build search conditions for Surah
-    if (query.surahName) {
-      surahConditions.name = { $regex: query.surahName, $options: "i" };
-    }
-    if (query.juzNumber) {
-      surahConditions.juzNumber = { $in: [parseInt(query.juzNumber)] };
-    }
+    const hadithResult = await Hadith.find(searchQuery);
 
-    // Execute queries
-    const hadithResults =
-      hadithConditions.length > 0
-        ? await Hadith.find({ $or: hadithConditions })
-        : [];
-    const verseResults =
-      verseConditions.length > 0
-        ? await VerseOtherData.find({ $or: verseConditions })
-        : [];
-    const surahResults =
-      Object.keys(surahConditions).length > 0
-        ? await Surah.find(surahConditions)
-        : [];
-
-    res.json({ hadithResults, verseResults, surahResults });
+    return ResponseHandler.success(res, {
+      success: true,
+      message: "Search successful",
+      data: hadithResult,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    console.error("Search error:", error);
+    return ResponseHandler.error(res, {
+      success: false,
+      message: "Search error",
+      error: error.message,
+    });
   }
-});
+};
 
-module.exports = router;
-
+module.exports = { search };

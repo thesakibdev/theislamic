@@ -220,6 +220,16 @@ hadithSchema.pre("save", async function (next) {
   }
 });
 
+// search index for full text search
+hadithSchema.index({
+  bookName: "text",
+  "parts.chapters.hadithList.internationalNumber": "text",
+  "parts.chapters.hadithList.note": "text",
+  "parts.chapters.hadithList.keywords": "text", // Keep keywords as text index
+  "parts.chapters.hadithList.translation": "text", // Add translation
+  "parts.chapters.hadithList.transliteration": "text", // Add transliteration
+});
+
 const Hadith = mongoose.model("Hadith", hadithSchema);
 
 module.exports = Hadith;

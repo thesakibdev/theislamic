@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import IndexPageBanner from "../../assets/index-page-banner.png";
-
-import { useGetAllSurahsNameQuery } from "@/slices/admin/surah";
+import { surahNameList } from "../../constant";
 import {
   Tabs,
   TabsContent,
@@ -13,124 +12,6 @@ import RubAlHizb from "@/assets/icon/RubAlHizb";
 
 export default function IndexPage() {
   const navigate = useNavigate();
-  const arabicSurahName = [
-    { id: 1, name: "الفاتحة" },
-    { id: 2, name: "البقرة" },
-    { id: 3, name: "آل عمران" },
-    { id: 4, name: "النساء" },
-    { id: 5, name: "المائدة" },
-    { id: 6, name: "الأنعام" },
-    { id: 7, name: "الأعراف" },
-    { id: 8, name: "الأنفال" },
-    { id: 9, name: "التوبة" },
-    { id: 10, name: "يونس" },
-    { id: 11, name: "هود" },
-    { id: 12, name: "يوسف" },
-    { id: 13, name: "الرعد" },
-    { id: 14, name: "إبراهيم" },
-    { id: 15, name: "الحجر" },
-    { id: 16, name: "النحل" },
-    { id: 17, name: "الإسراء" },
-    { id: 18, name: "الكهف" },
-    { id: 19, name: "مريم" },
-    { id: 20, name: "طه" },
-    { id: 21, name: "الأنبياء" },
-    { id: 22, name: "الحج" },
-    { id: 23, name: "المؤمنون" },
-    { id: 24, name: "النور" },
-    { id: 25, name: "الفرقان" },
-    { id: 26, name: "الشعراء" },
-    { id: 27, name: "النمل" },
-    { id: 28, name: "القصص" },
-    { id: 29, name: "العنكبوت" },
-    { id: 30, name: "الروم" },
-    { id: 31, name: "لقمان" },
-    { id: 32, name: "السجدة" },
-    { id: 33, name: "الأحزاب" },
-    { id: 34, name: "سبأ" },
-    { id: 35, name: "فاطر" },
-    { id: 36, name: "يس" },
-    { id: 37, name: "الصافات" },
-    { id: 38, name: "ص" },
-    { id: 39, name: "الزمر" },
-    { id: 40, name: "غافر" },
-    { id: 41, name: "فصلت" },
-    { id: 42, name: "الشورى" },
-    { id: 43, name: "الزخرف" },
-    { id: 44, name: "الدخان" },
-    { id: 45, name: "الجاثية" },
-    { id: 46, name: "الأحقاف" },
-    { id: 47, name: "محمد" },
-    { id: 48, name: "الفتح" },
-    { id: 49, name: "الحجرات" },
-    { id: 50, name: "ق" },
-    { id: 51, name: "الذاريات" },
-    { id: 52, name: "الطور" },
-    { id: 53, name: "النجم" },
-    { id: 54, name: "القمر" },
-    { id: 55, name: "الرحمن" },
-    { id: 56, name: "الواقعة" },
-    { id: 57, name: "الحديد" },
-    { id: 58, name: "المجادلة" },
-    { id: 59, name: "الحشر" },
-    { id: 60, name: "الممتحنة" },
-    { id: 61, name: "الصف" },
-    { id: 62, name: "الجمعة" },
-    { id: 63, name: "المنافقون" },
-    { id: 64, name: "التغابن" },
-    { id: 65, name: "الطلاق" },
-    { id: 66, name: "التحريم" },
-    { id: 67, name: "الملك" },
-    { id: 68, name: "القلم" },
-    { id: 69, name: "الحاقة" },
-    { id: 70, name: "المعارج" },
-    { id: 71, name: "نوح" },
-    { id: 72, name: "الجن" },
-    { id: 73, name: "المزمل" },
-    { id: 74, name: "المدثر" },
-    { id: 75, name: "القيامة" },
-    { id: 76, name: "الإنسان" },
-    { id: 77, name: "المرسلات" },
-    { id: 78, name: "النبأ" },
-    { id: 79, name: "النازعات" },
-    { id: 80, name: "عبس" },
-    { id: 81, name: "التكوير" },
-    { id: 82, name: "الإنفطار" },
-    { id: 83, name: "المطففين" },
-    { id: 84, name: "الإنشقاق" },
-    { id: 85, name: "البروج" },
-    { id: 86, name: "الطارق" },
-    { id: 87, name: "الأعلى" },
-    { id: 88, name: "الغاشية" },
-    { id: 89, name: "الفجر" },
-    { id: 90, name: "البلد" },
-    { id: 91, name: "الشمس" },
-    { id: 92, name: "الليل" },
-    { id: 93, name: "الضحى" },
-    { id: 94, name: "الشرح" },
-    { id: 95, name: "التين" },
-    { id: 96, name: "العلق" },
-    { id: 97, name: "القدر" },
-    { id: 98, name: "البينة" },
-    { id: 99, name: "الزلزلة" },
-    { id: 100, name: "العاديات" },
-    { id: 101, name: "القارعة" },
-    { id: 102, name: "التكاثر" },
-    { id: 103, name: "العصر" },
-    { id: 104, name: "الهمزة" },
-    { id: 105, name: "الفيل" },
-    { id: 106, name: "قريش" },
-    { id: 107, name: "الماعون" },
-    { id: 108, name: "الكوثر" },
-    { id: 109, name: "الكافرون" },
-    { id: 110, name: "النصر" },
-    { id: 111, name: "المسد" },
-    { id: 112, name: "الإخلاص" },
-    { id: 113, name: "الفلق" },
-    { id: 114, name: "الناس" },
-  ];
-
-  const { data: surahs, isLoading } = useGetAllSurahsNameQuery();
 
   let recentSurahs = JSON.parse(localStorage.getItem("surahs")) || [];
 
@@ -182,19 +63,20 @@ export default function IndexPage() {
             </TabsList>
             <TabsContent value="recent">
               {recentSurahs.length > 0 ? (
-                <div className="flex justify-around gap-2 overflow-x-auto">
+                <div className="flex gap-4 overflow-x-auto whitespace-nowrap">
                   {recentSurahs.map((surah) => (
                     <p
                       key={surah.surahNumber}
-                      className="text-md font-bold cursor-pointer hover:text-primary-foreground w-1/4"
+                      className="text-md font-bold cursor-pointer hover:text-primary-foreground"
                       onClick={() => navigate(`/recite/${surah.surahNumber}`)}
                     >
-                      `{surah.surahName}`
+                      {surah.surahName},
                     </p>
                   ))}
                 </div>
               ) : null}
             </TabsContent>
+
             <TabsContent value="bookmark">
               You do not have any bookmarks yet ?
             </TabsContent>
@@ -215,90 +97,10 @@ export default function IndexPage() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="surah" className="w-full">
-              {isLoading && (
-                <div className="">
-                  <div className="grid grid-cols-4 gap-2 items-center">
-                    <div role="status" className="max-w-sm animate-pulse">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                      <span className="sr-only">Loading...</span>
-                    </div>
-                    <div role="status" className="max-w-sm animate-pulse">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                      <span className="sr-only">Loading...</span>
-                    </div>
-                    <div role="status" className="max-w-sm animate-pulse">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                      <span className="sr-only">Loading...</span>
-                    </div>
-                    <div role="status" className="max-w-sm animate-pulse">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                      <span className="sr-only">Loading...</span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2 items-center mt-5">
-                    <div role="status" className="max-w-sm animate-pulse">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                      <span className="sr-only">Loading...</span>
-                    </div>
-                    <div role="status" className="max-w-sm animate-pulse">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                      <span className="sr-only">Loading...</span>
-                    </div>
-                    <div role="status" className="max-w-sm animate-pulse">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                      <span className="sr-only">Loading...</span>
-                    </div>
-                    <div role="status" className="max-w-sm animate-pulse">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                      <span className="sr-only">Loading...</span>
-                    </div>
-                  </div>
-                </div>
-              )}
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 justify-between gap-10 w-full">
-                {surahs?.map((surah) => (
+                {surahNameList?.map((surah) => (
                   <div
-                    className="flex gap-5 items-center border cursor-pointer p-5 rounded-lg hover:border-primary group w-full bg-white"
+                    className="flex items-center border cursor-pointer p-5 rounded-lg hover:border-primary group w-full bg-white"
                     key={surah.id}
                     onClick={() => {
                       navigate(`/recite/${surah.surahNumber}`);
@@ -325,7 +127,7 @@ export default function IndexPage() {
                       );
                     }}
                   >
-                    <div className="relative flex items-center justify-center max-w-[22%]">
+                    <div className="relative flex items-center justify-center max-w-[22%] mr-5">
                       <span className="absolute text-black text-sm font-medium group-hover:text-primary">
                         {surah.surahNumber}
                       </span>
@@ -337,17 +139,21 @@ export default function IndexPage() {
                     </div>
 
                     <div className="max-w-[78%]">
-                      <div className="flex gap-5 justify-between">
-                        <p className="font-bold text-lg lg:text-2xl font-sans text-start">
-                          {surah.surahName}
-                        </p>
-                        <p className="font-arabic text-balck text-lg rlt lg:text-2xl font-bold group-hover:text-primary">
-                          {
-                            arabicSurahName.find(
-                              (name) => name.id === surah.surahNumber
-                            )?.name
-                          }
-                        </p>
+                      <div className="grid grid-cols-3 gap-5 justify-between">
+                        {/* en name */}
+                        <div className="col-span-2">
+                          <p className="font-bold text-lg lg:text-xl font-sans text-start">
+                            {surah.surahName.en}
+                          </p>
+                        </div>
+
+                        {/* ar name */}
+                        <div
+                          className="text-right font-arabic text-balck text-lg rlt lg:text-2xl font-bold group-hover:text-primary"
+                          dir="rtl"
+                        >
+                          {surah.surahName.ar}
+                        </div>
                       </div>
 
                       <div className="flex justify-between gap-5">
