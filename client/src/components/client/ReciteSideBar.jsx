@@ -1,33 +1,24 @@
-import {
-  useGetAllSurahsNameQuery,
-  useGetAllSurahsPaginatedQuery,
-} from "@/slices/admin/surah";
+import { useGetAllSurahsPaginatedQuery } from "@/slices/admin/surah";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { CiSearch } from "react-icons/ci";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { surahNameList } from "../../constant";
 
 export default function ReciteSideBar() {
-  const { data: allSurahs } = useGetAllSurahsNameQuery();
   const { number } = useParams();
   const navigate = useNavigate();
   const isOpen = useSelector((state) => state.utility.isOpenSidebar);
-  // const dispatch = useDispatch();
-  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: surahData, isLoading } = useGetAllSurahsPaginatedQuery({
-    page: currentPage,
-    limit: 1,
+    language: "en",
+    surahNumber: number,
   });
 
-  const currentSurah = surahData?.surahs?.find(
-    (surah) => surah?.surahNumber === Number(number)
-  );
-
   useEffect(() => {
-    setCurrentPage(Number(number));
-  }, [number]);
+    console.log("surahData changed", surahData?.surahName);
+  }, [surahData]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -50,12 +41,12 @@ export default function ReciteSideBar() {
             >
               Surah
             </TabsTrigger>
-            <TabsTrigger
+            {/* <TabsTrigger
               className="px-0 py-2 data-[state=active]:rounded-full"
               value="juz"
             >
               Juz
-            </TabsTrigger>
+            </TabsTrigger> */}
             {/* <MdClose onClick={() => dispatch(toggleSidebar())} className="absolute cursor-pointer right-0 top-1/2 -translate-y-1/2 transform text-black text-3xl"/> */}
           </TabsList>
           <TabsContent value="surah" className="m-0">
@@ -70,7 +61,7 @@ export default function ReciteSideBar() {
                   <CiSearch className="cursor-pointer absolute right-2 top-1/2 transform -translate-y-1/2 text-black  text-xl lg:text-3xl" />
                 </div>
                 <ul className="bg-white rounded-md ">
-                  {allSurahs?.map((surah, index) => (
+                  {surahNameList?.map((surah, index) => (
                     <li
                       key={index}
                       className=" hover:text-black/90 hover:bg-primary-foreground border-b-2 text-black text-lg md:text-xl text-left cursor-pointer p-3 flex gap-2"
@@ -81,7 +72,7 @@ export default function ReciteSideBar() {
                     >
                       <span>{surah.surahNumber}</span>
                       <span>-</span>
-                      <span>{surah.surahName}</span>
+                      <span>{surah.surahName.en}</span>
                     </li>
                   ))}
                 </ul>
@@ -96,7 +87,7 @@ export default function ReciteSideBar() {
                   {/* <CiSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-black  text-xl lg:text-3xl" /> */}
                 </div>
                 <ul className="bg-white rounded-md">
-                  {currentSurah?.verses.map((verse, index) => (
+                  {surahData?.verses.map((verse, index) => (
                     <li
                       key={index}
                       // className=" hover:text-black/90 hover:bg-primary-foreground border-b-2 text-black text-lg md:text-xl  text-center cursor-pointer p-3"
@@ -111,7 +102,11 @@ export default function ReciteSideBar() {
             </div>
           </TabsContent>
           <TabsContent value="juz">
-            <div className="md:p-2 lg:p-5 min-h-screen">Juz</div>
+            <div className="md:p-2 lg:p-5 min-h-screen">
+              {surahData?.juzNumber?.map((juz, index) => (
+                <p key={index}>{juz}</p>
+              ))}
+            </div>
           </TabsContent>
         </Tabs>
       </div>

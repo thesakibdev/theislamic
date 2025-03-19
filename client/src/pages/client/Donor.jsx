@@ -115,8 +115,7 @@ export default function DonorPage() {
                 <PaginationPrevious
                   aria-label="Go to previous page"
                   onClick={handlePaginationPrev}
-                  className="bg-white hover:bg-primary hover:border-primary
-                  duration-500 hover:text-white cursor-pointer text-black border border-black"
+                  className="bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary cursor-pointer"
                   disabled={currentPage == 1}
                 />
               </PaginationItem>
@@ -127,8 +126,7 @@ export default function DonorPage() {
                 <PaginationNext
                   aria-label="Go to next page"
                   onClick={handlePaginationNext}
-                  className="bg-white hover:bg-primary hover:border-primary
-                  duration-500 hover:text-white cursor-pointer text-black border border-black"
+                  className="bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary cursor-pointer"
                 />
               </PaginationItem>
             </PaginationContent>
