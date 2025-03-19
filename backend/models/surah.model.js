@@ -27,6 +27,13 @@ const SurahSchema = new mongoose.Schema({
 
 SurahSchema.index({ surahNumber: 1, name: 1 }, { unique: true });
 
+// Full-Text Search Index
+SurahSchema.index({
+  name: "text", 
+  "juzNumber": "text",
+  "verses.verseNumber": "text"
+});
+
 const Surah = mongoose.model("Surah", SurahSchema);
 
 module.exports = Surah;
