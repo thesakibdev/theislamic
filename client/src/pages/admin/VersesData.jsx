@@ -1,5 +1,4 @@
-import { FaEdit } from "react-icons/fa";
-import { RiDeleteBinLine } from "react-icons/ri";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import CommonForm from "@/components/common/Form";
 import { toast } from "react-toastify";
@@ -18,9 +17,8 @@ import {
   useGetAllSurahsPaginatedQuery,
 } from "../../slices/admin/surah";
 
-import { useGetAllLanguagesQuery } from "../../slices/utils";
+import { languagesList } from "../../constant";
 
-import ArrowDown from "../../assets/icon/arrow-down.png";
 import {
   Pagination,
   PaginationContent,
@@ -30,6 +28,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import Loading from "@/components/common/Loading";
+import VerseEndIcon from "@/assets/icon/VerseEndIcon";
 
 const initialFormData = {
   surahNumber: null,
@@ -48,23 +47,22 @@ export default function VersesOtherData() {
   const [openVerseData, setOpenVerseDate] = useState({});
   const [selectedLanguage, setSelectedLanguage] = useState("en");
 
-  const { data: languages } = useGetAllLanguagesQuery();
-
   const [addVerseOtherData] = useAddVerseOtherDataMutation();
   const [editVerseOtherData] = useEditVerseOtherDataMutation();
   const [deleteVerseOtherData] = useDeleteVerseOtherDataMutation();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  console.log("currentPage", currentPage);
+  const [surahNumber, setSurahNumber] = useState(1);
   const {
     data: surahData,
     isLoading,
     isError,
     refetch,
   } = useGetAllSurahsPaginatedQuery({
-    page: currentPage,
-    limit: 1,
+    language: selectedLanguage,
+    surahNumber: surahNumber,
   });
+
+  console.log(surahData);
 
   useEffect(() => {
     if (surahData) {
@@ -95,8 +93,8 @@ export default function VersesOtherData() {
       name: "language",
       componentType: "select",
       options:
-        languages &&
-        languages.data?.map((language) => ({
+        languagesList &&
+        languagesList.map((language) => ({
           id: language?.code,
           label: language?.name,
         })),
@@ -180,28 +178,46 @@ export default function VersesOtherData() {
     setCurrentEditedId(null);
   };
 
-  const toggleSurah = (surahIndex, verseIndex) => {
+  const toggleSurah = (index) => {
     setOpenVerseDate((prev) => ({
       ...prev,
-      [`${surahIndex}-${verseIndex}`]: !prev[`${surahIndex}-${verseIndex}`],
+      [index]: !prev[index],
     }));
   };
 
   const handleDeleteVerse = async (surahNumber, verseNumber, language) => {
     try {
-      const deleteResponse = await deleteVerseOtherData({
-        surahNumber,
-        verseNumber,
-        language,
-      }).unwrap();
-      refetch();
-      toast.success(
-        deleteResponse.message || "Verse data deleted successfully"
+      const userConfirmed = window.confirm(
+        "Are you sure you want to delete this verse? This action cannot be undone."
       );
+
+      if (userConfirmed) {
+        const deleteResponse = await deleteVerseOtherData({
+          surahNumber,
+          verseNumber,
+          language,
+        }).unwrap();
+        refetch();
+        toast.success(
+          deleteResponse.message || "Verse data deleted successfully"
+        );
+      } else {
+        // User canceled the action
+        toast.info("Delete action canceled");
+      }
     } catch (error) {
       toast.error(error?.data?.message);
     }
   };
+
+  function convertToArabicNumber(num) {
+    const arabicNumbers = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+    return num
+      .toString()
+      .split("")
+      .map((digit) => arabicNumbers[digit])
+      .join("");
+  }
 
   return (
     <main className="mt-12">
@@ -209,14 +225,14 @@ export default function VersesOtherData() {
         Verses Language Base Data
       </h1>
       <div className="mt-10 h-full">
-        <div className="flex justify-between px-10">
+        <div className="flex justify-between px-4 md:px-10">
           <select
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
             className="px-4 py-2 rounded-md border bg-adminInput focus:ring-2 focus:ring-primary"
           >
-            {languages?.data &&
-              languages.data?.map((language) => (
+            {languagesList &&
+              languagesList.map((language) => (
                 <option
                   className="bg-primary/50 text-white"
                   key={language?.code}
@@ -245,124 +261,111 @@ export default function VersesOtherData() {
           <>Loading...</>
         ) : surahData ? (
           <>
-            {surahData?.surahs?.map((quran, index) => (
-              <div key={index} className="py-2">
-                <div className="flex justify-between items-center px-10 my-10">
-                  <div className="font-semibold text-2xl w-36 font-sans">
-                    Number: {quran.surahNumber}
-                  </div>
-                  <div className="font-semibold text-2xl font-sans">
-                    Name: {quran.surahName}
-                  </div>
+            <div className="px-4 md:px-10 mb-2">
+              <div className="grid grid-cols-2 justify-between items-center">
+                <div className="font-semibold text-2xl font-sans ">
+                  Surah Name:{" "}
+                  <span className="text-primary">{surahData?.surahName}</span>
                 </div>
-
-                <div className="h-[calc(100vh-320px)] overflow-y-auto">
-                  <ul>
-                    {quran?.verses.map((verse, verseIndex) => {
-                      const selectedVerseData = verse.verseOtherData.find(
-                        (data) => data.language === selectedLanguage
-                      );
-
-                      return (
-                        <li
-                          key={verseIndex}
-                          className="py-4 hover:bg-gray-100 border-t-2 border-gray-400 last:border-b-2 cursor-pointer"
-                          onClick={() => {
-                            toggleSurah(index, verseIndex);
-                          }}
-                        >
-                          <div className="flex px-5 justify-between items-center">
-                            <div className="flex gap-5 font-bold">
-                              <span className="text-lg">
-                                {verse.verseNumber}. {verse.arabicAyah}
-                              </span>
-                            </div>
-                            <img
-                              className={`transition-transform ${
-                                openVerseData[`${index}-${verseIndex}`]
-                                  ? "rotate-180"
-                                  : ""
-                              }`}
-                              src={ArrowDown}
-                              alt="Arrow Down"
-                            />
-                          </div>
-                          <div
-                            className={
-                              openVerseData[`${index}-${verseIndex}`]
-                                ? "block my-5"
-                                : "hidden"
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <div className="flex gap-4 justify-end mb-5">
-                              <button
-                                className="px-6 py-2 flex items-center gap-2 text-white bg-primary rounded-md hover:bg-primary-foreground"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setOpenAddVerseDataForm(true);
-                                  setCurrentEditedId(quran.surahNumber);
-                                  setFormData({
-                                    surahNumber: quran.surahNumber,
-                                    verseNumber: verse.verseNumber,
-                                    language: selectedLanguage,
-                                    ...selectedVerseData,
-                                  });
-                                }}
-                              >
-                                Edit <FaEdit />
-                              </button>
-
-                              <button
-                                className="px-6 py-2 flex items-center gap-2 text-white bg-deleteRed rounded-md hover:bg-red-600"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteVerse(
-                                    quran.surahNumber,
-                                    verse.verseNumber,
-                                    selectedLanguage
-                                  );
-                                }}
-                              >
-                                Delete <RiDeleteBinLine />
-                              </button>
-                            </div>
-                            <div className="flex flex-col">
-                              <p className="flex gap-2 text-md border-t p-5">
-                                <span className="font-semibold">
-                                  Translation:{" "}
-                                </span>
-                                {selectedVerseData?.translation}
-                              </p>
-                              <p className="flex gap-2 text-md border-t p-5">
-                                <span className="font-semibold">
-                                  Transliteration:{" "}
-                                </span>
-                                {selectedVerseData?.transliteration}
-                              </p>
-                              <p className="flex gap-2 text-md border-t p-5">
-                                <span className="font-semibold">Note: </span>
-                                {selectedVerseData?.note}
-                              </p>
-                              <p className="flex gap-2 text-md border-t p-5 pb-0">
-                                <span className="font-semibold">
-                                  Keywords:{" "}
-                                </span>
-                                {selectedVerseData?.keywords?.map((k, i) => (
-                                  <span key={i} className="mr-2">
-                                    {k}
-                                  </span>
-                                ))}
-                              </p>
-                            </div>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                <div className="font-semibold text-2xl font-sans text-right">
+                  Surah No:{" "}
+                  <span className="text-primary">{surahData?.surahNumber}</span>
                 </div>
               </div>
-            ))}
+              <div className="overflow-y-scroll h-[60vh]">
+                {surahData?.verses?.map((verse, index) => (
+                  <div
+                    key={index}
+                    className="border-t mt-2 border-primary md:gap-5 py-2 px-2 last:border-b cursor-pointer"
+                    onClick={() => toggleSurah(index)}
+                  >
+                    <div className="data flex justify-between">
+                      <span
+                        key={index}
+                        dir="rtl"
+                        className="text-base md:text-2xl font-arabic font-medium inline rtl:mr-0 align-middle ayah"
+                      >
+                        {verse.arabicAyah}
+                        <span className="relative w-[40px] h-[40px] inline-flex items-center justify-center align-middle ml-1">
+                          <VerseEndIcon
+                            width={30}
+                            height={30}
+                            className="align-middle"
+                          />
+                          <span className="absolute text-base text-center align-middle top-1">
+                            {convertToArabicNumber(verse.verseNumber)}
+                          </span>
+                        </span>
+                      </span>
+
+                      <div className="flex gap-3 md:gap-5 ">
+                        <div
+                          className="text-primary cursor-pointer px-4 py-2 rounded-md hover:bg-primary/50 border border-primary flex items-center justify-center"
+                          onClick={() => {
+                            setFormData({
+                              surahNumber: surahData.surahNumber,
+                              verseNumber: verse.verseNumber,
+                              translation: verse.verseOtherData?.translation,
+                              transliteration:
+                                verse.verseOtherData?.transliteration,
+                              note: verse.verseOtherData?.note,
+                              keywords: verse.verseOtherData?.keywords,
+                            });
+                            setOpenAddVerseDataForm(true);
+                            setCurrentEditedId(verse._id);
+                          }}
+                        >
+                          <FaEdit />
+                        </div>
+                        <div
+                          className="text-white bg-red-500 px-4 py-2 rounded-md hover:bg-red-600 cursor-pointer flex items-center justify-center"
+                          onClick={() => {
+                            handleDeleteVerse(
+                              surahData.surahNumber,
+                              verse.verseNumber,
+                              verse.verseOtherData.language
+                            );
+                          }}
+                        >
+                          <FaTrash />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      className={
+                        openVerseData[index] ? "block my-2 pl-4" : "hidden"
+                      }
+                    >
+                      <p className="text-left text-sm sm:text-base md:text-lg">
+                        <span className="font-semibold text-primary">
+                          Translation :
+                        </span>{" "}
+                        {verse?.verseOtherData?.translation}
+                      </p>
+                      <p className="text-left text-sm sm:text-base md:text-lg">
+                        <span className="font-semibold text-primary">
+                          Transliteration :
+                        </span>{" "}
+                        {verse?.verseOtherData?.transliteration}
+                      </p>
+                      <p className="text-left text-sm sm:text-base md:text-lg">
+                        <span className="font-semibold text-primary">
+                          Note :
+                        </span>{" "}
+                        {verse?.verseOtherData?.note}
+                      </p>
+                      <p className="text-left text-sm sm:text-base md:text-lg">
+                        <span className="font-semibold text-primary">
+                          Keywords :
+                        </span>{" "}
+                        {verse?.verseOtherData?.keywords?.join(", ")}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
             <div className="p-4 flex justify-center">
               <Pagination className="px-4">
                 <PaginationContent>
@@ -370,12 +373,12 @@ export default function VersesOtherData() {
                     <PaginationPrevious
                       aria-label="Go to previous page"
                       onClick={() =>
-                        setCurrentPage(() =>
-                          currentPage == 1 ? 1 : currentPage - 1
+                        setSurahNumber(() =>
+                          surahNumber == 1 ? 1 : surahNumber - 1
                         )
                       }
                       className="bg-primary hover:bg-green-400 cursor-pointer text-white"
-                      disabled={currentPage == 1}
+                      disabled={surahNumber == 1}
                     />
                   </PaginationItem>
                   <PaginationItem>
@@ -385,7 +388,7 @@ export default function VersesOtherData() {
                     <Button
                       className="bg-primary hover:bg-green-400 cursor-pointer text-white"
                       onClick={() =>
-                        setCurrentPage(() => currentPage + 5, refetch())
+                        setSurahNumber(() => surahNumber + 5, refetch())
                       }
                     >
                       Skip
@@ -397,7 +400,7 @@ export default function VersesOtherData() {
                   <PaginationItem>
                     <PaginationNext
                       aria-label="Go to next page"
-                      onClick={() => setCurrentPage(currentPage + 1)}
+                      onClick={() => setSurahNumber(surahNumber + 1)}
                       className="bg-primary hover:bg-green-400 cursor-pointer text-white"
                     />
                   </PaginationItem>

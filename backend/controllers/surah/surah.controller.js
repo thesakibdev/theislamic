@@ -213,69 +213,89 @@ const addVerseOtherData = async (req, res) => {
   } = req.body;
 
   try {
+    // Normalize input data
     const normalSurahNumber = Number(surahNumber);
     const normalVerseNumber = Number(verseNumber);
-
     const normalLanguage = language?.trim().toLowerCase();
     const normalTranslation = translation?.trim();
     const normalTransliteration = transliteration?.trim();
-
     const normalNote = note ? note.trim() : "";
     const normalKeywords = Array.isArray(keywords)
       ? keywords.map((k) => k.trim())
       : [];
 
+    // Validate inputs
     if (!normalSurahNumber || isNaN(normalSurahNumber)) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Invalid normalSurahNumber." });
+      return res.status(400).json({
+        error: true,
+        message: "Invalid surahNumber.",
+      });
     }
     if (!normalVerseNumber || isNaN(normalVerseNumber)) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Invalid verseNumber." });
+      return res.status(400).json({
+        error: true,
+        message: "Invalid verseNumber.",
+      });
     }
     if (!normalLanguage) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Please provide a language." });
+      return res.status(400).json({
+        error: true,
+        message: "Please provide a valid language.",
+      });
     }
 
-    const existingVerse = await verseOtherData.findOne({
+    // Check if the document for the surah and language exists
+    let verseData = await verseOtherData.findOne({
       surahNumber: normalSurahNumber,
-      verseNumber: normalVerseNumber,
       language: normalLanguage,
     });
+
+    if (!verseData) {
+      // Create a new document if it doesn't exist
+      verseData = new verseOtherData({
+        surahNumber: normalSurahNumber,
+        language: normalLanguage,
+        verses: [],
+      });
+    }
+
+    // Check if the verse already exists in the document
+    const existingVerse = verseData.verses.find(
+      (v) => v.verseNumber === normalVerseNumber
+    );
 
     if (existingVerse) {
       return res.status(400).json({
         error: true,
-        message: `আয়াত ${normalVerseNumber} ইতিমধ্যে ${normalLanguage} ভাষায় আছে।`,
+        message: `Verse ${normalVerseNumber} already exists in ${normalLanguage} language.`,
       });
     }
 
-    const newVerse = new verseOtherData({
-      surahNumber: normalSurahNumber,
+    // Add the new verse to the verses array
+    verseData.verses.push({
       verseNumber: normalVerseNumber,
-      language: normalLanguage,
       translation: normalTranslation,
       transliteration: normalTransliteration,
       note: normalNote,
       keywords: normalKeywords,
     });
 
-    await newVerse.save();
+    // Save the updated document
+    await verseData.save();
 
-    // invalidate cache
+    // Invalidate cache
     invalidateCache();
 
     return res.status(201).json({
-      message: "নতুন ভাষায় আয়াত সংরক্ষণ করা হয়েছে।",
-      verseOtherData: newVerse,
+      message: "New verse data has been added successfully.",
+      verseOtherData: verseData,
     });
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: true, message: "সার্ভার এরর।" });
+    console.error("Error adding verse data:", error);
+    res.status(500).json({
+      error: true,
+      message: "Server error.",
+    });
   }
 };
 
@@ -313,43 +333,37 @@ const editVerseOtherData = async (req, res) => {
         .json({ error: true, message: "Invalid language." });
     }
 
-    // Find the existing verse data
-    const existingVerse = await verseOtherData.findOne({
-      surahNumber: normalSurahNumber,
-      verseNumber: normalVerseNumber,
-      language: normalLanguage,
-    });
+    // Update the specific verse inside the verses array
+    const updatedVerse = await verseOtherData.findOneAndUpdate(
+      {
+        surahNumber: normalSurahNumber,
+        language: normalLanguage,
+        "verses.verseNumber": normalVerseNumber,
+      },
+      {
+        $set: {
+          "verses.$.translation": normalTranslation,
+          "verses.$.transliteration": normalTransliteration,
+          "verses.$.note": normalNote,
+          "verses.$.keywords": normalKeywords,
+        },
+      },
+      { new: true } // Return updated document
+    );
 
-    if (!existingVerse) {
+    if (!updatedVerse) {
       return res.status(404).json({
         error: true,
         message: `আয়াত ${normalVerseNumber} ${normalLanguage} ভাষায় পাওয়া যায়নি।`,
       });
     }
 
-    // Update the fields if provided
-    if (normalTranslation) {
-      existingVerse.translation = normalTranslation;
-    }
-    if (normalTransliteration) {
-      existingVerse.transliteration = normalTransliteration;
-    }
-    if (normalNote !== undefined) {
-      existingVerse.note = normalNote;
-    }
-    if (normalKeywords.length > 0) {
-      existingVerse.keywords = normalKeywords;
-    }
-
-    // Save the updated verse data
-    await existingVerse.save();
-
-    // invalidate cache
+    // Invalidate cache if applicable
     invalidateCache();
 
     return res.status(200).json({
       message: `আয়াত ${normalVerseNumber} এর ${normalLanguage} ভাষায় সংরক্ষণ করা হয়েছে।`,
-      verseOtherData: existingVerse,
+      verseOtherData: updatedVerse,
     });
   } catch (error) {
     console.error("Error:", error);
@@ -361,58 +375,76 @@ const deleteVerseOtherData = async (req, res) => {
   const { surahNumber, verseNumber, language } = req.params;
 
   try {
-    // Normalize and validate input
     const normalSurahNumber = Number(surahNumber);
     const normalVerseNumber = Number(verseNumber);
     const normalLanguage = language?.trim().toLowerCase();
 
-    // Validate inputs
     if (!normalSurahNumber || isNaN(normalSurahNumber)) {
-      return res.status(400).json({
-        error: true,
-        message: "অবৈধ সূরা নম্বর।",
-      });
+      return res.status(400).json({ error: true, message: "অবৈধ সূরা নম্বর।" });
     }
     if (!normalVerseNumber || isNaN(normalVerseNumber)) {
-      return res.status(400).json({
-        error: true,
-        message: "অবৈধ আয়াত নম্বর।",
-      });
+      return res
+        .status(400)
+        .json({ error: true, message: "অবৈধ আয়াত নম্বর।" });
     }
     if (!normalLanguage) {
-      return res.status(400).json({
+      return res.status(400).json({ error: true, message: "অবৈধ ভাষা।" });
+    }
+
+    // Find the document and update it by pulling the matching verse
+    const updatedDocument = await verseOtherData.findOneAndUpdate(
+      {
+        surahNumber: normalSurahNumber,
+        language: normalLanguage,
+      },
+      {
+        $pull: {
+          verses: { verseNumber: normalVerseNumber },
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedDocument) {
+      return res.status(404).json({
         error: true,
-        message: "অবৈধ ভাষা।",
+        message: `সূরা ${normalSurahNumber} এর ${normalLanguage} ভাষার তথ্য খুঁজে পাওয়া যায়নি।`,
       });
     }
 
-    // Find and delete the verse
-    const deletedVerse = await verseOtherData.findOneAndDelete({
+    // Check if any verse was actually removed
+    // Compare the updated document with the original to ensure deletion happened
+    const originalDoc = await verseOtherData.findOne({
       surahNumber: normalSurahNumber,
-      verseNumber: normalVerseNumber,
       language: normalLanguage,
     });
 
-    if (!deletedVerse) {
+    if (
+      originalDoc &&
+      originalDoc.verses.some((v) => v.verseNumber === normalVerseNumber)
+    ) {
       return res.status(404).json({
         error: true,
-        message: `আয়াত ${normalVerseNumber} (${normalLanguage}) খুঁজে পাওয়া যায়নি।`,
+        message: `আয়াত ${normalVerseNumber} (${normalLanguage}) খুঁজে পাওয়া যায়নি।`,
       });
     }
 
-    // invalidate cache
-    invalidateCache();
+    // If we get here, the verse was successfully removed
+    // Invalidate cache if you're using caching
+    if (typeof invalidateCache === "function") {
+      invalidateCache();
+    }
 
     return res.status(200).json({
       success: true,
-      message: `আয়াত ${normalVerseNumber} এর (${normalLanguage}) ডিলিট করা হয়েছে।`,
-      deletedData: deletedVerse,
+      message: `আয়াত ${normalVerseNumber} (${normalLanguage}) ডিলিট করা হয়েছে।`,
+      updatedData: updatedDocument,
     });
   } catch (error) {
     console.error("ডিলিট করতে সমস্যা:", error);
     res.status(500).json({
       error: true,
-      message: "সার্ভারে সমস্যা হয়েছে।",
+      message: "সার্ভারে সমস্যা হয়েছে।",
     });
   }
 };
@@ -471,66 +503,6 @@ const getAllSurahs = async (req, res) => {
   }
 };
 
-const getVerseOtherData = async (req, res) => {
-  try {
-    const { surahNumber: surahNumberParam, language } = req.query;
-
-    // Validate required parameters
-    if (!surahNumberParam || !language) {
-      return res.status(400).json({
-        error: "Both surahNumber and language parameters are required",
-      });
-    }
-
-    const surahNumber = parseInt(surahNumberParam, 10);
-
-    // Validate number conversion
-    if (isNaN(surahNumber)) {
-      return res.status(400).json({
-        error: "Invalid surahNumber format. Must be a number",
-      });
-    }
-
-    const result = await verseOtherData.aggregate([
-      {
-        $match: {
-          surahNumber: surahNumber,
-          language: language.toString(),
-        },
-      },
-      {
-        $sort: { verseNumber: 1 },
-      },
-      {
-        $group: {
-          _id: "$surahNumber",
-          verses: {
-            $push: {
-              verseNumber: "$verseNumber",
-              translation: "$translation",
-              transliteration: "$transliteration",
-              note: "$note",
-              keyword: { $ifNull: [{ $arrayElemAt: ["$keywords", 0] }, ""] },
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          surahNumber: "$_id",
-          language: language.toString(),
-          verses: 1,
-        },
-      },
-    ]);
-
-    return res.status(200).json(result.length > 0 ? result[0] : {});
-  } catch (error) {
-    console.error("Error fetching formatted data:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-};
 // get surahs name
 const getSurahsName = async (req, res) => {
   try {
@@ -560,85 +532,6 @@ const getSurahsName = async (req, res) => {
   }
 };
 
-// const getAllSurahsPaginated = async (req, res) => {
-//   const { page = 1, limit = 1, language = "en" } = req.query;
-
-//   try {
-//     const currentPage = parseInt(page, 10) || 1;
-//     const pageLimit = parseInt(limit, 10) || 1;
-
-//     const cacheKey = `surahsPage_${currentPage}_limit_${pageLimit}_lang_${language}`;
-//     const cachedSurahs = getCache(cacheKey);
-
-//     if (cachedSurahs) {
-//       return res.status(200).json(cachedSurahs);
-//     }
-
-//     // Fetch Surahs with verses sorted in-memory
-//     const surahs = await Surah.aggregate([
-//       { $sort: { surahNumber: 1 } },
-//       { $skip: (currentPage - 1) * pageLimit },
-//       { $limit: pageLimit },
-//       // Unwind and sort verses here
-//       { $unwind: "$verses" },
-//       { $sort: { "verses.verseNumber": 1 } },
-//       {
-//         $group: {
-//           _id: "$_id",
-//           surahNumber: { $first: "$surahNumber" },
-//           name: { $first: "$name" },
-//           juzNumber: { $first: "$juzNumber" },
-//           verses: { $push: "$verses" },
-//         },
-//       },
-//     ]);
-
-//     // Fetch translations for the language
-//     const verseOtherDataByLanguage = await verseOtherData
-//       .find({ language: language })
-//       .lean();
-
-//     const formattedSurahs = surahs.map((surah) => ({
-//       _id: surah._id,
-//       surahName: surah.name,
-//       surahNumber: surah.surahNumber,
-//       juzNumber: surah.juzNumber,
-//       verses: surah.verses.map((verse) => ({
-//         _id: verse._id,
-//         verseNumber: verse.verseNumber,
-//         arabicAyah: verse.arabicAyah,
-//         totalVerseNumber: verse.totalVerseNumber,
-//         verseOtherData: verseOtherDataByLanguage
-//           .filter((data) => data.surahNumber === surah.surahNumber)
-//           .flatMap((data) =>
-//             data.verses
-//               .filter((v) => v.verseNumber === verse.verseNumber)
-//               .map(({ verseNumber, ...rest }) => ({
-//                 language: language,
-//                 ...rest,
-//               }))
-//           ),
-//       })),
-//     }));
-
-//     const count = await Surah.countDocuments();
-
-//     const paginatedData = {
-//       surahs: formattedSurahs,
-//       totalSurahs: count,
-//       totalPages: Math.ceil(count / pageLimit),
-//       currentPage,
-//       language: language,
-//     };
-
-//     setCache(cacheKey, paginatedData, 600);
-//     res.status(200).json(paginatedData);
-//   } catch (err) {
-//     console.error("Error in getAllSurahsPaginated:", err); // Enhanced logging
-//     res.status(500).json({ error: "Server error." });
-//   }
-// };
-
 const getAllSurahsPaginated = async (req, res) => {
   const { surahNumber, language = "en" } = req.query;
 
@@ -665,10 +558,12 @@ const getAllSurahsPaginated = async (req, res) => {
     }
 
     // Fetch translations only for the requested language
-    const verseOtherDataByLanguage = await verseOtherData.findOne(
-      { language, surahNumber: parseInt(surahNumber, 10) },
-      "verses.verseNumber verses.translation verses.transliteration verses.note verses.keywords"
-    ).lean();
+    const verseOtherDataByLanguage = await verseOtherData
+      .findOne(
+        { language, surahNumber: parseInt(surahNumber, 10) },
+        "verses.verseNumber verses.translation verses.transliteration verses.note verses.keywords"
+      )
+      .lean();
 
     // Map verses and attach translations, sorted by verseNumber
     const formattedSurah = {
@@ -710,7 +605,6 @@ const getAllSurahsPaginated = async (req, res) => {
   }
 };
 
-
 module.exports = {
   // main verses
   addVerse,
@@ -721,7 +615,6 @@ module.exports = {
   addVerseOtherData,
   editVerseOtherData,
   deleteVerseOtherData,
-  getVerseOtherData,
 
   // get main surahs
   getAllSurahs,
