@@ -33,6 +33,33 @@ export const donorApi = createApi({
       invalidatesTags: ["Donor"],
     }),
 
+    // donor history api
+    addNewDonationHistory: builder.mutation({
+      query: ({ donorId, ...formData }) => ({
+        url: `/donor/add-history/${donorId}`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: ["Donor"],
+    }),
+
+    editDonationHistory: builder.mutation({
+      query: ({ donorId, historyId, ...formData }) => ({
+        url: `/donor/edit/history/${donorId}/${historyId}`,
+        method: "PUT",
+        body: formData,
+      }),
+      invalidatesTags: ["Donor"],
+    }),
+
+    deleteDonorHistory: builder.mutation({
+      query: ({ donorId, historyId }) => ({
+        url: `/donor/delete/history/${donorId}/${historyId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Donor"],
+    }),
+
     // Fetch paginated Donors
     getAllDonors: builder.query({
       query: ({ page, limit }) => ({
@@ -50,4 +77,7 @@ export const {
   useEditDonorMutation,
   useDeleteDonorMutation,
   useGetAllDonorsQuery,
+  useAddNewDonationHistoryMutation,
+  useEditDonationHistoryMutation,
+  useDeleteDonorHistoryMutation,
 } = donorApi;

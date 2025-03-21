@@ -22,6 +22,7 @@ const handleImageUpload = async (req, res) => {
   }
 };
 
+// donor controller functions
 const createDonor = async (req, res) => {
   try {
     const {
@@ -43,6 +44,8 @@ const createDonor = async (req, res) => {
       isDetailsVisible,
       donateDate,
     } = req.body;
+
+    console.log(req.body);
 
     if (!phone) {
       return ResponseHandler.error(res, "Phone number is required.", 404);
@@ -70,7 +73,6 @@ const createDonor = async (req, res) => {
       email,
       phone,
       dateOfBirth,
-      typeOfDonation,
       companyName,
       designation,
       profession,
@@ -82,7 +84,7 @@ const createDonor = async (req, res) => {
       TotalDonation: amount,
       isDetailsVisible,
       donateDate,
-      donationHistory: [{ amount, donateDate, history: [] }],
+      donationHistory: [{ amount, donateDate, typeOfDonation, history: [] }],
     });
 
     const savedDonor = await newDonor.save();
@@ -111,7 +113,6 @@ const editDonor = async (req, res) => {
       email,
       phone,
       dateOfBirth,
-      typeOfDonation,
       companyName,
       designation,
       profession,
@@ -129,7 +130,6 @@ const editDonor = async (req, res) => {
     findDonor.email = email || findDonor.email;
     findDonor.phone = phone || findDonor.phone;
     findDonor.dateOfBirth = dateOfBirth || findDonor.dateOfBirth;
-    findDonor.typeOfDonation = typeOfDonation || findDonor.typeOfDonation;
     findDonor.companyName = companyName || findDonor.companyName;
     findDonor.designation = designation || findDonor.designation;
     findDonor.profession = profession || findDonor.profession;
@@ -144,49 +144,6 @@ const editDonor = async (req, res) => {
     invalidateCache("donors");
 
     return ResponseHandler.success(res, "Donor updated successfully.");
-  } catch (error) {
-    console.error(error);
-    return ResponseHandler.error(res, "Server error.");
-  }
-};
-
-const editDonationHistory = async (req, res) => {
-  const { historyId, donorId } = req.params;
-  const { amount, donateDate } = req.body;
-
-  try {
-    const donor = await Donor.findById(donorId);
-    if (!donor) {
-      return ResponseHandler.error(res, "Donor not found.", 404);
-    }
-
-    // Find the specific donation history entry
-    const historyIndex = donor.donationHistory.findIndex(
-      (item) => item._id.toString() === historyId
-    );
-
-    if (historyIndex === -1) {
-      return ResponseHandler.error(res, "Donation history not found.", 404);
-    }
-
-    // Step 1: Push new updated donation entry
-    donor.donationHistory.push({ amount, donateDate });
-
-    // Step 2: Remove old donation history entry
-    donor.donationHistory.splice(historyIndex, 1);
-
-    // Step 3: Recalculate TotalDonation
-    donor.TotalDonation = donor.donationHistory.reduce(
-      (total, entry) => total + entry.amount,
-      0
-    );
-
-    // Step 4: Save the donor
-    await donor.save();
-
-    invalidateCache("donors");
-
-    return ResponseHandler.success(res, "Donation history updated.", donor);
   } catch (error) {
     console.error(error);
     return ResponseHandler.error(res, "Server error.");
@@ -209,6 +166,124 @@ const deleteDonor = async (req, res) => {
   }
 };
 
+// donor history controller functions
+const addNewDonationHistory = async (req, res) => {
+  try {
+    const { id: donorId } = req.params;
+    const { amount, donateDate, typeOfDonation } = req.body;
+
+    const donor = await Donor.findById(donorId);
+
+    if (!donor) {
+      return ResponseHandler.error(res, "Donor not found.", 404);
+    }
+
+    // Step 1: Push new updated donation entry
+    donor.donationHistory.push({ amount, donateDate, typeOfDonation });
+
+    // Step 2: Recalculate TotalDonation
+    donor.TotalDonation = donor.donationHistory.reduce(
+      (total, entry) => total + entry.amount,
+      0
+    );
+
+    // Step 3: Save the updated donor document
+    await donor.save();
+
+    invalidateCache("donors");
+
+    return ResponseHandler.success(res, "Donation history added.", donor);
+  } catch (error) {
+    console.error(error);
+    return ResponseHandler.error(res, "Server error.");
+  }
+};
+
+const editDonationHistory = async (req, res) => {
+  const { historyId, donorId } = req.params;
+  const { amount, donateDate, typeOfDonation } = req.body;
+  console.log(req.body);
+  console.log(req.params);
+
+  try {
+    const donor = await Donor.findById(donorId);
+    if (!donor) {
+      return ResponseHandler.error(res, "Donor not found.", 404);
+    }
+
+    // Find the specific donation history entry
+    const historyIndex = donor.donationHistory.findIndex(
+      (item) => item._id.toString() === historyId
+    );
+
+    if (historyIndex === -1) {
+      return ResponseHandler.error(res, "Donation history not found.", 404);
+    }
+
+    // Step 1: Push new updated donation entry
+    donor.donationHistory.push({ amount, donateDate, typeOfDonation });
+
+    // Step 2: Remove old donation history entry
+    donor.donationHistory.splice(historyIndex, 1);
+
+    // Step 3: Recalculate TotalDonation
+    donor.TotalDonation = donor.donationHistory.reduce(
+      (total, entry) => total + entry.amount,
+      0
+    );
+
+    // Step 4: Save the donor
+    await donor.save();
+
+    invalidateCache("donors");
+
+    return ResponseHandler.success(res, "Donation history updated.", donor);
+  } catch (error) {
+    console.error(error);
+    return ResponseHandler.error(res, "Server error.");
+  }
+};
+
+const deleteDonorHistory = async (req, res) => {
+  try {
+    const { donorId, historyId } = req.params;
+    const donor = await Donor.findById(donorId);
+
+    if (!donor) {
+      return ResponseHandler.error(res, "Donor not found.", 404);
+    }
+
+    // Find the specific donation history entry
+    const historyIndex = donor.donationHistory.findIndex(
+      (item) => item._id.toString() === historyId
+    );
+
+    if (historyIndex === -1) {
+      return ResponseHandler.error(res, "Donation history not found.", 404);
+    }
+
+    // Step 1: Remove the donation history entry
+    donor.donationHistory.splice(historyIndex, 1);
+
+    // Step 2: Recalculate TotalDonation
+    donor.TotalDonation = donor.donationHistory.reduce(
+      (total, entry) => total + entry.amount,
+      0
+    );
+
+    // Step 3: Save the donor
+    await donor.save();
+
+    invalidateCache("donors");
+
+    return ResponseHandler.success(res, "Donation history deleted.", donor);
+  } catch (error) {
+    console.error(error);
+    return ResponseHandler.error(res, "Server error.");
+  }
+};
+
+// get all donors controller function
 const getAllDonors = async (req, res) => {
   try {
     const { page, limit } = req.query;
@@ -260,4 +335,6 @@ module.exports = {
   editDonor,
   deleteDonor,
   editDonationHistory,
+  addNewDonationHistory,
+  deleteDonorHistory,
 };

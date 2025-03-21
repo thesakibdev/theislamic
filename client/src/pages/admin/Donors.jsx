@@ -3,8 +3,11 @@ import {
   useEditDonorMutation,
   useDeleteDonorMutation,
   useGetAllDonorsQuery,
+  useAddNewDonationHistoryMutation,
+  useEditDonationHistoryMutation,
+  useDeleteDonorHistoryMutation,
 } from "../../slices/admin/donor";
-import { FaAngleUp, FaRegEdit, FaTrash } from "react-icons/fa";
+import { FaAngleUp, FaRegEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import CommonForm from "@/components/common/Form";
 import { toast } from "react-toastify";
@@ -27,11 +30,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ImageUploader from "@/components/common/imageUploader";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 const initialFormData = {
   name: "",
@@ -53,11 +56,21 @@ const initialFormData = {
   donateDate: "",
 };
 
+const initialDonationHistoryData = {
+  amount: null,
+  donateDate: "",
+  typeOfDonation: "",
+};
+
 export default function Donors() {
   const [formData, setFormData] = useState(initialFormData);
+  const [donationHistoryData, setDonationHistoryData] = useState(
+    initialDonationHistoryData
+  );
 
   const [openAddDonorForm, setOpenAddDonorForm] = useState(false);
   const [openHistory, setOpenHistory] = useState({});
+  const [openDonationHistoryForm, setOpenDonationHistoryForm] = useState(false);
 
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
@@ -65,19 +78,21 @@ export default function Donors() {
   const [imageLoadingState, setImageLoadingState] = useState(false);
 
   const [currentEditedId, setCurrentEditedId] = useState(null);
-  const [donationHistoryId, setDonationHistoryId] = useState(false);
-  console.log(donationHistoryId);
+  const [donationHistoryId, setDonationHistoryId] = useState(null);
+  const [donorId, setDonorId] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading, refetch } = useGetAllDonorsQuery({
     page: currentPage,
     limit: 5,
   });
-  console.log(data);
 
   const [addDonor] = useAddDonorMutation();
   const [editDonor] = useEditDonorMutation();
   const [deleteDonor] = useDeleteDonorMutation();
+  const [addNewDonationHistory] = useAddNewDonationHistoryMutation();
+  const [editDonationHistory] = useEditDonationHistoryMutation();
+  const [deleteDonorHistory] = useDeleteDonorHistoryMutation();
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -86,6 +101,10 @@ export default function Donors() {
     setImagePublicId(null);
     setImageLoadingState(false);
     setOpenAddDonorForm(false);
+    setDonationHistoryData(initialDonationHistoryData);
+    setOpenDonationHistoryForm(false);
+    setDonationHistoryId(null);
+    setCurrentEditedId(null);
     console.log("Form Data Reset and Form Closed");
   };
 
@@ -139,6 +158,56 @@ export default function Donors() {
     }
   };
 
+  const handleDonationHistory = async (e) => {
+    e.preventDefault();
+    const donationAmount = Number(donationHistoryData.amount);
+    const updatedDonationHistoryData = {
+      amount: donationAmount,
+      donateDate: donationHistoryData.donateDate,
+      typeOfDonation: donationHistoryData.typeOfDonation,
+    };
+    console.log("updatedDonationHistoryData", updatedDonationHistoryData);
+    console.log("donorId", donorId);
+    console.log("donationHistoryId", donationHistoryId);
+    try {
+      if (donationHistoryId !== null) {
+        const editResponse = await editDonationHistory({
+          donorId,
+          historyId: donationHistoryId,
+          ...updatedDonationHistoryData,
+        }).unwrap();
+        resetForm();
+        setOpenDonationHistoryForm(false);
+        // Show success message from server
+        toast.success(
+          editResponse.message || "Donation history updated successfully!"
+        );
+      } else {
+        const addResponse = await addNewDonationHistory({
+          donorId,
+          ...updatedDonationHistoryData,
+        }).unwrap();
+        // Show success or error messages based on the response
+        if (addResponse.error) {
+          setOpenDonationHistoryForm(false);
+          console.log(addResponse.error);
+          toast.error(addResponse.error.message);
+        } else {
+          setOpenDonationHistoryForm(false);
+          toast.success(
+            addResponse.message || "Donation history added successfully!"
+          );
+          resetForm();
+        }
+      }
+    } catch (error) {
+      // Extract and display server error message or default message
+      const errorMessage = error.data?.message || "Error submitting data!";
+      console.error("Error submitting data:", error);
+      toast.error(errorMessage);
+    }
+  };
+
   const handleEditDonor = (donor) => {
     setOpenAddDonorForm(true);
     setCurrentEditedId(donor._id);
@@ -177,6 +246,30 @@ export default function Donors() {
         toast.success(deleteResponse.message || "Verse deleted successfully");
       } else {
         // User canceled the action
+        toast.info("Delete action canceled");
+      }
+    } catch (error) {
+      toast.error(error?.data?.message);
+    }
+  };
+
+  const handleDonorHistoryDelete = async (donorId, historyId) => {
+    console.log("donorId", donorId);
+    console.log("historyId", historyId);
+    try {
+      const userConfirmed = window.confirm(
+        "Are you sure you want to delete this donation history? This action cannot be undone."
+      );
+      if (userConfirmed) {
+        const deleteResponse = await deleteDonorHistory({
+          donorId,
+          historyId,
+        }).unwrap();
+        refetch();
+        toast.success(
+          deleteResponse.message || "Donation history deleted successfully"
+        );
+      } else {
         toast.info("Delete action canceled");
       }
     } catch (error) {
@@ -435,6 +528,20 @@ export default function Donors() {
                     </div>
                   </div>
                   <div className={openHistory[index] ? "block my-5" : "hidden"}>
+                    <div className="flex justify-end">
+                      <Button
+                        className="text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          resetForm();
+                          setDonorId(donor._id);
+                          setOpenDonationHistoryForm(true);
+                        }}
+                      >
+                        <FaPlus />
+                        <span>Add New Donation</span>
+                      </Button>
+                    </div>
                     {donor?.donationHistory?.map((donation, index) => (
                       <div
                         key={index}
@@ -448,7 +555,8 @@ export default function Donors() {
                             <span>Donate Date :</span> {donation.donateDate}
                           </p>
                           <p>
-                            <span>Donation Type :</span> {donor.typeOfDonation}
+                            <span>Donation Type :</span>{" "}
+                            {donation.typeOfDonation}
                           </p>
                         </div>
                         <div className="flex gap-3">
@@ -456,12 +564,24 @@ export default function Donors() {
                             className="bg-white border p-2 rounded-md text-black hover:bg-primary hover:text-white duration-300"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setDonationHistoryId(true);
+                              setOpenDonationHistoryForm(true);
+                              setDonationHistoryId(donation._id);
+                              setDonationHistoryData({
+                                amount: donation.amount,
+                                donateDate: donation.donateDate,
+                                typeOfDonation: donation.typeOfDonation,
+                              });
                             }}
                           >
                             <FaRegEdit />
                           </div>
-                          <div className="bg-red-500 border p-2 rounded-md text-white hover:bg-primary hover:text-black duration-300">
+                          <div
+                            className="bg-red-500 border p-2 rounded-md text-white hover:bg-primary hover:text-black duration-300"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDonorHistoryDelete(donor._id, donation._id);
+                            }}
+                          >
                             <FaTrash />
                           </div>
                         </div>
@@ -469,10 +589,10 @@ export default function Donors() {
                     ))}
                   </div>
                   <Dialog
-                    open={donationHistoryId}
+                    open={openDonationHistoryForm}
                     onOpenChange={(open) => {
                       if (!open) {
-                        setDonationHistoryId(false);
+                        setOpenDonationHistoryForm(false);
                       }
                     }}
                   >
@@ -481,34 +601,59 @@ export default function Donors() {
                         <DialogTitle>Edit Donation History</DialogTitle>
                       </DialogHeader>
 
-                      <form>
+                      <form onSubmit={handleDonationHistory}>
                         <div className="">
                           <Label htmlFor="amount">Amount</Label>
-                          <input
+                          <Input
                             type="text"
                             id="amount"
                             name="amount"
+                            value={donationHistoryData.amount}
+                            onChange={(e) =>
+                              setDonationHistoryData({
+                                ...donationHistoryData,
+                                amount: e.target.value,
+                              })
+                            }
                             className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
                           />
                         </div>
                         <div className="">
                           <Label htmlFor="date">Date</Label>
-                          <input
-                            type="text"
+                          <Input
+                            type="date"
                             id="date"
                             name="date"
+                            value={donationHistoryData.donateDate}
+                            onChange={(e) =>
+                              setDonationHistoryData({
+                                ...donationHistoryData,
+                                donateDate: e.target.value,
+                              })
+                            }
                             className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
                           />
                         </div>
                         <div className="">
                           <Label htmlFor="typeOfDonation">Donation Type</Label>
-                          <input
+                          <Input
                             type="text"
                             id="typeOfDonation"
                             name="typeOfDonation"
+                            value={donationHistoryData.typeOfDonation}
+                            onChange={(e) =>
+                              setDonationHistoryData({
+                                ...donationHistoryData,
+                                typeOfDonation: e.target.value,
+                              })
+                            }
                             className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
                           />
                         </div>
+
+                        <Button className="mt-3 text-white">
+                          {donationHistoryId ? "Update" : "Add"}
+                        </Button>
                       </form>
                     </DialogContent>
                   </Dialog>
