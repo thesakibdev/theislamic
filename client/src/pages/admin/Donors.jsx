@@ -166,9 +166,6 @@ export default function Donors() {
       donateDate: donationHistoryData.donateDate,
       typeOfDonation: donationHistoryData.typeOfDonation,
     };
-    console.log("updatedDonationHistoryData", updatedDonationHistoryData);
-    console.log("donorId", donorId);
-    console.log("donationHistoryId", donationHistoryId);
     try {
       if (donationHistoryId !== null) {
         const editResponse = await editDonationHistory({
@@ -254,8 +251,6 @@ export default function Donors() {
   };
 
   const handleDonorHistoryDelete = async (donorId, historyId) => {
-    console.log("donorId", donorId);
-    console.log("historyId", historyId);
     try {
       const userConfirmed = window.confirm(
         "Are you sure you want to delete this donation history? This action cannot be undone."

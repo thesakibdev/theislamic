@@ -202,8 +202,6 @@ const addNewDonationHistory = async (req, res) => {
 const editDonationHistory = async (req, res) => {
   const { historyId, donorId } = req.params;
   const { amount, donateDate, typeOfDonation } = req.body;
-  console.log(req.body);
-  console.log(req.params);
 
   try {
     const donor = await Donor.findById(donorId);
