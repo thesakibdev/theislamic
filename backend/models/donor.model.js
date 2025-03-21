@@ -13,7 +13,6 @@ const donorSchema = new mongoose.Schema({
   city: { type: String, default: "Not Provided" },
   country: { type: String, required: true },
   TotalDonation: { type: Number, required: true, default: 0 },
-  typeOfDonation: { type: String, required: true },
   avatar: { type: String, default: "" },
   avatarId: { type: String, default: "" },
   isDetailsVisible: { type: Boolean, default: true },
@@ -22,6 +21,7 @@ const donorSchema = new mongoose.Schema({
     {
       amount: { type: Number, required: true },
       donateDate: { type: String, required: true },
+      typeOfDonation: { type: String, required: true },
     },
   ],
 });

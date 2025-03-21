@@ -3,8 +3,12 @@ import {
   useEditDonorMutation,
   useDeleteDonorMutation,
   useGetAllDonorsQuery,
+  useAddNewDonationHistoryMutation,
+  useEditDonationHistoryMutation,
+  useDeleteDonorHistoryMutation,
 } from "../../slices/admin/donor";
-import { useState } from "react";
+import { FaAngleUp, FaRegEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { useEffect, useState } from "react";
 import CommonForm from "@/components/common/Form";
 import { toast } from "react-toastify";
 import {
@@ -21,9 +25,16 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ImageUploader from "@/components/common/imageUploader";
-import ArrowDown from "../../assets/icon/arrow-down.png";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 const initialFormData = {
   name: "",
@@ -45,18 +56,30 @@ const initialFormData = {
   donateDate: "",
 };
 
+const initialDonationHistoryData = {
+  amount: null,
+  donateDate: "",
+  typeOfDonation: "",
+};
+
 export default function Donors() {
   const [formData, setFormData] = useState(initialFormData);
+  const [donationHistoryData, setDonationHistoryData] = useState(
+    initialDonationHistoryData
+  );
 
   const [openAddDonorForm, setOpenAddDonorForm] = useState(false);
+  const [openHistory, setOpenHistory] = useState({});
+  const [openDonationHistoryForm, setOpenDonationHistoryForm] = useState(false);
+
   const [imageFile, setImageFile] = useState(null);
-
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
-
   const [imagePublicId, setImagePublicId] = useState(null);
-
   const [imageLoadingState, setImageLoadingState] = useState(false);
+
   const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [donationHistoryId, setDonationHistoryId] = useState(null);
+  const [donorId, setDonorId] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading, refetch } = useGetAllDonorsQuery({
@@ -67,6 +90,9 @@ export default function Donors() {
   const [addDonor] = useAddDonorMutation();
   const [editDonor] = useEditDonorMutation();
   const [deleteDonor] = useDeleteDonorMutation();
+  const [addNewDonationHistory] = useAddNewDonationHistoryMutation();
+  const [editDonationHistory] = useEditDonationHistoryMutation();
+  const [deleteDonorHistory] = useDeleteDonorHistoryMutation();
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -75,6 +101,10 @@ export default function Donors() {
     setImagePublicId(null);
     setImageLoadingState(false);
     setOpenAddDonorForm(false);
+    setDonationHistoryData(initialDonationHistoryData);
+    setOpenDonationHistoryForm(false);
+    setDonationHistoryId(null);
+    setCurrentEditedId(null);
     console.log("Form Data Reset and Form Closed");
   };
 
@@ -128,6 +158,53 @@ export default function Donors() {
     }
   };
 
+  const handleDonationHistory = async (e) => {
+    e.preventDefault();
+    const donationAmount = Number(donationHistoryData.amount);
+    const updatedDonationHistoryData = {
+      amount: donationAmount,
+      donateDate: donationHistoryData.donateDate,
+      typeOfDonation: donationHistoryData.typeOfDonation,
+    };
+    try {
+      if (donationHistoryId !== null) {
+        const editResponse = await editDonationHistory({
+          donorId,
+          historyId: donationHistoryId,
+          ...updatedDonationHistoryData,
+        }).unwrap();
+        resetForm();
+        setOpenDonationHistoryForm(false);
+        // Show success message from server
+        toast.success(
+          editResponse.message || "Donation history updated successfully!"
+        );
+      } else {
+        const addResponse = await addNewDonationHistory({
+          donorId,
+          ...updatedDonationHistoryData,
+        }).unwrap();
+        // Show success or error messages based on the response
+        if (addResponse.error) {
+          setOpenDonationHistoryForm(false);
+          console.log(addResponse.error);
+          toast.error(addResponse.error.message);
+        } else {
+          setOpenDonationHistoryForm(false);
+          toast.success(
+            addResponse.message || "Donation history added successfully!"
+          );
+          resetForm();
+        }
+      }
+    } catch (error) {
+      // Extract and display server error message or default message
+      const errorMessage = error.data?.message || "Error submitting data!";
+      console.error("Error submitting data:", error);
+      toast.error(errorMessage);
+    }
+  };
+
   const handleEditDonor = (donor) => {
     setOpenAddDonorForm(true);
     setCurrentEditedId(donor._id);
@@ -149,6 +226,7 @@ export default function Donors() {
       isDetailsVisible: donor.isDetailsVisible,
       donateDate: donor.donateDate,
     });
+    setOpenHistory((prev) => ({ ...prev }));
   };
 
   const handleDeleteDonor = async (donorId) => {
@@ -165,6 +243,28 @@ export default function Donors() {
         toast.success(deleteResponse.message || "Verse deleted successfully");
       } else {
         // User canceled the action
+        toast.info("Delete action canceled");
+      }
+    } catch (error) {
+      toast.error(error?.data?.message);
+    }
+  };
+
+  const handleDonorHistoryDelete = async (donorId, historyId) => {
+    try {
+      const userConfirmed = window.confirm(
+        "Are you sure you want to delete this donation history? This action cannot be undone."
+      );
+      if (userConfirmed) {
+        const deleteResponse = await deleteDonorHistory({
+          donorId,
+          historyId,
+        }).unwrap();
+        refetch();
+        toast.success(
+          deleteResponse.message || "Donation history deleted successfully"
+        );
+      } else {
         toast.info("Delete action canceled");
       }
     } catch (error) {
@@ -280,13 +380,16 @@ export default function Donors() {
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
-  const [openHistory, setOpenHistory] = useState({});
   const toggleDonationHistory = (index) => {
     setOpenHistory((prev) => ({
       ...prev,
       [index]: !prev[index],
     }));
   };
+
+  useEffect(() => {
+    setOpenHistory((prev) => ({ ...prev }));
+  }, [openAddDonorForm]);
 
   return (
     <>
@@ -314,217 +417,248 @@ export default function Donors() {
               <p>Loading...</p>
             ) : data?.donors?.length > 0 ? (
               data?.donors?.map((donor, index) => (
-                // <div
-                //   key={donor.name}
-                //   className="border p-4 grid grid-cols-1 md:grid-cols-5 my-6 gap-5 rounded-md relative"
-                //   onClick={() => toggleDonationHistory(index)}
-                // >
-                //   <div className="md:col-span-1 overflow-hidden rounded-md">
-                //     {donor.avatar === "" ? (
-                //       <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
-                //     ) : (
-                //       <div className="max-h-[400px] md:max-h-[200px] w-full object-fill">
-                //         <img
-                //           src={donor.avatar}
-                //           alt={donor.name}
-                //           className="rounded-md h-full w-full object-cover mx-auto md:mx-0"
-                //         />
-                //       </div>
-                //     )}
-                //   </div>
-                //   <div className="md:col-span-4">
-                //     <div className="flex justify-between items-center">
-                //       <p className="text-xl md:text-2xl font-bold mb-2">
-                //         Name: {donor.name}
-                //       </p>
-                //       <div className="flex gap-2">
-                //         <Button
-                //           className="bg-primary text-white"
-                //           onClick={() => handleEditDonor(donor)}
-                //         >
-                //           Edit
-                //         </Button>
-                //         <Button
-                //           variant="destructive"
-                //           onClick={() => handleDeleteDonor(donor._id)}
-                //         >
-                //           Delete
-                //         </Button>
-                //       </div>
-                //     </div>
-
-                //     <div className="grid md:grid-cols-2 gap-y-3 gap-x-10">
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           Profession:
-                //         </span>{" "}
-                //         {donor.profession}
-                //       </p>
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           Company:
-                //         </span>{" "}
-                //         {donor.companyName}
-                //       </p>
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           Designation:{" "}
-                //         </span>
-                //         {donor.designation}
-                //       </p>
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           Street:
-                //         </span>{" "}
-                //         {donor.street}
-                //       </p>
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           City:
-                //         </span>{" "}
-                //         {donor.city}
-                //       </p>
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           Country:
-                //         </span>{" "}
-                //         {donor.country}
-                //       </p>
-                //       <div className="grid grid-cols-2 justify-between">
-                //         <p className="text-lg text-black/50">
-                //           <span className="font-semibold text-black/60">
-                //             Total Donation:
-                //           </span>{" "}
-                //           {donor.TotalDonation}
-                //         </p>
-                //         <img
-                //           className={`transition-transform ${
-                //             openHistory[index] ? "rotate-180" : ""
-                //           }`}
-                //           src={ArrowDown}
-                //           alt="Arrow Down"
-                //         />
-                //       </div>
-                //     </div>
-                //     <div
-                //       className={openHistory[index] ? "block my-5" : "hidden"}
-                //     >
-                //       {donor?.donationHistory?.map((donation, index) => (
-                //         <div key={index}>{donation.amount}</div>
-                //       ))}
-                //     </div>
-                //   </div>
-                // </div>
-
                 <div
-                  id="Donor"
                   key={donor.name}
-                  className="border p-4 flex flex-col md:flex-row my-6 gap-5 rounded-md relative"
+                  className="border p-4 rounded-md mt-3 md:mt-5 relative"
                   onClick={() => toggleDonationHistory(index)}
                 >
-                  <div className="w-full md:max-w-[190px] md:w-1/4 overflow-hidden rounded-md">
-                    {donor.avatar === "" ? (
-                      <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
-                    ) : (
-                      <div
-                        className="h-96 md:h-[220px] w-full bg-cover bg-center rounded-md"
-                        style={{ backgroundImage: `url(${donor.avatar})` }}
-                      ></div>
-                    )}
-                  </div>
-                  <div className="w-full md:w-3/4">
-                    <div className="flex justify-between items-center mb-1">
-                      <p className="text-xl md:text-2xl font-bold mb-2">
-                        Name: {donor.name}
-                      </p>
-                      <div className="flex gap-2">
-                        <Button
-                          className="bg-primary text-white"
-                          onClick={() => handleEditDonor(donor)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={() => handleDeleteDonor(donor._id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
+                  <div
+                    id="Donor"
+                    className="flex flex-col md:flex-row my-3 gap-5 rounded-md"
+                  >
+                    <div className="w-full md:max-w-[190px] md:w-1/4 overflow-hidden">
+                      {donor.avatar === "" ? (
+                        <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
+                      ) : (
+                        <div
+                          className="h-96 md:h-[220px] w-full bg-cover bg-center rounded-md"
+                          style={{ backgroundImage: `url(${donor.avatar})` }}
+                        ></div>
+                      )}
                     </div>
-                    <div className="flex gap-y-3 gap-x-5 ">
-                      <div className="w-1/2 flex flex-col gap-y-3">
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            Profession:
-                          </span>{" "}
-                          {donor.profession}
+                    <div className="w-full md:w-3/4">
+                      <div className="flex justify-between items-center mb-1">
+                        <p className="text-xl md:text-2xl font-bold mb-2">
+                          Name: {donor.name}
                         </p>
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            Designation:{" "}
-                          </span>
-                          {donor.designation}
-                        </p>
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            City:
-                          </span>{" "}
-                          {donor.city}
-                        </p>
-                        <div className="grid grid-cols-2 justify-between">
-                          <p className="text-lg text-black/50">
-                            <span className="font-semibold text-black/60">
-                              Total Donation:
-                            </span>{" "}
-                            {donor.TotalDonation}
-                          </p>
-                          <img
-                            className={`transition-transform ${
-                              openHistory[index] ? "rotate-180" : ""
-                            }`}
-                            src={ArrowDown}
-                            alt="Arrow Down"
-                          />
+                        <div className="flex gap-2">
+                          <Button
+                            className="bg-primary text-white"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditDonor(donor);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteDonor(donor._id);
+                            }}
+                          >
+                            Delete
+                          </Button>
                         </div>
                       </div>
-                      <div className="w-1/2 flex flex-col gap-y-3">
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            Company:
-                          </span>{" "}
-                          {donor.companyName}
-                        </p>
+                      <div className="flex gap-y-3 gap-x-5 ">
+                        <div className="w-1/2 flex flex-col gap-y-3">
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Profession:
+                            </span>{" "}
+                            {donor.profession}
+                          </p>
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Designation:{" "}
+                            </span>
+                            {donor.designation}
+                          </p>
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              City:
+                            </span>{" "}
+                            {donor.city}
+                          </p>
+                          <div className="flex items-center gap-3 cursor-pointer group">
+                            <p className="text-lg text-black/50">
+                              <span className="font-semibold text-black/60">
+                                Total Donation:
+                              </span>{" "}
+                              {donor.TotalDonation}
+                            </p>
+                            <FaAngleUp
+                              className={`transition-transform ${
+                                openHistory[index] ? "rotate-180" : ""
+                              } group-hover:text-primary duration-300`}
+                              alt="Arrow Down"
+                            />
+                          </div>
+                        </div>
+                        <div className="w-1/2 flex flex-col gap-y-3">
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Company:
+                            </span>{" "}
+                            {donor.companyName}
+                          </p>
 
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            Street:
-                          </span>{" "}
-                          {donor.street}
-                        </p>
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Street:
+                            </span>{" "}
+                            {donor.street}
+                          </p>
 
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            Country:
-                          </span>{" "}
-                          {donor.country}
-                        </p>
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Country:
+                            </span>{" "}
+                            {donor.country}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-
                   <div className={openHistory[index] ? "block my-5" : "hidden"}>
+                    <div className="flex justify-end">
+                      <Button
+                        className="text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          resetForm();
+                          setDonorId(donor._id);
+                          setOpenDonationHistoryForm(true);
+                        }}
+                      >
+                        <FaPlus />
+                        <span>Add New Donation</span>
+                      </Button>
+                    </div>
                     {donor?.donationHistory?.map((donation, index) => (
-                      <div key={index}>{donation.amount}</div>
+                      <div
+                        key={index}
+                        className="border p-4 rounded-md mt-3 flex justify-between cursor-pointer"
+                      >
+                        <div className="flex gap-5">
+                          <p>
+                            <span>Amount :</span> {donation.amount}
+                          </p>
+                          <p>
+                            <span>Donate Date :</span> {donation.donateDate}
+                          </p>
+                          <p>
+                            <span>Donation Type :</span>{" "}
+                            {donation.typeOfDonation}
+                          </p>
+                        </div>
+                        <div className="flex gap-3">
+                          <div
+                            className="bg-white border p-2 rounded-md text-black hover:bg-primary hover:text-white duration-300"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenDonationHistoryForm(true);
+                              setDonationHistoryId(donation._id);
+                              setDonationHistoryData({
+                                amount: donation.amount,
+                                donateDate: donation.donateDate,
+                                typeOfDonation: donation.typeOfDonation,
+                              });
+                            }}
+                          >
+                            <FaRegEdit />
+                          </div>
+                          <div
+                            className="bg-red-500 border p-2 rounded-md text-white hover:bg-primary hover:text-black duration-300"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDonorHistoryDelete(donor._id, donation._id);
+                            }}
+                          >
+                            <FaTrash />
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </div>
+                  <Dialog
+                    open={openDonationHistoryForm}
+                    onOpenChange={(open) => {
+                      if (!open) {
+                        setOpenDonationHistoryForm(false);
+                      }
+                    }}
+                  >
+                    <DialogContent onClick={(event) => event.stopPropagation()}>
+                      <DialogHeader>
+                        <DialogTitle>Edit Donation History</DialogTitle>
+                      </DialogHeader>
+
+                      <form onSubmit={handleDonationHistory}>
+                        <div className="">
+                          <Label htmlFor="amount">Amount</Label>
+                          <Input
+                            type="text"
+                            id="amount"
+                            name="amount"
+                            value={donationHistoryData.amount}
+                            onChange={(e) =>
+                              setDonationHistoryData({
+                                ...donationHistoryData,
+                                amount: e.target.value,
+                              })
+                            }
+                            className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                        <div className="">
+                          <Label htmlFor="date">Date</Label>
+                          <Input
+                            type="date"
+                            id="date"
+                            name="date"
+                            value={donationHistoryData.donateDate}
+                            onChange={(e) =>
+                              setDonationHistoryData({
+                                ...donationHistoryData,
+                                donateDate: e.target.value,
+                              })
+                            }
+                            className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                        <div className="">
+                          <Label htmlFor="typeOfDonation">Donation Type</Label>
+                          <Input
+                            type="text"
+                            id="typeOfDonation"
+                            name="typeOfDonation"
+                            value={donationHistoryData.typeOfDonation}
+                            onChange={(e) =>
+                              setDonationHistoryData({
+                                ...donationHistoryData,
+                                typeOfDonation: e.target.value,
+                              })
+                            }
+                            className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+
+                        <Button className="mt-3 text-white">
+                          {donationHistoryId ? "Update" : "Add"}
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               ))
             ) : (
               <p>No Donors Found</p>
             )}
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-3 md:mt-5">
             <Pagination className="px-4">
               <PaginationContent>
                 <PaginationItem>
