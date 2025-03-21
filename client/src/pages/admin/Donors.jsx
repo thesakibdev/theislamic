@@ -4,7 +4,8 @@ import {
   useDeleteDonorMutation,
   useGetAllDonorsQuery,
 } from "../../slices/admin/donor";
-import { useState } from "react";
+import { FaAngleUp, FaRegEdit, FaTrash } from "react-icons/fa";
+import { useEffect, useState } from "react";
 import CommonForm from "@/components/common/Form";
 import { toast } from "react-toastify";
 import {
@@ -21,9 +22,16 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ImageUploader from "@/components/common/imageUploader";
-import ArrowDown from "../../assets/icon/arrow-down.png";
+import { Label } from "@/components/ui/label";
 
 const initialFormData = {
   name: "",
@@ -49,20 +57,23 @@ export default function Donors() {
   const [formData, setFormData] = useState(initialFormData);
 
   const [openAddDonorForm, setOpenAddDonorForm] = useState(false);
+  const [openHistory, setOpenHistory] = useState({});
+
   const [imageFile, setImageFile] = useState(null);
-
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
-
   const [imagePublicId, setImagePublicId] = useState(null);
-
   const [imageLoadingState, setImageLoadingState] = useState(false);
+
   const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [donationHistoryId, setDonationHistoryId] = useState(false);
+  console.log(donationHistoryId);
 
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading, refetch } = useGetAllDonorsQuery({
     page: currentPage,
     limit: 5,
   });
+  console.log(data);
 
   const [addDonor] = useAddDonorMutation();
   const [editDonor] = useEditDonorMutation();
@@ -149,6 +160,7 @@ export default function Donors() {
       isDetailsVisible: donor.isDetailsVisible,
       donateDate: donor.donateDate,
     });
+    setOpenHistory((prev) => ({ ...prev }));
   };
 
   const handleDeleteDonor = async (donorId) => {
@@ -280,13 +292,16 @@ export default function Donors() {
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
-  const [openHistory, setOpenHistory] = useState({});
   const toggleDonationHistory = (index) => {
     setOpenHistory((prev) => ({
       ...prev,
       [index]: !prev[index],
     }));
   };
+
+  useEffect(() => {
+    setOpenHistory((prev) => ({ ...prev }));
+  }, [openAddDonorForm]);
 
   return (
     <>
@@ -314,217 +329,196 @@ export default function Donors() {
               <p>Loading...</p>
             ) : data?.donors?.length > 0 ? (
               data?.donors?.map((donor, index) => (
-                // <div
-                //   key={donor.name}
-                //   className="border p-4 grid grid-cols-1 md:grid-cols-5 my-6 gap-5 rounded-md relative"
-                //   onClick={() => toggleDonationHistory(index)}
-                // >
-                //   <div className="md:col-span-1 overflow-hidden rounded-md">
-                //     {donor.avatar === "" ? (
-                //       <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
-                //     ) : (
-                //       <div className="max-h-[400px] md:max-h-[200px] w-full object-fill">
-                //         <img
-                //           src={donor.avatar}
-                //           alt={donor.name}
-                //           className="rounded-md h-full w-full object-cover mx-auto md:mx-0"
-                //         />
-                //       </div>
-                //     )}
-                //   </div>
-                //   <div className="md:col-span-4">
-                //     <div className="flex justify-between items-center">
-                //       <p className="text-xl md:text-2xl font-bold mb-2">
-                //         Name: {donor.name}
-                //       </p>
-                //       <div className="flex gap-2">
-                //         <Button
-                //           className="bg-primary text-white"
-                //           onClick={() => handleEditDonor(donor)}
-                //         >
-                //           Edit
-                //         </Button>
-                //         <Button
-                //           variant="destructive"
-                //           onClick={() => handleDeleteDonor(donor._id)}
-                //         >
-                //           Delete
-                //         </Button>
-                //       </div>
-                //     </div>
-
-                //     <div className="grid md:grid-cols-2 gap-y-3 gap-x-10">
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           Profession:
-                //         </span>{" "}
-                //         {donor.profession}
-                //       </p>
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           Company:
-                //         </span>{" "}
-                //         {donor.companyName}
-                //       </p>
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           Designation:{" "}
-                //         </span>
-                //         {donor.designation}
-                //       </p>
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           Street:
-                //         </span>{" "}
-                //         {donor.street}
-                //       </p>
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           City:
-                //         </span>{" "}
-                //         {donor.city}
-                //       </p>
-                //       <p className="text-lg text-black/50">
-                //         <span className="font-semibold text-black/60">
-                //           Country:
-                //         </span>{" "}
-                //         {donor.country}
-                //       </p>
-                //       <div className="grid grid-cols-2 justify-between">
-                //         <p className="text-lg text-black/50">
-                //           <span className="font-semibold text-black/60">
-                //             Total Donation:
-                //           </span>{" "}
-                //           {donor.TotalDonation}
-                //         </p>
-                //         <img
-                //           className={`transition-transform ${
-                //             openHistory[index] ? "rotate-180" : ""
-                //           }`}
-                //           src={ArrowDown}
-                //           alt="Arrow Down"
-                //         />
-                //       </div>
-                //     </div>
-                //     <div
-                //       className={openHistory[index] ? "block my-5" : "hidden"}
-                //     >
-                //       {donor?.donationHistory?.map((donation, index) => (
-                //         <div key={index}>{donation.amount}</div>
-                //       ))}
-                //     </div>
-                //   </div>
-                // </div>
-
                 <div
-                  id="Donor"
                   key={donor.name}
-                  className="border p-4 flex flex-col md:flex-row my-6 gap-5 rounded-md relative"
+                  className="border p-4 rounded-md mt-3 md:mt-5 relative"
                   onClick={() => toggleDonationHistory(index)}
                 >
-                  <div className="w-full md:max-w-[190px] md:w-1/4 overflow-hidden rounded-md">
-                    {donor.avatar === "" ? (
-                      <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
-                    ) : (
-                      <div
-                        className="h-96 md:h-[220px] w-full bg-cover bg-center rounded-md"
-                        style={{ backgroundImage: `url(${donor.avatar})` }}
-                      ></div>
-                    )}
-                  </div>
-                  <div className="w-full md:w-3/4">
-                    <div className="flex justify-between items-center mb-1">
-                      <p className="text-xl md:text-2xl font-bold mb-2">
-                        Name: {donor.name}
-                      </p>
-                      <div className="flex gap-2">
-                        <Button
-                          className="bg-primary text-white"
-                          onClick={() => handleEditDonor(donor)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={() => handleDeleteDonor(donor._id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
+                  <div
+                    id="Donor"
+                    className="flex flex-col md:flex-row my-3 gap-5 rounded-md"
+                  >
+                    <div className="w-full md:max-w-[190px] md:w-1/4 overflow-hidden">
+                      {donor.avatar === "" ? (
+                        <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
+                      ) : (
+                        <div
+                          className="h-96 md:h-[220px] w-full bg-cover bg-center rounded-md"
+                          style={{ backgroundImage: `url(${donor.avatar})` }}
+                        ></div>
+                      )}
                     </div>
-                    <div className="flex gap-y-3 gap-x-5 ">
-                      <div className="w-1/2 flex flex-col gap-y-3">
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            Profession:
-                          </span>{" "}
-                          {donor.profession}
+                    <div className="w-full md:w-3/4">
+                      <div className="flex justify-between items-center mb-1">
+                        <p className="text-xl md:text-2xl font-bold mb-2">
+                          Name: {donor.name}
                         </p>
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            Designation:{" "}
-                          </span>
-                          {donor.designation}
-                        </p>
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            City:
-                          </span>{" "}
-                          {donor.city}
-                        </p>
-                        <div className="grid grid-cols-2 justify-between">
-                          <p className="text-lg text-black/50">
-                            <span className="font-semibold text-black/60">
-                              Total Donation:
-                            </span>{" "}
-                            {donor.TotalDonation}
-                          </p>
-                          <img
-                            className={`transition-transform ${
-                              openHistory[index] ? "rotate-180" : ""
-                            }`}
-                            src={ArrowDown}
-                            alt="Arrow Down"
-                          />
+                        <div className="flex gap-2">
+                          <Button
+                            className="bg-primary text-white"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditDonor(donor);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteDonor(donor._id);
+                            }}
+                          >
+                            Delete
+                          </Button>
                         </div>
                       </div>
-                      <div className="w-1/2 flex flex-col gap-y-3">
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            Company:
-                          </span>{" "}
-                          {donor.companyName}
-                        </p>
+                      <div className="flex gap-y-3 gap-x-5 ">
+                        <div className="w-1/2 flex flex-col gap-y-3">
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Profession:
+                            </span>{" "}
+                            {donor.profession}
+                          </p>
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Designation:{" "}
+                            </span>
+                            {donor.designation}
+                          </p>
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              City:
+                            </span>{" "}
+                            {donor.city}
+                          </p>
+                          <div className="flex items-center gap-3 cursor-pointer group">
+                            <p className="text-lg text-black/50">
+                              <span className="font-semibold text-black/60">
+                                Total Donation:
+                              </span>{" "}
+                              {donor.TotalDonation}
+                            </p>
+                            <FaAngleUp
+                              className={`transition-transform ${
+                                openHistory[index] ? "rotate-180" : ""
+                              } group-hover:text-primary duration-300`}
+                              alt="Arrow Down"
+                            />
+                          </div>
+                        </div>
+                        <div className="w-1/2 flex flex-col gap-y-3">
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Company:
+                            </span>{" "}
+                            {donor.companyName}
+                          </p>
 
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            Street:
-                          </span>{" "}
-                          {donor.street}
-                        </p>
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Street:
+                            </span>{" "}
+                            {donor.street}
+                          </p>
 
-                        <p className="text-lg text-black/50">
-                          <span className="font-semibold text-black/60">
-                            Country:
-                          </span>{" "}
-                          {donor.country}
-                        </p>
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Country:
+                            </span>{" "}
+                            {donor.country}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-
                   <div className={openHistory[index] ? "block my-5" : "hidden"}>
                     {donor?.donationHistory?.map((donation, index) => (
-                      <div key={index}>{donation.amount}</div>
+                      <div
+                        key={index}
+                        className="border p-4 rounded-md mt-3 flex justify-between cursor-pointer"
+                      >
+                        <div className="flex gap-5">
+                          <p>
+                            <span>Amount :</span> {donation.amount}
+                          </p>
+                          <p>
+                            <span>Donate Date :</span> {donation.donateDate}
+                          </p>
+                          <p>
+                            <span>Donation Type :</span> {donor.typeOfDonation}
+                          </p>
+                        </div>
+                        <div className="flex gap-3">
+                          <div
+                            className="bg-white border p-2 rounded-md text-black hover:bg-primary hover:text-white duration-300"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDonationHistoryId(true);
+                            }}
+                          >
+                            <FaRegEdit />
+                          </div>
+                          <div className="bg-red-500 border p-2 rounded-md text-white hover:bg-primary hover:text-black duration-300">
+                            <FaTrash />
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </div>
+                  <Dialog
+                    open={donationHistoryId}
+                    onOpenChange={(open) => {
+                      if (!open) {
+                        setDonationHistoryId(false);
+                      }
+                    }}
+                  >
+                    <DialogContent onClick={(event) => event.stopPropagation()}>
+                      <DialogHeader>
+                        <DialogTitle>Edit Donation History</DialogTitle>
+                      </DialogHeader>
+
+                      <form>
+                        <div className="">
+                          <Label htmlFor="amount">Amount</Label>
+                          <input
+                            type="text"
+                            id="amount"
+                            name="amount"
+                            className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                        <div className="">
+                          <Label htmlFor="date">Date</Label>
+                          <input
+                            type="text"
+                            id="date"
+                            name="date"
+                            className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                        <div className="">
+                          <Label htmlFor="typeOfDonation">Donation Type</Label>
+                          <input
+                            type="text"
+                            id="typeOfDonation"
+                            name="typeOfDonation"
+                            className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               ))
             ) : (
               <p>No Donors Found</p>
             )}
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-3 md:mt-5">
             <Pagination className="px-4">
               <PaginationContent>
                 <PaginationItem>
