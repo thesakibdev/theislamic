@@ -10,7 +10,6 @@ const {
   addVerseOtherData,
   editVerseOtherData,
   deleteVerseOtherData,
-  getVerseOtherData,
 
   // get main surahs
   getAllSurahs,
@@ -35,7 +34,6 @@ router.delete(
   "/surah/verse-other-data/:surahNumber/:verseNumber/:language",
   deleteVerseOtherData
 );
-router.get("/surah/verse-other-data/all", getVerseOtherData);
 
 router.get("/surah/all", getAllSurahs);
 router.get("/surah/all-name", getSurahsName);

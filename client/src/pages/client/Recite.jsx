@@ -189,8 +189,8 @@ export default function RecitePage() {
                                 </span>
 
                                 <p className="text-left text-sm sm:text-base md:text-2xl w-[90%]">
-                                  {verse?.verseOtherData?.translation}{" "}
-                                  {verse?.verseNumber}
+                                  {verse?.verseNumber}{" "}
+                                  {verse?.verseOtherData?.transliteration}
                                 </p>
                               </div>
                             ))}
