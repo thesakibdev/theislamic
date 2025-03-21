@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import ImageUploader from "@/components/common/imageUploader";
+import ArrowDown from "../../assets/icon/arrow-down.png";
 
 const initialFormData = {
   name: "",
@@ -46,21 +47,21 @@ const initialFormData = {
 
 export default function Donors() {
   const [formData, setFormData] = useState(initialFormData);
-  console.log("formData", formData);
+
   const [openAddDonorForm, setOpenAddDonorForm] = useState(false);
   const [imageFile, setImageFile] = useState(null);
-  console.log("imageFile", imageFile);
+
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
-  console.log("uploadedImageUrl", uploadedImageUrl);
+
   const [imagePublicId, setImagePublicId] = useState(null);
-  console.log("imagePublicId", imagePublicId);
+
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading, refetch } = useGetAllDonorsQuery({
     page: currentPage,
-    limit: 10,
+    limit: 5,
   });
 
   const [addDonor] = useAddDonorMutation();
@@ -279,6 +280,14 @@ export default function Donors() {
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
+  const [openHistory, setOpenHistory] = useState({});
+  const toggleDonationHistory = (index) => {
+    setOpenHistory((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
   return (
     <>
       <div className="p-12">
@@ -304,26 +313,127 @@ export default function Donors() {
             {isLoading ? (
               <p>Loading...</p>
             ) : data?.donors?.length > 0 ? (
-              data?.donors?.map((donor) => (
+              data?.donors?.map((donor, index) => (
+                // <div
+                //   key={donor.name}
+                //   className="border p-4 grid grid-cols-1 md:grid-cols-5 my-6 gap-5 rounded-md relative"
+                //   onClick={() => toggleDonationHistory(index)}
+                // >
+                //   <div className="md:col-span-1 overflow-hidden rounded-md">
+                //     {donor.avatar === "" ? (
+                //       <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
+                //     ) : (
+                //       <div className="max-h-[400px] md:max-h-[200px] w-full object-fill">
+                //         <img
+                //           src={donor.avatar}
+                //           alt={donor.name}
+                //           className="rounded-md h-full w-full object-cover mx-auto md:mx-0"
+                //         />
+                //       </div>
+                //     )}
+                //   </div>
+                //   <div className="md:col-span-4">
+                //     <div className="flex justify-between items-center">
+                //       <p className="text-xl md:text-2xl font-bold mb-2">
+                //         Name: {donor.name}
+                //       </p>
+                //       <div className="flex gap-2">
+                //         <Button
+                //           className="bg-primary text-white"
+                //           onClick={() => handleEditDonor(donor)}
+                //         >
+                //           Edit
+                //         </Button>
+                //         <Button
+                //           variant="destructive"
+                //           onClick={() => handleDeleteDonor(donor._id)}
+                //         >
+                //           Delete
+                //         </Button>
+                //       </div>
+                //     </div>
+
+                //     <div className="grid md:grid-cols-2 gap-y-3 gap-x-10">
+                //       <p className="text-lg text-black/50">
+                //         <span className="font-semibold text-black/60">
+                //           Profession:
+                //         </span>{" "}
+                //         {donor.profession}
+                //       </p>
+                //       <p className="text-lg text-black/50">
+                //         <span className="font-semibold text-black/60">
+                //           Company:
+                //         </span>{" "}
+                //         {donor.companyName}
+                //       </p>
+                //       <p className="text-lg text-black/50">
+                //         <span className="font-semibold text-black/60">
+                //           Designation:{" "}
+                //         </span>
+                //         {donor.designation}
+                //       </p>
+                //       <p className="text-lg text-black/50">
+                //         <span className="font-semibold text-black/60">
+                //           Street:
+                //         </span>{" "}
+                //         {donor.street}
+                //       </p>
+                //       <p className="text-lg text-black/50">
+                //         <span className="font-semibold text-black/60">
+                //           City:
+                //         </span>{" "}
+                //         {donor.city}
+                //       </p>
+                //       <p className="text-lg text-black/50">
+                //         <span className="font-semibold text-black/60">
+                //           Country:
+                //         </span>{" "}
+                //         {donor.country}
+                //       </p>
+                //       <div className="grid grid-cols-2 justify-between">
+                //         <p className="text-lg text-black/50">
+                //           <span className="font-semibold text-black/60">
+                //             Total Donation:
+                //           </span>{" "}
+                //           {donor.TotalDonation}
+                //         </p>
+                //         <img
+                //           className={`transition-transform ${
+                //             openHistory[index] ? "rotate-180" : ""
+                //           }`}
+                //           src={ArrowDown}
+                //           alt="Arrow Down"
+                //         />
+                //       </div>
+                //     </div>
+                //     <div
+                //       className={openHistory[index] ? "block my-5" : "hidden"}
+                //     >
+                //       {donor?.donationHistory?.map((donation, index) => (
+                //         <div key={index}>{donation.amount}</div>
+                //       ))}
+                //     </div>
+                //   </div>
+                // </div>
+
                 <div
+                  id="Donor"
                   key={donor.name}
-                  className="border p-4 grid grid-cols-1 md:grid-cols-5 my-6 gap-5 rounded-md relative"
+                  className="border p-4 flex flex-col md:flex-row my-6 gap-5 rounded-md relative"
+                  onClick={() => toggleDonationHistory(index)}
                 >
-                  <div className="md:col-span-1 overflow-hidden rounded-md">
+                  <div className="w-full md:max-w-[190px] md:w-1/4 overflow-hidden rounded-md">
                     {donor.avatar === "" ? (
                       <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
                     ) : (
-                      <div className="max-h-[400px] md:max-h-[200px] w-full object-fill">
-                        <img
-                          src={donor.avatar}
-                          alt={donor.name}
-                          className="rounded-md h-full w-full object-cover mx-auto md:mx-0"
-                        />
-                      </div>
+                      <div
+                        className="h-96 md:h-[220px] w-full bg-cover bg-center rounded-md"
+                        style={{ backgroundImage: `url(${donor.avatar})` }}
+                      ></div>
                     )}
                   </div>
-                  <div className="md:col-span-4">
-                    <div className="flex justify-between items-center">
+                  <div className="w-full md:w-3/4">
+                    <div className="flex justify-between items-center mb-1">
                       <p className="text-xl md:text-2xl font-bold mb-2">
                         Name: {donor.name}
                       </p>
@@ -342,59 +452,71 @@ export default function Donors() {
                         </Button>
                       </div>
                     </div>
+                    <div className="flex gap-y-3 gap-x-5 ">
+                      <div className="w-1/2 flex flex-col gap-y-3">
+                        <p className="text-lg text-black/50">
+                          <span className="font-semibold text-black/60">
+                            Profession:
+                          </span>{" "}
+                          {donor.profession}
+                        </p>
+                        <p className="text-lg text-black/50">
+                          <span className="font-semibold text-black/60">
+                            Designation:{" "}
+                          </span>
+                          {donor.designation}
+                        </p>
+                        <p className="text-lg text-black/50">
+                          <span className="font-semibold text-black/60">
+                            City:
+                          </span>{" "}
+                          {donor.city}
+                        </p>
+                        <div className="grid grid-cols-2 justify-between">
+                          <p className="text-lg text-black/50">
+                            <span className="font-semibold text-black/60">
+                              Total Donation:
+                            </span>{" "}
+                            {donor.TotalDonation}
+                          </p>
+                          <img
+                            className={`transition-transform ${
+                              openHistory[index] ? "rotate-180" : ""
+                            }`}
+                            src={ArrowDown}
+                            alt="Arrow Down"
+                          />
+                        </div>
+                      </div>
+                      <div className="w-1/2 flex flex-col gap-y-3">
+                        <p className="text-lg text-black/50">
+                          <span className="font-semibold text-black/60">
+                            Company:
+                          </span>{" "}
+                          {donor.companyName}
+                        </p>
 
-                    <div className="grid md:grid-cols-2 gap-y-3 gap-x-10">
-                      <p className="text-lg text-black/50">
-                        <span className="font-semibold text-black/60">
-                          Profession:
-                        </span>{" "}
-                        {donor.profession}
-                      </p>
-                      <p className="text-lg text-black/50">
-                        <span className="font-semibold text-black/60">
-                          Company:
-                        </span>{" "}
-                        {donor.companyName}
-                      </p>
-                      <p className="text-lg text-black/50">
-                        <span className="font-semibold text-black/60">
-                          Designation:{" "}
-                        </span>
-                        {donor.designation}
-                      </p>
-                      <p className="text-lg text-black/50">
-                        <span className="font-semibold text-black/60">
-                          Street:
-                        </span>{" "}
-                        {donor.street}
-                      </p>
-                      <p className="text-lg text-black/50">
-                        <span className="font-semibold text-black/60">
-                          City:
-                        </span>{" "}
-                        {donor.city}
-                      </p>
-                      <p className="text-lg text-black/50">
-                        <span className="font-semibold text-black/60">
-                          Country:
-                        </span>{" "}
-                        {donor.country}
-                      </p>
-                      <p className="text-lg text-black/50">
-                        <span className="font-semibold text-black/60">
-                          Total Donation:
-                        </span>{" "}
-                        {donor.TotalDonation}
-                      </p>
-                      <div className="donation-history flex gap-2 text-lg text-black/50">
-                        <span className="font-semibold text-black/60">
-                          Last Donation:
-                        </span>{" "}
-                        {donor?.donationHistory?.map((donation, index) => (
-                          <div key={index}>{donation.amount}</div>
-                        ))}
+                        <p className="text-lg text-black/50">
+                          <span className="font-semibold text-black/60">
+                            Street:
+                          </span>{" "}
+                          {donor.street}
+                        </p>
+
+                        <p className="text-lg text-black/50">
+                          <span className="font-semibold text-black/60">
+                            Country:
+                          </span>{" "}
+                          {donor.country}
+                        </p>
                       </div>
                     </div>
+                  </div>
+
+                  <div className={openHistory[index] ? "block my-5" : "hidden"}>
+                    {donor?.donationHistory?.map((donation, index) => (
+                      <div key={index}>{donation.amount}</div>
+                    ))}
                   </div>
                 </div>
               ))
