@@ -29,7 +29,6 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ImageUploader from "@/components/common/imageUploader";
@@ -420,7 +419,6 @@ export default function Donors() {
                 <div
                   key={donor.name}
                   className="border p-4 rounded-md mt-3 md:mt-5 relative"
-                  onClick={() => toggleDonationHistory(index)}
                 >
                   <div
                     id="Donor"
@@ -482,7 +480,10 @@ export default function Donors() {
                             </span>{" "}
                             {donor.city}
                           </p>
-                          <div className="flex items-center gap-3 cursor-pointer group">
+                          <div
+                            className="flex items-center gap-3 cursor-pointer group"
+                            onClick={() => toggleDonationHistory(index)}
+                          >
                             <p className="text-lg text-black/50">
                               <span className="font-semibold text-black/60">
                                 Total Donation:
@@ -591,9 +592,16 @@ export default function Donors() {
                       }
                     }}
                   >
-                    <DialogContent onClick={(event) => event.stopPropagation()}>
+                    <DialogContent
+                      onClick={(event) => event.stopPropagation()}
+                      className="bg-white backdrop-blur-none"
+                    >
                       <DialogHeader>
-                        <DialogTitle>Edit Donation History</DialogTitle>
+                        <p id="dialog-description">
+                          {donationHistoryId
+                            ? "Edit Donation History"
+                            : "Add New Donation"}
+                        </p>
                       </DialogHeader>
 
                       <form onSubmit={handleDonationHistory}>
