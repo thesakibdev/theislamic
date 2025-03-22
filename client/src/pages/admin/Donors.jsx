@@ -25,11 +25,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogOverlay } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ImageUploader from "@/components/common/imageUploader";
 import { Label } from "@/components/ui/label";
@@ -418,7 +414,7 @@ export default function Donors() {
               data?.donors?.map((donor, index) => (
                 <div
                   key={donor.name}
-                  className="border p-4 rounded-md mt-3 md:mt-5 relative"
+                  className="border p-4 rounded-md mt-3 md:mt-5"
                 >
                   <div
                     id="Donor"
@@ -592,9 +588,11 @@ export default function Donors() {
                       }
                     }}
                   >
+                    <DialogOverlay className="bg-black/20" />
                     <DialogContent
                       onClick={(event) => event.stopPropagation()}
-                      className="bg-white backdrop-blur-none"
+                      className="bg-white dark:bg-gray-900"
+                      aria-describedby="dialog-description"
                     >
                       <DialogHeader>
                         <p id="dialog-description">
