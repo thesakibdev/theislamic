@@ -18,7 +18,7 @@ verseOtherSchema.index({ surahNumber: 1, language: 1 }, { unique: true });
 
 // Full-Text Search Index
 verseOtherSchema.index({
-  surahName: "text",
+  surahNumber: "text",
   "verses.text": "text",
   "verses.translation": "text",
   "verses.transliteration": "text",
