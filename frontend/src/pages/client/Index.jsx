@@ -100,7 +100,7 @@ export default function IndexPage() {
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 justify-between gap-10 w-full">
                 {surahNameList?.map((surah) => (
                   <div
-                    className="flex items-center border cursor-pointer p-5 rounded-lg hover:border-primary group w-full bg-white"
+                    className="flex justify-between items-center border cursor-pointer p-5 rounded-lg hover:border-primary group w-full bg-white"
                     key={surah.id}
                     onClick={() => {
                       navigate(`/recite/${surah.surahNumber}`);
@@ -127,26 +127,27 @@ export default function IndexPage() {
                       );
                     }}
                   >
-                    <div className="relative flex items-center justify-center max-w-[22%] mr-5">
-                      <span className="absolute text-black text-sm font-medium group-hover:text-primary">
-                        {surah.surahNumber}
-                      </span>
-                      <RubAlHizb
-                        width={71}
-                        height={71}
-                        className="group-hover:text-primary text-black font-bold"
-                      />
+                    <div className="flex gap-2 items-center">
+                      <div className="relative flex items-center justify-center mr-5">
+                        <span className="absolute text-black text-sm font-medium group-hover:text-primary">
+                          {surah.surahNumber}
+                        </span>
+                        <RubAlHizb
+                          width={71}
+                          height={71}
+                          className="group-hover:text-primary text-black font-bold"
+                        />
+                      </div>
+                      {/* en name */}
+                      <div className="">
+                        <p className="font-bold text-lg lg:text-xl font-sans text-start">
+                          {surah.surahName.en}
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="max-w-[78%]">
-                      <div className="grid grid-cols-3 gap-5 justify-between">
-                        {/* en name */}
-                        <div className="col-span-2">
-                          <p className="font-bold text-lg lg:text-xl font-sans text-start">
-                            {surah.surahName.en}
-                          </p>
-                        </div>
-
+                    <div>
+                      <div className="">
                         {/* ar name */}
                         <div
                           className="text-right font-arabic text-balck text-lg rlt lg:text-2xl font-bold group-hover:text-primary"
@@ -154,9 +155,6 @@ export default function IndexPage() {
                         >
                           {surah.surahName.ar}
                         </div>
-                      </div>
-
-                      <div className="flex justify-between gap-5">
                         <p className="font-bold text-sm text-primary-foreground group-hover:text-primary">
                           Ayah: {surah.totalAyah}
                         </p>
