@@ -1,199 +1,111 @@
-// src/components/Search.jsx
-import { useState } from "react";
-import { useSearchQuery } from "../../slices/utils";
-import { booksList, surahNameList } from "../../constant";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input } from "../ui/input";
 
-const Search = ({ className }) => {
+const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(1);
-  const limit = 20;
-
+  const [history, setHistory] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const inputRef = useRef(null);
 
-  // RTK Query hook (initially skipped until user searches)
-  const { data, isLoading, isError, error } = useSearchQuery(
-    { query: searchTerm, page, limit },
-    { skip: !searchTerm }
-  );
+  // লোকাল স্টোরেজ থেকে সার্চ হিস্টোরি লোড করা
+  useEffect(() => {
+    const storedHistory =
+      JSON.parse(localStorage.getItem("searchHistory")) || [];
+    setHistory(storedHistory);
+  }, []);
 
-  const name = data?.results?.find((hadith) => hadith.bookName)?.bookName;
-  const bookName = booksList?.find((book) => book.nameEn === name);
-  const id = bookName?.id;
-  const number = data?.results?.find((hadith) => hadith.bookName)?.parts
-    ?.partNumber;
+  // ইনপুট বক্সের বাইরে ক্লিক করলে ড্রপডাউন বন্ধ করা
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (inputRef.current && !inputRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  console.log("surahNameList", surahNameList);
-  console.log("data", data);
-
-  const surahName = data?.results?.find((surah) => surah.name)?.name;
-  console.log("surahName", surahName);
-  const surahResult = surahNameList?.find(
-    (surah) => surah.surahName.en === surahName
-  );
-  console.log("surahResult", surahResult);
-  console.log("surahNumber", surahResult?.surahNumber);
-
+  // সার্চ হ্যান্ডলার ফাংশন
   const handleSearch = (e) => {
     e.preventDefault();
-    // ইউজার যখন সার্চ বাটন ক্লিক করবে তখন পেইজ ১ এ রিসেট করা
-    setPage(1);
+    if (!searchTerm.trim()) return;
+
+    // লোকাল স্টোরেজে হিস্টোরি সংরক্ষণ
+    const updatedHistory = [
+      searchTerm,
+      ...history.filter((item) => item !== searchTerm),
+    ].slice(0, 5);
+    setHistory(updatedHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+
+    // ইউজারকে নতুন রেজাল্ট পেজে পাঠানো (Dynamic Route)
+    navigate(`/search-results?query=${encodeURIComponent(searchTerm)}`);
+    setIsDropdownOpen(false); // সার্চের পর dropdown বন্ধ করা
   };
 
-  const handleNextPage = () => {
-    if (data && data.total > page * limit) {
-      setPage(page + 1);
-    }
+  // নির্দিষ্ট হিস্টোরি আইটেম ডিলিট করা
+  const deleteHistoryItem = (itemToDelete) => {
+    const updatedHistory = history.filter((item) => item !== itemToDelete);
+    setHistory(updatedHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
   };
 
-  const handlePrevPage = () => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  };
-
-  // হাদিথ রেন্ডার করার ফাংশন
-  const renderHadith = (hadith) => {
-    return (
-      <div className="hadith-container overflow-y-auto">
-        <main
-          className="border p-4 my-4 rounded-md border-primary cursor-pointer"
-          onClick={() => navigate(`/hadith/${id}/${number}`)}
-          key={hadith._id}
-        >
-          <h3 className="text-xl font-semibold">{hadith.bookName}</h3>
-          <div className="hadith-content border-t border-primaryLight my-3 pt-3">
-            <p>
-              <strong>Part:</strong> {hadith.parts.partName} (
-              {hadith.parts.partNumber})
-            </p>
-            <p>
-              <strong>Chapter:</strong> {hadith.parts.chapters.chapterName} (
-              {hadith.parts.chapters.chapterNumber})
-            </p>
-            <p>
-              <strong>Hadith:</strong>{" "}
-              {hadith.parts.chapters.hadithList.hadithNumber}
-            </p>
-            <p>
-              <strong>Narrator:</strong>{" "}
-              {hadith.parts.chapters.hadithList.narrator}
-            </p>
-
-            {hadith.parts.chapters.hadithList.hadithArabic && (
-              <p className="arabic-text">
-                {hadith.parts.chapters.hadithList.hadithArabic}
-              </p>
-            )}
-
-            {hadith.parts.chapters.hadithList.translation && (
-              <p>
-                <strong>Translation:</strong>{" "}
-                {hadith.parts.chapters.hadithList.translation}
-              </p>
-            )}
-
-            {hadith.parts.chapters.hadithList.note && (
-              <p>
-                <strong>Note:</strong> {hadith.parts.chapters.hadithList.note}
-              </p>
-            )}
-          </div>
-        </main>
-      </div>
-    );
-  };
-
-  // সূরা রেন্ডার করার ফাংশন (আপনার সূরা ডাটা ফরম্যাট অনুযায়ী অ্যাডাপ্ট করুন)
-  const renderSurah = (surah) => {
-    return (
-      <div
-        key={surah._id}
-        className="surah-card border p-4 my-4 rounded-md border-primary cursor-pointer"
-        onClick={() => navigate(`/recite/${surah?.surahNumber}`)}
-      >
-        <h3 className="text-lg md:text-2xl font-bold">{surah.name}</h3>
-
-        <div className="surah-content">
-          <p className="text-sm md:text-xl font-serif">
-            <span className="font-bold">Surah No:</span> {surah?.surahNumber}
-          </p>
-          <p className="text-sm md:text-xl font-serif">
-            <span className="font-bold">Total Ayah:</span>{" "}
-            {surahResult?.totalAyah}
-          </p>
-          <div className="flex gap-3 text-sm md:text-xl">
-            <span className="font-bold">Juz No:</span>{" "}
-            {surah?.juzNumber.map((juz, index) => (
-              <p className="font-serif" key={index}>
-                {juz}
-              </p>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+  const handleItemClick = (item) => {
+    console.log("Item clicked", item);
+    setSearchTerm(item);
+    setIsDropdownOpen(false);
+    setTimeout(() => {
+      navigate(`/search-results?query=${encodeURIComponent(item)}`);
+    }, 0); // নেভিগেশন ঠিক করার জন্য সামান্য ডিলে
   };
 
   return (
-    <section className={`${className} py-10`}>
-      <form onSubmit={handleSearch}>
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder="What you want to know from Quran & Hadith?"
-            className="w-full py-5 pl-6 rounded-full placeholder:text-xs md:placeholder:text-base"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button
-            type="submit"
-            className="absolute top-2 right-[20px] text-black hover:text-primary duration-300 transition-all ease-linear font-medium"
-          >
-            Search
-          </button>
-        </div>
+    <div className="relative w-full max-w-md mx-auto">
+      <form onSubmit={handleSearch} className="relative">
+        <input
+          ref={inputRef}
+          type="text"
+          className="w-full py-3 px-4 border rounded-md"
+          placeholder="Search here..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onFocus={() => setIsDropdownOpen(true)} // শুধু ক্লিক করলে dropdown show করবে
+        />
+        <button
+          type="submit"
+          className="absolute right-3 top-3 bg-blue-500 text-white px-4 py-1 rounded"
+        >
+          Search
+        </button>
       </form>
 
-      {isLoading && <div className="loading">Loading...</div>}
-
-      {isError && <div className="error">Error: {error.message}</div>}
-
-      {data && data.results && (
-        <>
-          <div className="search-results bg-white p-4 mt-2 overflow-y-auto rounded-md">
-            {data.results.length === 0 ? (
-              <p>No results found for {searchTerm}</p>
-            ) : (
-              <div className="results-list grid md:grid-cols-2 gap-5 overflow-y-scroll">
-                {data.results.map((result) =>
-                  result.bookName ? renderHadith(result) : renderSurah(result)
-                )}
-              </div>
-            )}
-          </div>
-
-          {/*  next & prev button */}
-          <div className="flex gap-3 mt-5 justify-center">
-            <button
-              onClick={handlePrevPage}
-              disabled={page <= 1}
-              className="cursor-pointer bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary disabled:opacity-50 border-black/50"
+      {/* সার্চ হিস্টোরি দেখানো (শুধু ইনপুটে ক্লিক করলে) */}
+      {isDropdownOpen && history.length > 0 && (
+        <ul className="absolute bg-white w-full border mt-1 rounded-md shadow-md">
+          {history.map((item, index) => (
+            <li
+              key={index}
+              className="flex justify-between px-4 py-2 cursor-pointer hover:bg-gray-100"
+              onClick={() =>
+                navigate(`/search-results?query=${encodeURIComponent(item)}`)
+              }
             >
-              Prev
-            </button>
-            <button
-              onClick={handleNextPage}
-              disabled={data.total <= page * limit}
-              className="cursor-pointer bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary disabled:opacity-50 border-black/50"
-            >
-              Next
-            </button>
-          </div>
-        </>
+              <span onClick={() => handleItemClick(item)}>{item}</span>
+              <button
+                className="text-red-500 ml-4"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent navigating
+                  deleteHistoryItem(item);
+                }}
+              >
+                X
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
-    </section>
+    </div>
   );
 };
 
