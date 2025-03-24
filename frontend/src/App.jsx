@@ -59,7 +59,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<ClientLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/search-result" element={<SearchResult />} />
+        <Route path="/search-results" element={<SearchResult />} />
         <Route path="/index" element={<IndexPage />} />
         <Route path="/translation" element={<Translation />} />
         <Route path="/profile" element={<AuthProfile />} />
