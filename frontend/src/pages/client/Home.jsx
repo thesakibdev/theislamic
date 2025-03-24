@@ -7,10 +7,10 @@ export default function Home() {
       {/* hero section  */}
       <section
         style={{ backgroundImage: `url(${Banner})` }}
-        className="bg-no-repeat bg-cover bg-center flex justify-center items-center overflow-hidden"
+        className="bg-no-repeat bg-cover bg-center flex justify-center items-center overflow-hidden min-h-screen"
       >
         <div className="container mx-auto px-4 ">
-          <div className="">
+          <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-white font-bold text-4xl text-center">
               This Website is Under Construction
             </h1>

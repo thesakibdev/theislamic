@@ -138,7 +138,7 @@ const Search = ({ className }) => {
 
   return (
     <section className={`${className} py-10`}>
-      <form onSubmit={handleSearch} className="max-w-3xl mx-auto">
+      <form onSubmit={handleSearch}>
         <div className="relative">
           <Input
             type="text"
