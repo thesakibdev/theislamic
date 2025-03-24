@@ -18,31 +18,30 @@ export default function HadithPage() {
               <div
                 key={book._id}
                 onClick={() => navigate(`/hadith/${book.id}`)}
-                className="flex gap-5 items-center border cursor-pointer border-gray-200 bg-white/60 p-4 rounded-lg hover:border-primary group w-full"
+                className="flex justify-between gap-5 items-center border cursor-pointer border-gray-200 bg-white/60 p-4 rounded-lg hover:border-primary group w-full"
               >
-                <div className="relative flex items-center justify-center max-w-[22%]">
-                  <span className="absolute text-black text-sm font-medium group-hover:text-primary">
-                    {index + 1}
-                  </span>
-                  <RubAlHizb
-                    width={71}
-                    height={71}
-                    className="group-hover:text-primary text-black font-bold"
-                  />
-                </div>
-                <div className="max-w-[78%]">
-                  <div className="grid grid-cols-2 gap-5 justify-between">
-                    <div className="">
-                      <p className="text-lg md:text-xl text-black group-hover:text-primary">
-                        {book?.nameEn}
-                      </p>
-                    </div>
-                    <div dir="rtl" className="">
-                      <p className="text-2xl text-black group-hover:text-primary text-right">
-                        {book?.nameAr}
-                      </p>
-                    </div>
+                <div className="flex gap-2 items-center">
+                  <div className="relative flex items-center justify-center">
+                    <span className="absolute text-black text-sm font-medium group-hover:text-primary">
+                      {index + 1}
+                    </span>
+                    <RubAlHizb
+                      width={50}
+                      height={50}
+                      className="group-hover:text-primary text-black font-bold"
+                    />
                   </div>
+                  <div className="">
+                    <p className="text-base md:text-xl text-black group-hover:text-primary">
+                      {book?.nameEn}
+                    </p>
+                  </div>
+                </div>
+
+                <div dir="rtl" className="">
+                  <p className="text-2xl text-black group-hover:text-primary text-right">
+                    {book?.nameAr}
+                  </p>
                 </div>
               </div>
             ))}
