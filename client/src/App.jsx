@@ -34,6 +34,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { checkAuth } from "./slices/authslice";
 // import { Skeleton } from "./components/ui/skeleton";
+import SearchResult from "./pages/client/SearchResult";
 
 export default function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -58,6 +59,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<ClientLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/search-result" element={<SearchResult />} />
         <Route path="/index" element={<IndexPage />} />
         <Route path="/translation" element={<Translation />} />
         <Route path="/profile" element={<AuthProfile />} />

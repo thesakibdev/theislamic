@@ -27,9 +27,21 @@ export default {
           DEFAULT: "#46b9b0",
           foreground: "#80BDA9",
         },
+        primaryLight: {
+          DEFAULT: "#d1edeb",
+          // foreground: "#80BDA9",
+        },
+        primaryDeep: {
+          DEFAULT: "#277871",
+          // foreground: "#80BDA9",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+        },
+        ultraLight: {
+          DEFAULT: "#f6fbfb",
+          // foreground: "hsl(var(--secondary-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",

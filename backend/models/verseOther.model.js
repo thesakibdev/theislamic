@@ -14,10 +14,17 @@ const verseOtherSchema = new mongoose.Schema({
   ],
 });
 
-verseOtherSchema.index(
-  { surahNumber: 1, language: 1 },
-  { unique: true }
-);
+verseOtherSchema.index({ surahNumber: 1, language: 1 }, { unique: true });
+
+// Full-Text Search Index
+verseOtherSchema.index({
+  surahName: "text",
+  "verses.text": "text",
+  "verses.translation": "text",
+  "verses.transliteration": "text",
+  "verses.note": "text",
+  "verses.keywords": "text",
+});
 
 const verseOtherData = mongoose.model("VerseOtherData", verseOtherSchema);
 

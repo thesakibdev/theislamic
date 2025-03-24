@@ -31,7 +31,8 @@ SurahSchema.index({ surahNumber: 1, name: 1 }, { unique: true });
 SurahSchema.index({
   name: "text", 
   "juzNumber": "text",
-  "verses.verseNumber": "text"
+  "verses.verseNumber": "text",
+  "verses.totalVerseNumber": "text"
 });
 
 const Surah = mongoose.model("Surah", SurahSchema);
