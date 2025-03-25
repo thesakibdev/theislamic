@@ -51,6 +51,7 @@ const hadithSchema = new mongoose.Schema(
       {
         // টেক্সট সার্চ ইনডেক্স (সংশোধিত)
         fields: {
+          bookName: "text",
           "parts.chapters.hadithList.translation": "text",
           "parts.chapters.hadithList.hadithArabic": "text",
           "parts.chapters.hadithList.keywords": "text",
