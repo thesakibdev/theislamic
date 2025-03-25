@@ -44,6 +44,8 @@ export default function HadithReadPage() {
     (language) => language.code === selectedLanguage
   );
 
+  console.log("currentLanguage", currentLanguage);
+
   const selectedBookName = booksList?.find((book) => book.id === id);
 
   // const { data: bookList } = useGetAllBookListQuery();
@@ -80,12 +82,20 @@ export default function HadithReadPage() {
         <div className="container mx-auto px-4 sm:px-0">
           <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded mt-10">
             <p>Error loading hadith data: {error.message}</p>
-            <button
-              onClick={() => refetch()}
-              className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Retry
-            </button>
+            <div className="flex gap-5">
+              <button
+                onClick={() => refetch()}
+                className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Retry
+              </button>
+              <button
+                onClick={() => setSelectedLanguage("en")}
+                className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Set Default Language
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -137,6 +147,7 @@ export default function HadithReadPage() {
               <TabsList className="flex justify-between w-full gap-2 h-full items-center bg-white p-4 rounded-b-none">
                 <div className="grid grid-cols-2 gap-2">
                   <TabsTrigger
+                    key={currentLanguage.code}
                     value="arabic"
                     className="data-[state=active]:border rounded-lg data-[state=active]:border-black py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-lg data-[state=active]:bg-transparent data-[state=active]:text-black text-xs sm:text-sm md:text-base lg:text-lg"
                   >
@@ -233,7 +244,7 @@ export default function HadithReadPage() {
                               <h2 className="text-base md:text-2xl font-semibold">
                                 Note:
                               </h2>
-                              <p className="text-base sm:text-md md:text-xl lg:text-2xl text-justify capitalize">
+                              <p className="text-base sm:text-md md:text-lg text-justify capitalize">
                                 {hadith.note}
                               </p>
                             </div>
