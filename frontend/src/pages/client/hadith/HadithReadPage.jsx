@@ -12,7 +12,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useGetAllLanguagesQuery } from "@/slices/utils";
+import { languagesList } from "@/constant";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,9 +23,7 @@ import { cn } from "@/lib/utils";
 export default function HadithReadPage() {
   const { number, id } = useParams();
   const [openSheet, setOpenSheet] = useState(false);
-  const { data: languages } = useGetAllLanguagesQuery();
   const [selectedLanguage, setSelectedLanguage] = useState("en");
-  const [selectedLanguageName, setSelectedLanguageName] = useState("English");
   const shareLink = window.location.href;
 
   // report error
@@ -41,6 +39,10 @@ export default function HadithReadPage() {
       toast.error("Failed to copy link!");
     }
   };
+
+  const currentLanguage = languagesList?.find(
+    (language) => language.code === selectedLanguage
+  );
 
   const selectedBookName = booksList?.find((book) => book.id === id);
 
@@ -110,7 +112,7 @@ export default function HadithReadPage() {
   };
 
   return (
-    <section className="bg-[#CBCBCB] py-16">
+    <section className="bg-[#CBCBCB] pt-[4.5rem] pb-5">
       <div className="container mx-auto">
         {/* heading */}
         <div className="container px-4 mx-auto  grid grid-cols-3 justify-between items-center py-2">
@@ -138,7 +140,7 @@ export default function HadithReadPage() {
                     value="arabic"
                     className="data-[state=active]:border rounded-lg data-[state=active]:border-black py-2 border-primary bg-none data-[state=active]:rounded-b-none data-[state=active]:rounded-lg data-[state=active]:bg-transparent data-[state=active]:text-black text-xs sm:text-sm md:text-base lg:text-lg"
                   >
-                    Arabic / {selectedLanguageName}
+                    Arabic / {currentLanguage.name}
                   </TabsTrigger>
                   <TabsTrigger
                     value="translation"
@@ -169,10 +171,13 @@ export default function HadithReadPage() {
               >
                 <div className="">
                   {selectedPart?.chapters?.map((chapter, index) => (
-                    <div key={index} className="bg-white py-5 p-4 rounded-md rounded-t-none my-10">
+                    <div
+                      key={index}
+                      className="bg-white py-5 p-4 rounded-md first:rounded-t-none my-10 first:mt-0"
+                    >
                       {/* chapter title */}
                       <div className="rounded-md mb-5">
-                        <div className="px-4 flex flex-col md:flex-row justify-between gap-5 text-xl text-black md:text-2xl font-medium">
+                        <div className="flex flex-col md:flex-row justify-between gap-5 text-base text-black md:text-2xl font-medium">
                           <h1 className="w-full md:w-1/2 text-justify">
                             <span className="text-primary font-bold">
                               Chapter no. {chapter.chapterNumber}{" "}
@@ -181,7 +186,7 @@ export default function HadithReadPage() {
                           </h1>
                           <h1
                             dir="rtl"
-                            className="w-full md:w-1/2 text-justify text-3xl"
+                            className="w-full md:w-1/2 text-justify text-lg md:text-3xl font-arabic font-bold"
                           >
                             {hadith.hadithChapterArabic}{" "}
                           </h1>
@@ -190,12 +195,12 @@ export default function HadithReadPage() {
                       {/* hadith list */}
                       {chapter.hadithList?.map((hadith, index) => (
                         <div
-                          className="text-xl text-black md:text-2xl font-medium bg-white p-4 rounded-md mb-5"
+                          className="text-xl text-black md:text-2xl font-medium bg-[#E6E6E6] p-4 rounded-md mb-3 shadow-md shadow-[(rgba(0, 0, 0, 0.12))]"
                           key={index}
                         >
                           {/* quranic data */}
                           {hadith?.quranic?.trim() && (
-                            <div className="rounded-md py-5 my-5 px-3">
+                            <div className="rounded-md py-5 my-3 px-3">
                               <p className="">
                                 <span className="text-2xl font-bold">
                                   Quranic:
@@ -205,43 +210,43 @@ export default function HadithReadPage() {
                             </div>
                           )}
 
-                          <div className="rounded-md px-4 py-5 flex flex-col md:flex-row justify-between gap-5">
-                            <div className="w-full md:w-1/2">
-                              <h3 className="text-sm font-bold capitalize md:text-base mb-2">
-                                Narrated by: {hadith.narrator}
-                              </h3>
-                              <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl text-justify capitalize">
-                                {hadith.hadithText}{" "}
-                              </h2>
+                          <div className="rounded-md px-4 py-5 bg-[#FAFAFA] shadow-md shadow-[(rgba(0, 0, 0, 0.12))]">
+                            <h3 className="text-sm font-bold capitalize md:text-base mb-2">
+                              Narrated by: {hadith.narrator}
+                            </h3>
+                            <div className="flex flex-col md:flex-row justify-between gap-5">
+                              <div className="w-full md:w-1/2 text-base sm:text-lg md:text-xl text-justify capitalize">
+                                {hadith.translation}{" "}
+                              </div>
+                              <div
+                                className="w-full md:w-1/2 text-lg font-arabic font-bold text-justify"
+                                dir="rtl"
+                              >
+                                {hadith.hadithArabic}{" "}
+                              </div>
                             </div>
-                            <h2
-                              className="w-full md:w-1/2 text-3xl text-justify"
-                              dir="rtl"
-                            >
-                              {hadith.hadithArabic}{" "}
-                            </h2>
                           </div>
 
                           {/* note */}
                           {hadith?.note.trim() && (
-                            <div className=" py-5 my-5 px-3">
-                              <h2 className="text-xl md:text-2xl font-semibold">
+                            <div className="bg-white rounded-md py-5 my-3 px-3">
+                              <h2 className="text-base md:text-2xl font-semibold">
                                 Note:
                               </h2>
-                              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-justify capitalize">
+                              <p className="text-base sm:text-md md:text-xl lg:text-2xl text-justify capitalize">
                                 {hadith.note}
                               </p>
                             </div>
                           )}
 
                           {/* reference  */}
-                          <div className=" my-5">
+                          <div className=" my-3">
                             <div
                               className={cn(
                                 "relative flex px-4 py-5 pb-10 md:pb-5 flex-col md:flex-row justify-between items-end gap-5"
                               )}
                             >
-                              <div className="text-lg md:text-xl flex flex-col gap-2">
+                              <div className="text-base md:text-xl flex flex-col gap-2">
                                 <p>
                                   Rrference :{" "}
                                   <span className="text-primary">
@@ -273,7 +278,7 @@ export default function HadithReadPage() {
                             {/* report form  */}
                             <div
                               className={cn(
-                                " transition-all duration-500 ease-in-out px-5",
+                                " transition-all duration-500 ease-in-out md:px-5",
                                 showErrorForm === hadith?.id
                                   ? "h-auto opacity-100 my-5 visible"
                                   : "h-0 opacity-0 my-0 py-0 hidden"
@@ -357,26 +362,25 @@ export default function HadithReadPage() {
                   ))}
                 </div>
               </TabsContent>
-              <TabsContent
-                className="mt-0 data-[state=active]:rounded-lg"
-                value="translation"
-              >
-                <div className=" text-center">
+              <TabsContent className="mt-0 h-[100vh]" value="translation">
+                <div className="text-center">
                   <div className="text-black w-full mx-auto leading-relaxed text-justify">
                     {selectedPart?.chapters?.map((chapter, index) => (
                       <div
                         key={index}
-                        className=" rounded-md rounded-b-none border"
+                        className={`my-3 md:my-5 rounded-md first:mt-0 bg-white ${
+                          index === 0 ? "rounded-t-none" : ""
+                        }`}
                       >
-                        {chapter.hadithList?.map((hadith, index) => (
-                          <div className="bg-white p-4" key={index}>
+                        {chapter.hadithList?.map((hadith, hadithIndex) => (
+                          <div className="p-4 rounded-md" key={hadithIndex}>
                             <div className="px-2 md:px-0 text-xl text-black md:text-2xl font-medium">
                               <div className="p-4 md:py-6 px-4 mx-auto gap-2 md:gap-5">
                                 <h3 className="text-sm font-bold capitalize md:text-base mb-2">
                                   Narrated by: {hadith.narrator}
                                 </h3>
                                 <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl text-justify capitalize">
-                                  {hadith.hadithText}{" "}
+                                  {hadith.transliteration}{" "}
                                 </h2>
                               </div>
                             </div>
@@ -397,12 +401,11 @@ export default function HadithReadPage() {
             <SheetTitle>Translation</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col overflow-auto h-screen">
-            {languages?.data?.map((lang) => (
+            {languagesList?.map((lang) => (
               <button
                 key={lang}
                 onClick={() => {
                   setSelectedLanguage(lang.code);
-                  setSelectedLanguageName(lang.name);
                   setOpenSheet(false);
                 }}
                 className={`px-4 py-2 m-2 hover:bg-primary hover:text-black rounded-md duration-500 transition-all ease-linear ${
