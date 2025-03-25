@@ -1,33 +1,25 @@
 const Surah = require("../../models/surah.model");
 const Hadith = require("../../models/hadith.model");
+const VerseOtherData = require("../../models/verseOther.model");
 const ResponseHandler = require("../../helper/ResponseHandler");
 
-/**
- * সার্চ কন্ট্রোলার - সূরা এবং হাদিথ ডাটাবেসে কোয়েরি সার্চ করে
- * @param {Object} req - রিকোয়েস্ট অবজেক্ট
- * @param {Object} res - রেসপন্স অবজেক্ট
- */
 const search = async (req, res) => {
   try {
-    const { query } = req.query;
+    const { query, language = "en" } = req.query; // Default language set to "Pur"
 
-    // কোয়েরি ভ্যালিডেশন
+    // Validate query parameter
     if (!query || query.trim() === "") {
       return ResponseHandler.error(res, 400, "Query is required");
     }
 
-    console.log("Search Query:", query);
-
-    // হাদিথ সার্চ - শুধুমাত্র ম্যাচিং হাদিথগুলি খুঁজে বের করা
+    // 1. Search Hadiths with Language Filter
     const hadithResults = await Hadith.aggregate([
-      // Unwind the nested arrays to access individual hadith
       { $unwind: "$parts" },
       { $unwind: "$parts.chapters" },
       { $unwind: "$parts.chapters.hadithList" },
-
-      // Match documents containing the search query
       {
         $match: {
+          language: language, 
           $or: [
             {
               "parts.chapters.hadithList.hadithArabic": {
@@ -74,12 +66,11 @@ const search = async (req, res) => {
           ],
         },
       },
-
-      // Project only the matching hadith and its context
       {
         $project: {
           _id: 1,
           bookName: 1,
+          language: 1,
           "parts.partName": 1,
           "parts.partNumber": 1,
           "parts.chapters.chapterName": 1,
@@ -89,27 +80,49 @@ const search = async (req, res) => {
       },
     ]);
 
-    // সূরা সার্চ - ম্যাচিং আয়াতগুলি খুঁজে বের করা
-    // Note: You would need a similar aggregation for Surah data
-    // This is a placeholder based on your structure
+    // 2. Search Surahs (assuming they don't need language filtering)
     const surahResults = await Surah.find(
       { $text: { $search: query } },
       { score: { $meta: "textScore" } }
     ).sort({ score: { $meta: "textScore" } });
 
-    // সব রেজাল্ট একত্রিত করা
-    const results = [...surahResults, ...hadithResults];
+    // 3. Search VerseOtherData with Language Filter
+    const verseOtherResults = await VerseOtherData.aggregate([
+      { $unwind: "$verses" },
+      {
+        $match: {
+          language: language, // Language filter added here
+          $or: [
+            { "verses.translation": { $regex: query, $options: "i" } },
+            { "verses.transliteration": { $regex: query, $options: "i" } },
+            { "verses.note": { $regex: query, $options: "i" } },
+            { "verses.keywords": { $regex: query, $options: "i" } },
+          ],
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          surahNumber: 1,
+          language: 1,
+          verseNumber: "$verses.verseNumber",
+          translation: "$verses.translation",
+          transliteration: "$verses.transliteration",
+          note: "$verses.note",
+          keywords: "$verses.keywords",
+        },
+      },
+    ]);
 
-    // পেজিনেশন প্যারামিটার
+    // Combine all results
+    const results = [...surahResults, ...hadithResults, ...verseOtherResults];
+
+    // Pagination logic
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-
-    // পেজিনেটেড রেজাল্ট
     const paginatedResults = results.slice(startIndex, endIndex);
-
-    console.log("Total Results Found:", results.length);
 
     return ResponseHandler.success(res, "Search successful", {
       total: results.length,
@@ -119,7 +132,7 @@ const search = async (req, res) => {
     });
   } catch (error) {
     console.error("Search Error:", error.message);
-    return ResponseHandler.error(res, 500, "Something went wrong");
+    return ResponseHandler.error(res, 500, "Internal Server Error");
   }
 };
 
