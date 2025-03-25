@@ -30,6 +30,7 @@ const hadithSchema = new mongoose.Schema(
                 transliteration: { type: String, trim: true },
                 referenceBook: { type: String, trim: true },
                 similarities: { type: String, trim: true },
+                quranic: { type: String, trim: true },
                 note: { type: String, trim: true },
                 keywords: { type: [String], default: [] },
               },
