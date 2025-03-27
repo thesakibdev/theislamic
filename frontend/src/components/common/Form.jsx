@@ -91,7 +91,7 @@ const CommonForm = memo(function CommonForm({
               {getControlItem.options && getControlItem.options.length > 0
                 ? getControlItem.options.map((optionItem) => (
                     <SelectItem
-                      className="capitalize"
+                      className="capitalize cursor-pointer"
                       key={optionItem.id}
                       value={optionItem.id || optionItem?.code}
                     >
@@ -346,25 +346,16 @@ const CommonForm = memo(function CommonForm({
                     "hadithNumber",
                     "internationalNumber",
                     "hadithArabic",
-                    "hadithHindi",
-                    "hadithUrdu",
-                    "hadithEnglish",
-                    "hadithBangla",
-                    "hadithIndonesia",
-                    "hadithText",
+                    "translation",
+                    "transliteration",
                     "referenceBook",
                     "similarities",
                     "narrator",
-                    "banglaTransliteration",
-                    "englishTransliteration",
-                    "hindiTransliteration",
-                    "indonesiaTransliteration",
-                    "urduTransliteration",
                     "note",
                   ].includes(controlItem.name)
                 )
                 .map((controlItem) => (
-                  <div key={controlItem.name} className="col-span-2">
+                  <div key={controlItem.name}>
                     <Label className="mb-1">{controlItem.label}</Label>
                     {renderInputsByComponentType(controlItem)}
                   </div>

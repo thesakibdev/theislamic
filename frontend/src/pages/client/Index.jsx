@@ -46,61 +46,66 @@ export default function IndexPage() {
       {/* surah list */}
       <section className="mt-10 pt-10">
         <div className="container mx-auto px-4">
-          <Tabs defaultValue="recent" className="my-5">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger
-                className="p-0 data-[state=active]:rounded-none"
-                value="recent"
-              >
-                Recent Read
-              </TabsTrigger>
-              <TabsTrigger
-                className="p-0 data-[state=active]:rounded-none"
-                value="bookmark"
-              >
-                Bookmarks
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="recent">
-              {recentSurahs.length > 0 ? (
-                <div className="flex gap-4 overflow-x-auto whitespace-nowrap">
-                  {recentSurahs.map((surah) => (
-                    <p
-                      key={surah.surahNumber}
-                      className="text-md font-bold cursor-pointer hover:text-primary-foreground"
-                      onClick={() => navigate(`/recite/${surah.surahNumber}`)}
-                    >
-                      {surah.surahName},
-                    </p>
-                  ))}
-                </div>
-              ) : null}
-            </TabsContent>
+          <div className="px-4 py-4 bg-white rounded-lg rounded-b-none">
+            <Tabs defaultValue="recent" className="my-5">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger
+                  className="p-0 data-[state=active]:rounded-none"
+                  value="recent"
+                >
+                  Recent Read
+                </TabsTrigger>
+                <TabsTrigger
+                  className="p-0 data-[state=active]:rounded-none"
+                  value="bookmark"
+                >
+                  Bookmarks
+                </TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="bookmark">
-              You do not have any bookmarks yet ?
-            </TabsContent>
-          </Tabs>
-          <Tabs defaultValue="surah" className="w-full my-5">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger
-                className="p-0 data-[state=active]:rounded-none"
-                value="surah"
-              >
-                Surah
-              </TabsTrigger>
-              <TabsTrigger
-                className="p-0 data-[state=active]:rounded-none"
-                value="juz"
-              >
-                Juz
-              </TabsTrigger>
-            </TabsList>
+              <TabsContent value="recent">
+                {recentSurahs.length > 0 ? (
+                  <div className="flex gap-4 overflow-x-auto whitespace-nowrap">
+                    {recentSurahs.map((surah) => (
+                      <p
+                        key={surah.surahNumber}
+                        className="text-md font-bold cursor-pointer hover:text-primary-foreground"
+                        onClick={() => navigate(`/recite/${surah.surahNumber}`)}
+                      >
+                        {surah.surahName},
+                      </p>
+                    ))}
+                  </div>
+                ) : null}
+              </TabsContent>
+
+              <TabsContent value="bookmark">
+                You do not have any bookmarks yet ?
+              </TabsContent>
+            </Tabs>
+          </div>
+          <Tabs defaultValue="surah" className="w-full">
+            <div className="bg-white rounded-lg p-4 rounded-t-none">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger
+                  className="p-0 data-[state=active]:rounded-none"
+                  value="surah"
+                >
+                  Surah
+                </TabsTrigger>
+                <TabsTrigger
+                  className="p-0 data-[state=active]:rounded-none"
+                  value="juz"
+                >
+                  Juz
+                </TabsTrigger>
+              </TabsList>
+            </div>
             <TabsContent value="surah" className="w-full">
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 justify-between gap-10 w-full">
                 {surahNameList?.map((surah) => (
                   <div
-                    className="flex items-center border cursor-pointer p-5 rounded-lg hover:border-primary group w-full bg-white"
+                    className="flex justify-between items-center border cursor-pointer p-5 rounded-lg hover:border-primary group w-full bg-white"
                     key={surah.id}
                     onClick={() => {
                       navigate(`/recite/${surah.surahNumber}`);
@@ -127,26 +132,27 @@ export default function IndexPage() {
                       );
                     }}
                   >
-                    <div className="relative flex items-center justify-center max-w-[22%] mr-5">
-                      <span className="absolute text-black text-sm font-medium group-hover:text-primary">
-                        {surah.surahNumber}
-                      </span>
-                      <RubAlHizb
-                        width={71}
-                        height={71}
-                        className="group-hover:text-primary text-black font-bold"
-                      />
+                    <div className="flex gap-2 items-center">
+                      <div className="relative flex items-center justify-center mr-5">
+                        <span className="absolute text-black text-sm font-medium group-hover:text-primary">
+                          {surah.surahNumber}
+                        </span>
+                        <RubAlHizb
+                          width={71}
+                          height={71}
+                          className="group-hover:text-primary text-black font-bold"
+                        />
+                      </div>
+                      {/* en name */}
+                      <div className="">
+                        <p className="font-bold text-lg lg:text-xl font-sans text-start">
+                          {surah.surahName.en}
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="max-w-[78%]">
-                      <div className="grid grid-cols-3 gap-5 justify-between">
-                        {/* en name */}
-                        <div className="col-span-2">
-                          <p className="font-bold text-lg lg:text-xl font-sans text-start">
-                            {surah.surahName.en}
-                          </p>
-                        </div>
-
+                    <div>
+                      <div className="">
                         {/* ar name */}
                         <div
                           className="text-right font-arabic text-balck text-lg rlt lg:text-2xl font-bold group-hover:text-primary"
@@ -154,9 +160,6 @@ export default function IndexPage() {
                         >
                           {surah.surahName.ar}
                         </div>
-                      </div>
-
-                      <div className="flex justify-between gap-5">
                         <p className="font-bold text-sm text-primary-foreground group-hover:text-primary">
                           Ayah: {surah.totalAyah}
                         </p>

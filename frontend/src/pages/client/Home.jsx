@@ -1,7 +1,7 @@
-import { Input } from "@/components/ui/input";
 import Banner from "../../assets/hero-banner.png";
+import SearchBar from "../../components/client/Search";
+import { Input } from "@/components/ui/input";
 import Search from "../../assets/icon/search-icon.png";
-// import CounterUp from "@/components/common/CounterUp";
 
 export default function Home() {
   return (
@@ -9,13 +9,14 @@ export default function Home() {
       {/* hero section  */}
       <section
         style={{ backgroundImage: `url(${Banner})` }}
-        className="h-screen bg-no-repeat bg-cover bg-center flex justify-center items-center"
+        className="bg-no-repeat bg-cover bg-center flex justify-center items-center overflow-hidden min-h-screen"
       >
         <div className="container mx-auto px-4 ">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-white font-bold text-4xl text-center">
               This Website is Under Construction
             </h1>
+            {/* <SearchBar className="mt-5 sm:mt-7 md:mt-10" /> */}
             <div className="mt-[70px] relative">
               <Input
                 placeholder="What you want to know from Quran & Hadith?"

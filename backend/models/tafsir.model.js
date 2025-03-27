@@ -1,12 +1,37 @@
 const mongoose = require("mongoose");
 
-const TafsirSchema = new mongoose.Schema({
-  surahNumber: { type: Number, required: true, ref: "Surah" },
-  verseNumber: { type: Number, required: true, ref: "Surah" },
-  totalVerseNumber: { type: Number, required: true, ref: "Surah" },
-  tafsir: { type: String, required: true },
+// tafsir model
+const tafsirSchema = new mongoose.Schema({
+  language: {
+    type: String,
+    required: true,
+  },
+  bookName: {
+    type: String,
+    required: true,
+  },
+  surahName: {
+    type: String,
+    required: true,
+  },
+  totalVerseNumber: {
+    type: Number,
+    required: true,
+  },
+  arabicAyah: {
+    type: String,
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  note: {
+    type: String,
+    required: true,
+  },
 });
 
-const Tafsir = mongoose.model("Tafsir", TafsirSchema);
+const Tafsir = mongoose.model("Tafsir", tafsirSchema);
 
 module.exports = Tafsir;

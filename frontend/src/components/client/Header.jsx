@@ -153,7 +153,12 @@ export default function Header() {
             >
               <img src={MenuIcon} alt="The Islamics Center" />
             </span>
-            <h1 className="text-xl font-bold text-primary">Islamics.com</h1>
+            <h1
+              onClick={() => navigate("/")}
+              className="text-xl font-bold text-primary cursor-pointer"
+            >
+              Islamics.com
+            </h1>
           </div>
           <Sheet open={openMenu} onOpenChange={setOpenMenu}>
             <SheetContent side="left" className="w-[300px] px-0">

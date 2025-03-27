@@ -1,7 +1,6 @@
 // import { FaEdit } from "react-icons/fa";
 // import { RiDeleteBinLine } from "react-icons/ri";
 
-import { useGetAllBookListQuery } from "../../slices/utils";
 import { useAddHadithMutation } from "../../slices/admin/hadith";
 
 import CommonForm from "@/components/common/Form";
@@ -26,18 +25,10 @@ const initialFormData = {
   hadithNumber: "",
   internationalNumber: "",
   hadithArabic: "",
-  hadithBangla: "",
-  hadithEnglish: "",
-  hadithHindi: "",
-  hadithIndonesia: "",
-  hadithUrdu: "",
+  translation: "",
+  transliteration: "",
   referenceBook: "",
   similarities: "",
-  banglaTransliteration: "",
-  englishTransliteration: "",
-  hindiTransliteration: "",
-  indonesiaTransliteration: "",
-  urduTransliteration: "",
   narrator: "",
   note: "",
   keywords: [],
@@ -47,12 +38,10 @@ export default function Hadith() {
   const [openAddHadithForm, setOpenAddHadithForm] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
-  const [bookName, setBookName] = useState("Sahih Al-Bukhari");
+  const [bookName, setBookName] = useState("bukhari");
   const [language, setLanguage] = useState("en");
 
   const [addHadith] = useAddHadithMutation();
-
-  const { data: allBookList } = useGetAllBookListQuery();
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -64,6 +53,7 @@ export default function Hadith() {
 
     const updatedFormData = {
       bookName: formData.bookName,
+      language: formData.language,
       partName: formData.partName,
       partNumber: formData.partNumber,
       chapterName: formData.chapterName,
@@ -72,18 +62,10 @@ export default function Hadith() {
         hadithNumber: formData.hadithNumber,
         internationalNumber: formData.internationalNumber,
         hadithArabic: formData.hadithArabic,
-        hadithBangla: formData.hadithBangla,
-        hadithEnglish: formData.hadithEnglish,
-        hadithHindi: formData.hadithHindi,
-        hadithIndonesia: formData.hadithIndonesia,
-        hadithUrdu: formData.hadithUrdu,
+        translation: formData.translation,
+        transliteration: formData.transliteration,
         referenceBook: formData.referenceBook,
         similarities: formData.similarities,
-        banglaTransliteration: formData.banglaTransliteration,
-        englishTransliteration: formData.englishTransliteration,
-        hindiTransliteration: formData.hindiTransliteration,
-        indonesiaTransliteration: formData.indonesiaTransliteration,
-        urduTransliteration: formData.urduTransliteration,
         narrator: formData.narrator,
         note: formData.note,
         keywords: formData.keywords,
@@ -113,14 +95,45 @@ export default function Hadith() {
       name: "bookName",
       componentType: "select",
       options:
-        allBookList &&
-        allBookList.data?.map((language) => ({
-          id: language?.nameEn,
+        booksList &&
+        booksList.map((language) => ({
+          id: language?.id,
           label: language?.nameEn,
         })),
       allClasses: {
         selectClass:
           "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary",
+      },
+    },
+    {
+      label: "Language Name",
+      name: "language",
+      componentType: "select",
+      options: [
+        {
+          id: "bn",
+          label: "Bangla",
+        },
+        {
+          id: "en",
+          label: "English",
+        },
+        {
+          id: "hi",
+          label: "Hindi",
+        },
+        {
+          id: "id",
+          label: "Indonesia",
+        },
+        {
+          id: "ur",
+          label: "Urdu",
+        },
+      ],
+      allClasses: {
+        selectClass:
+          "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary cursor-pointer",
       },
     },
     {
@@ -173,74 +186,18 @@ export default function Hadith() {
       placeholder: "Enter Hadith Arabic ( أدخل أبي العربي )",
     },
     {
-      label: "Hadith Bangla",
-      name: "hadithBangla",
+      label: "Translation",
+      name: "translation",
       componentType: "textarea",
       type: "text",
-      placeholder: "Enter Hadith Bangla ( বাংলা )",
+      placeholder: "Enter Translation",
     },
     {
-      label: "Hadith Bangla Transliteration",
-      name: "banglaTransliteration",
+      label: "Transliteration",
+      name: "transliteration",
       componentType: "textarea",
       type: "text",
-      placeholder: "Enter Hadith Bangla ( বাংলা )",
-    },
-    {
-      label: "Hadith English",
-      name: "hadithEnglish",
-      componentType: "textarea",
-      type: "text",
-      placeholder: "Enter Hadith English",
-    },
-    {
-      label: "Hadith English Transliteration",
-      name: "englishTransliteration",
-      componentType: "textarea",
-      type: "text",
-      placeholder: "Enter Hadith English",
-    },
-    {
-      label: "Hadith Hindi",
-      name: "hadithHindi",
-      componentType: "textarea",
-      type: "text",
-      placeholder: "Enter Hadith Hindi ( हिंदी )",
-    },
-    {
-      label: "Hadith Hindi Transliteration",
-      name: "hindiTransliteration",
-      componentType: "textarea",
-      type: "text",
-      placeholder: "Enter Hadith Hindi ( हिंदी )",
-    },
-    {
-      label: "Hadith Indonesia",
-      name: "hadithIndonesia",
-      componentType: "textarea",
-      type: "text",
-      placeholder: "Enter Hadith Indonesia ( Bahasa Indonesia )",
-    },
-    {
-      label: "Hadith Indonesia Transliteration",
-      name: "indonesiaTransliteration",
-      componentType: "textarea",
-      type: "text",
-      placeholder: "Enter Hadith Indonesia ( Bahasa Indonesia )",
-    },
-    {
-      label: "Hadith Urdu",
-      name: "hadithUrdu",
-      componentType: "textarea",
-      type: "text",
-      placeholder: "Enter Hadith Urdu ( اردو )",
-    },
-    {
-      label: "Hadith Urdu Transliteration",
-      name: "urduTransliteration",
-      componentType: "textarea",
-      type: "text",
-      placeholder: "Enter Hadith Urdu ( اردو )",
+      placeholder: "Enter Transliteration",
     },
     {
       label: "Reference Book",
@@ -311,7 +268,7 @@ export default function Hadith() {
                   <option
                     className="bg-primary/50 text-white"
                     key={index}
-                    value={book?.nameEn}
+                    value={book?.id}
                   >
                     {book?.nameEn}
                   </option>
@@ -351,6 +308,7 @@ export default function Hadith() {
                 "w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary",
               textareaClass:
                 "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary",
+              btnClass: "text-white",
             }}
             onSubmit={onSubmit}
             formData={formData}

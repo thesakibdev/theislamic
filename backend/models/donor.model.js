@@ -21,7 +21,7 @@ const donorSchema = new mongoose.Schema({
     {
       amount: { type: Number, required: true },
       donateDate: { type: String, required: true },
-      typeOfDonation: { type: String, required: true },
+      typeOfDonation: { type: String },
     },
   ],
 });

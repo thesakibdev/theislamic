@@ -45,8 +45,6 @@ const createDonor = async (req, res) => {
       donateDate,
     } = req.body;
 
-    console.log(req.body);
-
     if (!phone) {
       return ResponseHandler.error(res, "Phone number is required.", 404);
     }
