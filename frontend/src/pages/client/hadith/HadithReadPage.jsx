@@ -76,6 +76,15 @@ export default function HadithReadPage() {
     );
   }
 
+  // function convertToArabicNumber(num) {
+  //   const arabicNumbers = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+  //   return num
+  //     .toString()
+  //     .split("")
+  //     .map((digit) => arabicNumbers[digit])
+  //     .join("");
+  // }
+
   if (error) {
     return (
       <section className="pt-[4.5rem] pb-[4.5rem]">
@@ -191,7 +200,7 @@ export default function HadithReadPage() {
                         <div className="flex flex-col md:flex-row justify-between gap-5 text-base text-black md:text-2xl font-medium">
                           <h1 className="w-full md:w-1/2 text-justify">
                             <span className="text-primary font-bold">
-                              Chapter no. {chapter.chapterNumber}{" "}
+                              {chapter.chapterNumber} Chapter
                             </span>{" "}
                             {chapter.chapterName}
                           </h1>
@@ -199,7 +208,7 @@ export default function HadithReadPage() {
                             dir="rtl"
                             className="w-full md:w-1/2 text-justify text-lg md:text-3xl font-arabic font-bold"
                           >
-                            {hadith.hadithChapterArabic}{" "}
+                            {hadith.hadithChapterArabic}
                           </h1>
                         </div>
                       </div>
@@ -239,6 +248,7 @@ export default function HadithReadPage() {
                           </div>
 
                           {/* note */}
+                          {/* need add to a arrow down icon for dynamic render */}
                           {hadith?.note.trim() && (
                             <div className="bg-white rounded-md py-5 my-3 px-3">
                               <h2 className="text-base md:text-2xl font-semibold">
