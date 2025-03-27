@@ -123,7 +123,7 @@ const SearchResult = ({ className }) => {
           </p>
           <div className="flex gap-3 text-sm md:text-xl">
             <span className="font-bold">Juz No:</span>{" "}
-            {surah?.juzNumber.map((juz, index) => (
+            {surah?.juzNumber?.map((juz, index) => (
               <p className="font-serif" key={index}>
                 {juz}
               </p>
@@ -160,7 +160,7 @@ const SearchResult = ({ className }) => {
 
       {data && data.results && (
         <>
-          <div className="search-results bg-white p-4 mt-2 overflow-y-auto rounded-md">
+          <div className="container mx-auto px-4 search-results bg-white p-4 mt-2 overflow-y-auto rounded-md">
             {data.results.length === 0 ? (
               <p>No results found for {searchTerm}</p>
             ) : (
