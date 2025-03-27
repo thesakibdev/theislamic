@@ -50,7 +50,7 @@ export default function HadithReadPage() {
 
   // const { data: bookList } = useGetAllBookListQuery();
   const { data, error, isLoading, refetch } = useGetHadithsQuery({
-    bookName: selectedBookName?.nameEn,
+    bookName: selectedBookName?.id,
     language: selectedLanguage,
   });
   const hadiths = data?.data || [];
@@ -131,7 +131,7 @@ export default function HadithReadPage() {
   };
 
   return (
-    <section className="bg-[#CBCBCB] pt-[4.5rem] pb-5">
+    <section className="bg-[#CBCBCB] pt-[4.5rem] pb-5 min-h-screen overflow-y-auto">
       <div className="container mx-auto">
         {/* heading */}
         <div className="container px-4 mx-auto  grid grid-cols-3 justify-between items-center py-2">

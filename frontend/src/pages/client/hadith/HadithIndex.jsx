@@ -9,7 +9,7 @@ export default function HadithIndex() {
   const bookName = booksList?.find((book) => book.id === id);
 
   const { data, error, isLoading, refetch } = useGetHadithsQuery({
-    bookName: bookName?.nameEn,
+    bookName: bookName?.id,
     language: "en",
   });
 
@@ -57,7 +57,7 @@ export default function HadithIndex() {
         <div className="bg-white border border-black rounded-md flex flex-col gap-5 text-black font-serif py-5 md:py-10 px-5 md:px-16  my-10">
           <div className="flex justify-between">
             <h1 className="text-xl md:text-2xl font-bold">
-              {selectedBook?.bookName || "No Book Selected"}
+              {bookName.nameEn || "No Book Selected"}
             </h1>
             <p className="text-xl md:text-2xl font-bold">صحيح البخاري</p>
           </div>

@@ -609,8 +609,8 @@ const getHadithByBook = async (req, res) => {
 
     // Fetch book with language
     const selectedBook = await Hadith.findOne({
-      bookName,
-      language,
+      bookName: { $regex: new RegExp(`^${bookName}$`, "i") }, // Case-insensitive match
+      language: { $regex: new RegExp(`^${language}$`, "i") },
     }).lean();
 
     if (!selectedBook) {

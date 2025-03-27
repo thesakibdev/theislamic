@@ -1,5 +1,7 @@
 import Banner from "../../assets/hero-banner.png";
 import SearchBar from "../../components/client/Search";
+import { Input } from "@/components/ui/input";
+import Search from "../../assets/icon/search-icon.png";
 
 export default function Home() {
   return (
@@ -14,7 +16,18 @@ export default function Home() {
             <h1 className="text-white font-bold text-4xl text-center">
               This Website is Under Construction
             </h1>
-            <SearchBar className="mt-5 sm:mt-7 md:mt-10" />
+            {/* <SearchBar className="mt-5 sm:mt-7 md:mt-10" /> */}
+            <div className="mt-[70px] relative">
+              <Input
+                placeholder="What you want to know from Quran & Hadith?"
+                className="w-full py-5 pl-16 rounded-full placeholder:text-xs md:placeholder:text-base"
+              />
+              <img
+                src={Search}
+                alt="search"
+                className="absolute top-2 left-[20px]"
+              />
+            </div>
           </div>
         </div>
       </section>
