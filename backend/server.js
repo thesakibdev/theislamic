@@ -21,6 +21,7 @@ const donorRouter = require("./routes/donor/donor.route");
 const globalSearchRouter = require("./routes/utils/search.route");
 const reportRouter = require("./routes/report/report.route");
 const searchRouter = require("./routes/search/search.route");
+const tafsirRouter = require("./routes/tafsir/tafsir.route");
 
 dotenv.config();
 
@@ -86,6 +87,9 @@ app.use("/api/v1/admin/blog", blogRouter);
 
 // hadith route
 app.use("/api/v1/admin/hadith", hadithRouter);
+
+// tafsir route
+app.use("/api/v1/admin/tafsir", tafsirRouter);
 
 // donor route
 app.use("/api/v1/donor", donorRouter);
