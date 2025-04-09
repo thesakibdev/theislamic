@@ -7,54 +7,60 @@ const addTafsir = async (req, res) => {
   try {
     const { bookName, language, tafsirData } = req.body;
 
-    if (!bookName || !language) {
+    const allowedLanguages = ["bn", "en"];
+    if (!allowedLanguages.includes(language)) {
+      return ResponseHandler.error(
+        res,
+        "Only Bengali (bn) and English (en) tafsir are allowed.",
+        400
+      );
+    }
+
+    if (
+      !bookName ||
+      !language ||
+      !tafsirData?.surahNumber ||
+      !tafsirData?.totalVerseNumber
+    ) {
       return ResponseHandler.error(res, "All fields are required.", 400);
     }
 
-    const tafsir = await Tafsir.findOne({
-      bookName,
-      language,
-    });
+    const globalVerseNumber = Number(tafsirData.totalVerseNumber);
+    const surahNumber = Number(tafsirData.surahNumber);
 
-    // Find Surah where any verse has the given totalVerseNumber
+    const tafsir = await Tafsir.findOne({ bookName, language });
+
     const surah = await Surah.findOne({
-      "verses.totalVerseNumber": parseInt(tafsirData.totalVerseNumber, 10),
+      "verses.totalVerseNumber": globalVerseNumber,
     });
 
     if (!surah) {
       return ResponseHandler.error(
         res,
-        `${tafsirData.totalVerseNumber} no. Verse's surah not found.`,
+        `${globalVerseNumber} no. Verse's Surah not found.`,
         400
       );
     }
 
-    const formattedSurahData = {
-      _id: surah._id,
-      surahNumber: surah.surahNumber,
+    const formattedTafsirData = {
+      ...tafsirData,
     };
 
-    console.log("formattedSurahData", formattedSurahData);
-
     if (tafsir) {
-      const existingTafsirData = tafsir.tafsirData.find(
-        (data) => data.totalVerseNumber === tafsirData.totalVerseNumber
+      const alreadyExists = tafsir.tafsirData.some(
+        (item) =>
+          item.surahNumber === surahNumber &&
+          item.totalVerseNumber === globalVerseNumber
       );
 
-      if (existingTafsirData) {
+      if (alreadyExists) {
         return ResponseHandler.error(
           res,
-          `${bookName}'s ( ${language} ) language's ${tafsirData.totalVerseNumber} no. Verse's tafsir already exists.`,
+          `${bookName} (${language}) already contains tafsir for Surah ${surahNumber}, Verse ${globalVerseNumber}.`,
           400
         );
       }
 
-      const formattedTafsirData = {
-        surahInfo: formattedSurahData,
-        ...tafsirData,
-      };
-
-      // Update the tafsir document
       tafsir.tafsirData.push(formattedTafsirData);
       await tafsir.save();
 
@@ -62,33 +68,29 @@ const addTafsir = async (req, res) => {
 
       return ResponseHandler.success(
         res,
-        `${bookName}'s ${language}language's ${tafsirData.totalVerseNumber} Verse's tafsir updated successfully.`,
+        `${bookName} (${language}) tafsir added for Surah ${surahNumber}, Verse ${globalVerseNumber}.`,
         200
       );
     } else {
-      const formattedTafsirData = {
-        surahInfo: formattedSurahData,
-        ...tafsirData,
-      };
-      // Create a new tafsir document
       const newTafsir = new Tafsir({
         bookName,
         language,
         tafsirData: [formattedTafsirData],
       });
+
       await newTafsir.save();
 
       invalidateCache();
 
       return ResponseHandler.success(
         res,
-        "New tafsir document created successfully.",
+        `New tafsir document created for ${bookName} (${language}).`,
         200
       );
     }
   } catch (error) {
     console.log(error);
-    ResponseHandler.error(res, "Server error.", 500);
+    return ResponseHandler.error(res, "Server error.", 500);
   }
 };
 
@@ -132,7 +134,9 @@ const getTafsir = async (req, res) => {
     }
 
     // Find Surah where any verse has the given totalVerseNumber
-    const surah = await Surah.findById(selectedBook.tafsirData[0].surahInfo._id);
+    const surah = await Surah.findById(
+      selectedBook.tafsirData[0].surahInfo._id
+    );
   } catch (error) {
     console.log(error);
     return ResponseHandler.error(res, "Server error.", 500);
