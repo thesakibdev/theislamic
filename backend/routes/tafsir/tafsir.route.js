@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post("/add", addTafsir);
 router.get("/get", getTafsir);
-router.put("/edit/:language/:id", editTafsir);
-router.delete("/delete/:language/:id", deleteTafsir);
+router.put("/edit/:language/:id/:bookName", editTafsir);
+router.delete("/delete/:language/:id/:bookName", deleteTafsir);
 
 module.exports = router;
