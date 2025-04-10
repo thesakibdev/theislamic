@@ -2,6 +2,7 @@ const Tafsir = require("../../models/tafsir.model");
 const Surah = require("../../models/surah.model");
 const { invalidateCache, setCache, getCache } = require("../../utils/utils");
 const ResponseHandler = require("../../helper/ResponseHandler");
+const mongoose = require("mongoose");
 
 const addTafsir = async (req, res) => {
   try {
@@ -103,19 +104,25 @@ const addTafsir = async (req, res) => {
 const editTafsir = async (req, res) => {
   try {
     const { language, id, bookName } = req.params;
-    const { mainContent, OtherLanguageContent, note } = req.body;
+    const { mainContent, OtherLanguageContent, note, totalVerseNumber } =
+      req.body;
 
     // Validate that all required params are provided
     if (!language || !id || !bookName) {
       return ResponseHandler.error(
         res,
-        "Language, ID, and Book Name are required.",
+        `Missing required parameters. Received: language=${language}, id=${id}, bookName=${bookName}`,
         400
       );
     }
 
     // Validate that at least one field is provided for update
-    if (!mainContent && !OtherLanguageContent && note === undefined) {
+    if (
+      !mainContent &&
+      !OtherLanguageContent &&
+      totalVerseNumber &&
+      note === undefined
+    ) {
       return ResponseHandler.error(
         res,
         "At least one field to update must be provided.",
@@ -123,28 +130,45 @@ const editTafsir = async (req, res) => {
       );
     }
 
-    // Build update object dynamically
-    const updateFields = {};
-    if (mainContent !== undefined)
-      updateFields["tafsirData.$.mainContent"] = mainContent;
-    if (OtherLanguageContent !== undefined)
-      updateFields["tafsirData.$.OtherLanguageContent"] = OtherLanguageContent;
-    if (note !== undefined) updateFields["tafsirData.$.note"] = note;
+    let mainTafsirDoc = await Tafsir.findOne({
+      language,
+      bookName: { $regex: new RegExp("^" + bookName + "$", "i") },
+    });
 
-    // Find and update the document using language, bookName, and the specific tafsir entry id
-    const updated = await Tafsir.findOneAndUpdate(
-      {
-        language,
-        bookName,
-        "tafsirData._id": id,
-      },
-      { $set: updateFields },
-      { new: true }
+    if (!mainTafsirDoc) {
+      return ResponseHandler.error(
+        res,
+        `Tafsir collection not found for language: ${language}, bookName: ${bookName}`,
+        404
+      );
+    }
+
+    // Find the specific tafsir entry in the array
+    const tafsirIndex = mainTafsirDoc.tafsirData.findIndex(
+      (item) => item._id.toString() === id
     );
 
-    if (!updated) {
+    if (tafsirIndex === -1) {
       return ResponseHandler.error(res, "Tafsir entry not found.", 404);
     }
+
+    // Update the specific fields if provided
+    if (mainContent) {
+      mainTafsirDoc.tafsirData[tafsirIndex].mainContent = mainContent;
+    }
+    if (totalVerseNumber) {
+      mainTafsirDoc.tafsirData[tafsirIndex].totalVerseNumber = totalVerseNumber;
+    }
+    if (OtherLanguageContent) {
+      mainTafsirDoc.tafsirData[tafsirIndex].OtherLanguageContent =
+        OtherLanguageContent;
+    }
+    if (note !== undefined) {
+      mainTafsirDoc.tafsirData[tafsirIndex].note = note;
+    }
+
+    // Save the main document
+    await mainTafsirDoc.save();
 
     invalidateCache();
 
@@ -159,6 +183,7 @@ const editTafsir = async (req, res) => {
 const deleteTafsir = async (req, res) => {
   try {
     const { language, id, bookName } = req.params;
+    console.log(language, id, bookName);
 
     // Validate that all required params are provided
     if (!language || !id || !bookName) {
@@ -170,7 +195,10 @@ const deleteTafsir = async (req, res) => {
     }
 
     // First find the document to check if the entry exists
-    const tafsir = await Tafsir.findOne({ language, bookName });
+    const tafsir = await Tafsir.findOne({
+      language,
+      bookName: { $regex: new RegExp("^" + bookName + "$", "i") },
+    });
 
     if (!tafsir) {
       return ResponseHandler.error(res, "Tafsir collection not found.", 404);
@@ -282,11 +310,6 @@ const getTafsir = async (req, res) => {
       "verses.totalVerseNumber": { $in: verseNumbers },
     });
 
-    console.log(
-      "Surahs names:",
-      surahs.map((s) => s.name)
-    );
-
     // Create a map of totalVerseNumber to verse and surah information
     const verseMap = {};
 
@@ -321,7 +344,7 @@ const getTafsir = async (req, res) => {
         mainContent: tafsirItem.mainContent,
         OtherLanguageContent: tafsirItem.OtherLanguageContent,
         note: tafsirItem.note || "",
-        tafsirId: tafsirDoc._id,
+        tafsirId: tafsirItem._id,
       };
     });
 
