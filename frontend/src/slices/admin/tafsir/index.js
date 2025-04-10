@@ -20,19 +20,22 @@ export const tafsirApi = createApi({
 
     // Edit an existing tafsir
     editTafsir: builder.mutation({
-      query: ({ id, language, ...formData }) => ({
-        url: `/admin/tafsir/edit/${language}/${id}`,
-        method: "PUT",
-        body: formData,
-        headers: { "Content-Type": "application/json" },
-      }),
+      query: ({ id, language, bookName, ...formData }) => (
+        console.log(id, bookName, language),
+        {
+          url: `/admin/tafsir/edit/${language}/${id}/${bookName}`,
+          method: "PUT",
+          body: formData,
+          headers: { "Content-Type": "application/json" },
+        }
+      ),
       invalidatesTags: ["tafsir"],
     }),
 
     // Delete a specific tafsir
     deleteTafsir: builder.mutation({
-      query: ({ id, language }) => ({
-        url: `/admin/tafsir/edit/${language}/${id}`,
+      query: ({ id, language, bookName }) => ({
+        url: `/admin/tafsir/edit/${language}/${id}/${bookName}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Surah", "Verse"],
