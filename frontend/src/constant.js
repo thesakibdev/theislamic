@@ -3806,3 +3806,79 @@ export const surahNameList = [
     totalAyah: 6,
   },
 ];
+
+export const tafsirBooksList = [
+  {
+    nameEn: "Tafseer al Kabir",
+    nameBn: "তাফসির আল কাবির",
+  },
+  {
+    nameEn: "Tafsir Ibn 'Abbas",
+    nameBn: "তাফসির ইবনে আব্বাস",
+  },
+  {
+    nameEn: "Tafsir Al-Qurtubi",
+    nameBn: "তাফসির আল-কুরতুবি",
+  },
+  {
+    nameEn: "Tafsir Ibn Kathir",
+    nameBn: "তাফসির ইবনে কাসীর",
+  },
+  {
+    nameEn: "Tafsir Al-Jalalayn",
+    nameBn: "তাফসির আল-জালালাইন",
+  },
+  {
+    nameEn: "Tafseer ul Baizawi",
+    nameBn: "তাফসির আল-বায়জাভি",
+  },
+  {
+    nameEn: "Tafsir Al-Tabari",
+    nameBn: "তাফসির আল-তাবারী",
+  },
+  {
+    nameEn: "Tafseer al-Mazhari",
+    nameBn: "তাফসির আল-মাজহারি",
+  },
+  {
+    nameEn: "Tafseer As-Sa'di",
+    nameBn: "তাফসির আস-সা’দী",
+  },
+  {
+    nameEn: "Ma'ariful Qur'an",
+    nameBn: "মা'আরিফুল কুরআন",
+  },
+  {
+    nameEn: "Tafseer-e-Usmani",
+    nameBn: "তাফসির-এ-উসমানী",
+  },
+  {
+    nameEn: "Tafseer al-Madani",
+    nameBn: "তাফসির আল-মাদানী",
+  },
+  {
+    nameEn: "Tauzeeh Al-Qur'an",
+    nameBn: "তাওজীহুল কুরআন",
+  },
+  {
+    nameEn: "Tafseer Fi Zilalil Quran",
+    nameBn: "তাফসির ফি জিলালিল কুরআন",
+  },
+  {
+    nameEn: "Tafhimul Quran",
+    nameBn: "তাফহীমুল কুরআন",
+  },
+  {
+    nameEn: "Taiseer ul Quran",
+    nameBn: "তাইসীরুল কুরআন",
+  },
+  {
+    nameEn: "Tafsir Fathul Majid",
+    nameBn: "তাফসির ফাতহুল মাজীদ",
+  },
+  {
+    nameEn: "Tafseer Ahsan-ul-Bayan",
+    nameBn: "তাফসির আহসানুল বায়ান",
+  },
+];
+
