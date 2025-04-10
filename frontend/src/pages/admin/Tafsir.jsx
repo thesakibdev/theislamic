@@ -30,7 +30,7 @@ export default function Tafsir() {
   const [openAddTafsirForm, setOpenAddTafsirForm] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
-  const [bookName, setBookName] = useState("");
+  const [bookName, setBookName] = useState("Sahih International");
   const [language, setLanguage] = useState("en");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalVerseNumber, setTotalVerseNumber] = useState(1);
@@ -42,7 +42,6 @@ export default function Tafsir() {
   const { data, isLoading, refetch } = useGetAllTafsirPaginatedQuery({
     language: language,
     bookName: bookName,
-    totalVerseNumber: totalVerseNumber,
     page: currentPage,
     limit: 10,
   });
