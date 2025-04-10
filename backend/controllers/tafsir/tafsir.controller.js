@@ -196,31 +196,24 @@ const deleteTafsir = async (req, res) => {
 // Get tafsir for a specific verse
 const getTafsir = async (req, res) => {
   try {
-    const {
-      language,
-      totalVerseNumber,
-      bookName,
-      page = 1,
-      limit = 10,
-    } = req.query;
+    const { language, bookName, page = 1, limit = 10 } = req.query;
 
     // Convert to appropriate types
-    const verseNumber = totalVerseNumber ? parseInt(totalVerseNumber) : null;
     const currentPage = parseInt(page);
     const itemsPerPage = parseInt(limit);
 
     // Validate parameters
-    if (!verseNumber) {
+    if (!bookName) {
       return res.status(400).json({
         success: false,
-        message: "Verse number is required",
+        message: "Book name is required",
       });
     }
 
     // Generate a unique cache key based on query parameters
-    const cacheKey = `tafsir_${language || "all"}_${
-      bookName || "all"
-    }_${verseNumber}_${currentPage}_${itemsPerPage}`;
+    const cacheKey = `tafsir_${
+      language || "all"
+    }_${bookName}_${currentPage}_${itemsPerPage}`;
 
     // Try to get data from cache first
     const cachedData = await getCache(cacheKey);
@@ -229,84 +222,92 @@ const getTafsir = async (req, res) => {
     }
 
     // Build query
-    const query = {};
+    const query = { bookName: bookName };
     if (language) query.language = language;
-    if (bookName) query.bookName = bookName;
 
-    // Use aggregation to get tafsir data for the specific verse
-    const tafsirResults = await Tafsir.aggregate([
-      { $match: query },
-      { $unwind: "$tafsirData" },
-      { $match: { "tafsirData.totalVerseNumber": verseNumber } },
-      { $skip: (currentPage - 1) * itemsPerPage },
-      { $limit: itemsPerPage },
-      {
-        $project: {
-          _id: 1,
-          bookName: 1,
-          language: 1,
-          tafsirData: 1,
-        },
-      },
-    ]);
+    // First get the tafsir document that matches our criteria
+    const tafsirDoc = await Tafsir.findOne(query);
 
-    // If no tafsir found
-    if (tafsirResults.length === 0) {
+    if (!tafsirDoc) {
       return res.status(404).json({
         success: false,
-        message: "Tafsir not found for the specified verse",
+        message: "Tafsir book not found",
       });
     }
 
-    // Get the verse information from Surah
-    const surah = await Surah.findOne(
-      { "verses.totalVerseNumber": verseNumber },
+    // Sort tafsir data by totalVerseNumber to ensure they're in order
+    const sortedTafsirData = tafsirDoc.tafsirData.sort(
+      (a, b) => a.totalVerseNumber - b.totalVerseNumber
+    );
+
+    // Apply pagination to the tafsir data
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedTafsirData = sortedTafsirData.slice(startIndex, endIndex);
+
+    // If no tafsir data after pagination
+    if (paginatedTafsirData.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No tafsir data found for this page",
+      });
+    }
+
+    // Get all the verse numbers needed for this page
+    const verseNumbers = paginatedTafsirData.map(
+      (item) => item.totalVerseNumber
+    );
+
+    // Get all the surah information for these verses in one query
+    const surahs = await Surah.find(
+      { "verses.totalVerseNumber": { $in: verseNumbers } },
       {
         surahName: 1,
         surahNumber: 1,
-        "verses.$": 1,
+        verses: 1,
       }
     );
 
-    if (!surah || !surah.verses || surah.verses.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Verse information not found",
+    // Create a map of totalVerseNumber to verse and surah information
+    const verseMap = {};
+    surahs.forEach((surah) => {
+      surah.verses.forEach((verse) => {
+        if (verseNumbers.includes(verse.totalVerseNumber)) {
+          verseMap[verse.totalVerseNumber] = {
+            surahName: surah.surahName,
+            surahNumber: surah.surahNumber,
+            verseNumber: verse.verseNumber,
+            arabicAyah: verse.arabicAyah,
+          };
+        }
       });
-    }
+    });
 
-    const verse = surah.verses[0];
+    // Format the response data
+    const formattedData = paginatedTafsirData.map((tafsirItem) => {
+      const verseInfo = verseMap[tafsirItem.totalVerseNumber] || {};
 
-    // Count total documents for pagination
-    const totalDocs = await Tafsir.aggregate([
-      { $match: query },
-      { $unwind: "$tafsirData" },
-      { $match: { "tafsirData.totalVerseNumber": verseNumber } },
-      { $count: "total" },
-    ]);
-
-    const total = totalDocs.length > 0 ? totalDocs[0].total : 0;
-
-    // Format the response data according to the required structure
-    const formattedData = tafsirResults.map((tafsir) => ({
-      bookName: tafsir.bookName,
-      language: tafsir.language,
-      surahName: surah.surahName,
-      surahNumber: surah.surahNumber,
-      verseNumber: verse.verseNumber,
-      totalVerseNumber: verseNumber,
-      mainContent: tafsir.tafsirData.mainContent,
-      OtherLanguageContent: tafsir.tafsirData.OtherLanguageContent,
-      note: tafsir.tafsirData.note || "",
-      tafsirId: tafsir._id,
-    }));
+      return {
+        bookName: tafsirDoc.bookName,
+        language: tafsirDoc.language,
+        surahName: verseInfo.surahName || "Unknown",
+        surahNumber: verseInfo.surahNumber || 0,
+        verseNumber: verseInfo.verseNumber || 0,
+        totalVerseNumber: tafsirItem.totalVerseNumber,
+        arabicAyah: verseInfo.arabicAyah || "",
+        mainContent: tafsirItem.mainContent,
+        OtherLanguageContent: tafsirItem.OtherLanguageContent,
+        note: tafsirItem.note || "",
+        tafsirId: tafsirDoc._id,
+      };
+    });
 
     // Prepare response with pagination info
     const responseData = {
       success: true,
       currentPage,
-      totalPages: Math.ceil(total / itemsPerPage),
-      totalItems: total,
+      totalPages: Math.ceil(sortedTafsirData.length / itemsPerPage),
+      totalItems: sortedTafsirData.length,
       data: formattedData,
     };
 
