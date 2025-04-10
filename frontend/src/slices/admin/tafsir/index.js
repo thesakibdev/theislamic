@@ -40,14 +40,8 @@ export const tafsirApi = createApi({
 
     // Fetch paginated Tafsir data
     getAllTafsirPaginated: builder.query({
-      query: ({
-        language,
-        bookName,
-        totalVerseNumber,
-        page = 1,
-        limit = 10,
-      }) => ({
-        url: `/admin/tafsir/get?language=${language}&bookName=${bookName}&totalVerseNumber=${totalVerseNumber}&page=${page}&limit=${limit}`,
+      query: ({ language, bookName, page = 1, limit = 10 }) => ({
+        url: `/admin/tafsir/get?language=${language}&bookName=${bookName}&page=${page}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["tafsir"],
