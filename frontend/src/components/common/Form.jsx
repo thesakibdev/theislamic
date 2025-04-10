@@ -94,6 +94,7 @@ const CommonForm = memo(function CommonForm({
                       className="capitalize cursor-pointer"
                       key={optionItem.id}
                       value={optionItem.id || optionItem?.code}
+                      onValueChange={getControlItem.onChange}
                     >
                       {optionItem.label || optionItem?.name}
                     </SelectItem>
