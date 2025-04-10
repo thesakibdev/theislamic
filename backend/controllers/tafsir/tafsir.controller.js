@@ -259,22 +259,26 @@ const getTafsir = async (req, res) => {
     );
 
     // Get all the surah information for these verses in one query
-    const surahs = await Surah.find(
-      { "verses.totalVerseNumber": { $in: verseNumbers } },
-      {
-        surahName: 1,
-        surahNumber: 1,
-        verses: 1,
-      }
+    const surahs = await Surah.find({
+      "verses.totalVerseNumber": { $in: verseNumbers },
+    });
+
+    console.log(
+      "Surahs names:",
+      surahs.map((s) => s.name)
     );
 
     // Create a map of totalVerseNumber to verse and surah information
     const verseMap = {};
+
     surahs.forEach((surah) => {
+      // Get the surah name directly from the top level property
+      const surahName = surah.name;
+
       surah.verses.forEach((verse) => {
         if (verseNumbers.includes(verse.totalVerseNumber)) {
           verseMap[verse.totalVerseNumber] = {
-            surahName: surah.surahName,
+            surahName: surahName,
             surahNumber: surah.surahNumber,
             verseNumber: verse.verseNumber,
             arabicAyah: verse.arabicAyah,
