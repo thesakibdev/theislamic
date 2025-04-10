@@ -70,18 +70,37 @@ export default function Tafsir() {
 
     console.log(updatedFormData);
 
+    const editFormData = {
+      mainContent: formData.mainContent,
+      OtherLanguageContent: formData.OtherLanguageContent,
+      note: formData.note,
+    };
+
     try {
-      const addResponse = await addTafsir(updatedFormData).unwrap();
-      // Show success or error messages based on the response
-      if (addResponse.error) {
-        toast.error(addResponse.error.message);
-        console.log(addResponse.error);
-      } else {
-        toast.success(addResponse.message || "Hadith added successfully!");
+      if (currentEditedId !== null) {
+        const editResponse = await editTafsir({
+          id: currentEditedId,
+          bookName: formData.bookName,
+          language: formData.language,
+          ...editFormData,
+        }).unwrap();
+        toast.success(editResponse.message || "Tafsir updated successfully!");
         resetForm();
+      } else {
+        const addResponse = await addTafsir(updatedFormData).unwrap();
+        // Show success or error messages based on the response
+        if (addResponse.error) {
+          toast.error(addResponse.error.message);
+        } else {
+          toast.success(addResponse.message || "Tafsir added successfully!");
+          resetForm();
+        }
       }
     } catch (error) {
       console.log(error);
+      toast.error(
+        error?.data?.message || "Something went wrong! Please try again."
+      );
     }
   };
 
