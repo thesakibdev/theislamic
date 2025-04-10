@@ -47,6 +47,8 @@ export default function Tafsir() {
   });
   console.log(data, "tafsir data");
 
+  const allTafsir = data?.data || [];
+
   const resetForm = () => {
     setFormData(initialFormData);
     setOpenAddTafsirForm(false);
@@ -140,38 +142,38 @@ export default function Tafsir() {
     },
   ];
 
-  const allTafsir = [
-    {
-      id: "01",
-      Name: "Al-Fatihah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      id: "02",
-      Name: "Al-Baqarah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      id: "03",
-      Name: "Al-Imran",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      id: "04",
-      Name: "An-Nisa",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      id: "004",
-      Name: "An-Nisa",
-      btn: "Edit",
-      delete: "Delete",
-    },
-  ];
+  // const allTafsir = [
+  //   {
+  //     id: "01",
+  //     Name: "Al-Fatihah",
+  //     btn: "Edit",
+  //     delete: "Delete",
+  //   },
+  //   {
+  //     id: "02",
+  //     Name: "Al-Baqarah",
+  //     btn: "Edit",
+  //     delete: "Delete",
+  //   },
+  //   {
+  //     id: "03",
+  //     Name: "Al-Imran",
+  //     btn: "Edit",
+  //     delete: "Delete",
+  //   },
+  //   {
+  //     id: "04",
+  //     Name: "An-Nisa",
+  //     btn: "Edit",
+  //     delete: "Delete",
+  //   },
+  //   {
+  //     id: "004",
+  //     Name: "An-Nisa",
+  //     btn: "Edit",
+  //     delete: "Delete",
+  //   },
+  // ];
 
   return (
     <section className="px-10">
@@ -213,27 +215,27 @@ export default function Tafsir() {
 
           {/* content */}
           <div className="pb-10">
-            {allTafsir.map((quran, index) => (
+            {allTafsir.map((tafsir, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between py-2"
               >
                 <div className="flex items-center">
                   <div className="font-semibold text-2xl w-36 font-sans">
-                    {quran.id}
+                    {tafsir.totalVerseNumber}
                   </div>
                   <div className="font-semibold text-2xl font-sans">
-                    {quran.Name}
+                    {tafsir.surahName}
                   </div>
                 </div>
                 {/* Action Buttons */}
                 <div className="flex gap-12">
                   <button className="px-6 py-2 flex items-center gap-2 text-xl font-semibold text-white bg-primary rounded-md hover:bg-primary-foreground hover:text-black transition duration-200">
-                    {quran.btn}
+                    Edit
                     <FaEdit className="text-xl font-semibold" />
                   </button>
                   <button className="px-6 py-2 font-semibold text-xl flex items-center gap-2 text-white bg-deleteRed rounded-md hover:bg-red-600 transition duration-200">
-                    {quran.delete} <RiDeleteBinLine />
+                    Delete <RiDeleteBinLine />
                   </button>
                 </div>
               </div>
