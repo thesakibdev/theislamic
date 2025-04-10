@@ -100,12 +100,19 @@ const addTafsir = async (req, res) => {
   }
 };
 
-// Edit an existing tafsir entry
-
 const editTafsir = async (req, res) => {
   try {
-    const { language, id } = req.params;
+    const { language, id, bookName } = req.params;
     const { mainContent, OtherLanguageContent, note } = req.body;
+
+    // Validate that all required params are provided
+    if (!language || !id || !bookName) {
+      return ResponseHandler.error(
+        res,
+        "Language, ID, and Book Name are required.",
+        400
+      );
+    }
 
     // Validate that at least one field is provided for update
     if (!mainContent && !OtherLanguageContent && note === undefined) {
@@ -124,8 +131,13 @@ const editTafsir = async (req, res) => {
       updateFields["tafsirData.$.OtherLanguageContent"] = OtherLanguageContent;
     if (note !== undefined) updateFields["tafsirData.$.note"] = note;
 
+    // Find and update the document using language, bookName, and the specific tafsir entry id
     const updated = await Tafsir.findOneAndUpdate(
-      { language, "tafsirData._id": id },
+      {
+        language,
+        bookName,
+        "tafsirData._id": id,
+      },
       { $set: updateFields },
       { new: true }
     );
@@ -146,13 +158,19 @@ const editTafsir = async (req, res) => {
 // Delete a tafsir entry
 const deleteTafsir = async (req, res) => {
   try {
-    const { language, id } = req.params;
+    const { language, id, bookName } = req.params;
 
-    if (!language || !id) {
-      return ResponseHandler.error(res, "Language and ID are required.", 400);
+    // Validate that all required params are provided
+    if (!language || !id || !bookName) {
+      return ResponseHandler.error(
+        res,
+        "Language, ID, and Book Name are required.",
+        400
+      );
     }
 
-    const tafsir = await Tafsir.findOne({ language });
+    // First find the document to check if the entry exists
+    const tafsir = await Tafsir.findOne({ language, bookName });
 
     if (!tafsir) {
       return ResponseHandler.error(res, "Tafsir collection not found.", 404);
@@ -164,8 +182,9 @@ const deleteTafsir = async (req, res) => {
       return ResponseHandler.error(res, "Tafsir entry not found.", 404);
     }
 
+    // Remove the specific tafsir entry from the tafsirData array
     const updated = await Tafsir.findOneAndUpdate(
-      { language },
+      { language, bookName },
       { $pull: { tafsirData: { _id: id } } },
       { new: true }
     );
