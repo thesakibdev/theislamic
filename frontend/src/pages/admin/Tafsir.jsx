@@ -7,6 +7,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+// import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
 import {
   useAddTafsirMutation,
@@ -14,8 +22,18 @@ import {
   useDeleteTafsirMutation,
   useGetAllTafsirPaginatedQuery,
 } from "@/slices/admin/tafsir";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { tafsirBooksList } from "@/constant";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import Swal from 'sweetalert2';
 
 const initialFormData = {
   bookName: "",
@@ -30,10 +48,10 @@ export default function Tafsir() {
   const [openAddTafsirForm, setOpenAddTafsirForm] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
-  const [bookName, setBookName] = useState("Sahih International");
-  const [language, setLanguage] = useState("en");
+  const [bookName, setBookName] = useState("");
+  const [language, setLanguage] = useState("bn");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalVerseNumber, setTotalVerseNumber] = useState(1);
+  // const [totalVerseNumber, setTotalVerseNumber] = useState(1);
 
   const [addTafsir] = useAddTafsirMutation();
   const [editTafsir] = useEditTafsirMutation();
@@ -45,15 +63,29 @@ export default function Tafsir() {
     page: currentPage,
     limit: 10,
   });
-  console.log(data, "tafsir data");
 
   const allTafsir = data?.data || [];
+  console.log(allTafsir);
 
   const resetForm = () => {
     setFormData(initialFormData);
     setOpenAddTafsirForm(false);
   };
 
+  // Add state to track selected language
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
+
+  // Handler for language change
+  const handleLanguageChange = (value) => {
+    setSelectedLanguage(value);
+    setFormData({
+      ...formData,
+      language: value,
+      bookName: "",
+    });
+  };
+
+  // on submit
   const onSubmit = async (event) => {
     event.preventDefault();
 
@@ -68,9 +100,8 @@ export default function Tafsir() {
       },
     };
 
-    console.log(updatedFormData);
-
     const editFormData = {
+      totalVerseNumber: formData.totalVerseNumber,
       mainContent: formData.mainContent,
       OtherLanguageContent: formData.OtherLanguageContent,
       note: formData.note,
@@ -86,6 +117,7 @@ export default function Tafsir() {
         }).unwrap();
         toast.success(editResponse.message || "Tafsir updated successfully!");
         resetForm();
+        refetch();
       } else {
         const addResponse = await addTafsir(updatedFormData).unwrap();
         // Show success or error messages based on the response
@@ -94,6 +126,7 @@ export default function Tafsir() {
         } else {
           toast.success(addResponse.message || "Tafsir added successfully!");
           resetForm();
+          refetch();
         }
       }
     } catch (error) {
@@ -119,17 +152,17 @@ export default function Tafsir() {
           label: "English",
         },
       ],
-      allClasses: {
-        selectClass:
-          "w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary cursor-pointer",
-      },
     },
     {
-      label: "Book Name",
+      label: "Tafsir Book Name",
       name: "bookName",
-      componentType: "input",
-      type: "text",
-      placeholder: "Enter Book Name",
+      componentType: "select",
+      options:
+        tafsirBooksList &&
+        tafsirBooksList.map((book) => ({
+          id: selectedLanguage === "en" ? book?.nameEn : book?.nameBn,
+          label: selectedLanguage === "en" ? book?.nameEn : book?.nameBn,
+        })),
     },
     {
       label: "Total Verse Number",
@@ -161,56 +194,136 @@ export default function Tafsir() {
     },
   ];
 
-  // const allTafsir = [
-  //   {
-  //     id: "01",
-  //     Name: "Al-Fatihah",
-  //     btn: "Edit",
-  //     delete: "Delete",
-  //   },
-  //   {
-  //     id: "02",
-  //     Name: "Al-Baqarah",
-  //     btn: "Edit",
-  //     delete: "Delete",
-  //   },
-  //   {
-  //     id: "03",
-  //     Name: "Al-Imran",
-  //     btn: "Edit",
-  //     delete: "Delete",
-  //   },
-  //   {
-  //     id: "04",
-  //     Name: "An-Nisa",
-  //     btn: "Edit",
-  //     delete: "Delete",
-  //   },
-  //   {
-  //     id: "004",
-  //     Name: "An-Nisa",
-  //     btn: "Edit",
-  //     delete: "Delete",
-  //   },
-  // ];
+  // Pagination
+  const handlePaginationNext = () => {
+    setCurrentPage(currentPage + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handlePaginationPrev = () => {
+    setCurrentPage(() => (currentPage == 1 ? 1 : currentPage - 1));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleDeleteTafsir = async (tafsirId, bookName, language) => {
+    try {
+      const result = await Swal.fire({
+        title: 'আপনি কি নিশ্চিত?',
+        text: `"${bookName}" থেকে এই তাফসির ডিলিট করতে চান?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'হ্যাঁ, ডিলিট করুন!',
+        cancelButtonText: 'না, থাক',
+        background: '#fff',
+        customClass: {
+          title: 'text-xl font-semibold',
+          popup: 'rounded-lg',
+          confirmButton: 'rounded-md px-4 py-2',
+          cancelButton: 'rounded-md px-4 py-2'
+        }
+      });
+
+      if (result.isConfirmed) {
+        const deleteResponse = await deleteTafsir({
+          id: tafsirId,
+          bookName: bookName,
+          language: language,
+        }).unwrap();
+        
+        Swal.fire({
+          title: 'ডিলিট করা হয়েছে!',
+          text: deleteResponse.message || 'তাফসির সফলভাবে ডিলিট করা হয়েছে।',
+          icon: 'success',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'ঠিক আছে'
+        });
+        
+        refetch();
+      }
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        title: 'ত্রুটি!',
+        text: error?.data?.message || 'কিছু একটা ভুল হয়েছে! আবার চেষ্টা করুন।',
+        icon: 'error',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'ঠিক আছে'
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (bookName === "" || bookName === undefined) {
+      setBookName(tafsirBooksList[0]?.nameBn);
+    }
+  }, [bookName]);
 
   return (
     <section className="px-10">
       <div className="mt-12">
+        {/* tafsir filter and add button */}
         <div className="flex justify-between">
           <div className="flex gap-3">
-            <select
+            <Select
               value={language}
-              onChange={(e) => setLanguage(e.target.value)}
+              onValueChange={(value) => setLanguage(value)}
               className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
             >
-              <option className="bg-primary/50 text-white" key="en" value="en">
-                English
-              </option>
-              <option className="bg-primary/50 text-white" key="bn" value="bn">
-                Bangla
-              </option>
-            </select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select Language" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  className="bg-primary/50 text-white cursor-pointer"
+                  key="en"
+                  value="en"
+                >
+                  English
+                </SelectItem>
+                <SelectItem
+                  className="bg-primary/50 text-white cursor-pointer"
+                  key="bn"
+                  value="bn"
+                >
+                  Bangla
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={bookName}
+              name="bookName"
+              id="bookName"
+              onValueChange={(value) => {
+                console.log("Selected value:", value);
+                setBookName(value);
+              }}
+              className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
+            >
+              <SelectTrigger className="">
+                <SelectValue
+                  placeholder={
+                    language === "en"
+                      ? "Select A Book Name"
+                      : "একটি বইয়ের নাম নির্বাচন করুন"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {tafsirBooksList &&
+                  tafsirBooksList.map((book, index) => (
+                    <SelectItem
+                      key={index}
+                      className="bg-primary/50 text-white cursor-pointer"
+                      value={language === "en" ? book.nameEn : book.nameBn}
+                    >
+                      {language === "en" ? book.nameEn : book.nameBn}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
           <Button
             className="bg-primary text-white"
@@ -223,6 +336,8 @@ export default function Tafsir() {
             Add New Tafsir
           </Button>
         </div>
+
+        {/* tafsir list */}
         <div>
           {/* heading */}
           <div className="flex items-center justify-between py-5">
@@ -234,32 +349,93 @@ export default function Tafsir() {
 
           {/* content */}
           <div className="pb-10">
-            {allTafsir.map((tafsir, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between py-2"
-              >
-                <div className="flex items-center">
-                  <div className="font-semibold text-2xl w-36 font-sans">
-                    {tafsir.totalVerseNumber}
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : (
+              allTafsir.map((tafsir, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between py-2"
+                >
+                  <div className="flex items-center">
+                    <div className="font-semibold text-2xl w-36 font-sans">
+                      {tafsir.totalVerseNumber}
+                    </div>
+                    <div className="font-semibold text-2xl font-sans">
+                      {tafsir.surahName}
+                    </div>
                   </div>
-                  <div className="font-semibold text-2xl font-sans">
-                    {tafsir.surahName}
+                  {/* Action Buttons */}
+                  <div className="flex gap-12">
+                    <Button
+                      onClick={() => {
+                        setCurrentEditedId(tafsir?.tafsirId);
+                        setOpenAddTafsirForm(true);
+                        setFormData({
+                          bookName: tafsir?.bookName,
+                          language: tafsir?.language,
+                          totalVerseNumber: tafsir?.totalVerseNumber,
+                          mainContent: tafsir?.mainContent,
+                          OtherLanguageContent: tafsir?.OtherLanguageContent,
+                          note: tafsir?.note,
+                        });
+                      }}
+                      className="px-6 py-2 flex items-center gap-2 text-xl font-semibold text-white bg-primary rounded-md hover:bg-primary-foreground hover:text-black transition duration-200"
+                    >
+                      Edit
+                      <FaEdit className="text-xl font-semibold" />
+                    </Button>
+                    <Button
+                      onClick={() =>
+                        handleDeleteTafsir(
+                          tafsir?.tafsirId,
+                          tafsir?.bookName,
+                          tafsir?.language
+                        )
+                      }
+                      className="px-6 py-2 font-semibold text-xl flex items-center gap-2 text-white bg-deleteRed rounded-md hover:bg-red-600 transition duration-200"
+                    >
+                      Delete <RiDeleteBinLine />
+                    </Button>
                   </div>
                 </div>
-                {/* Action Buttons */}
-                <div className="flex gap-12">
-                  <button className="px-6 py-2 flex items-center gap-2 text-xl font-semibold text-white bg-primary rounded-md hover:bg-primary-foreground hover:text-black transition duration-200">
-                    Edit
-                    <FaEdit className="text-xl font-semibold" />
-                  </button>
-                  <button className="px-6 py-2 font-semibold text-xl flex items-center gap-2 text-white bg-deleteRed rounded-md hover:bg-red-600 transition duration-200">
-                    Delete <RiDeleteBinLine />
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
+        </div>
+
+        {/* pagination button */}
+        <div className="flex justify-center">
+          <Pagination className="px-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  aria-label="Go to previous page"
+                  onClick={handlePaginationPrev}
+                  className="bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary cursor-pointer"
+                  disabled={currentPage == 1}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <Button className="bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary cursor-pointer">
+                  Skip
+                </Button>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  aria-label="Go to next page"
+                  onClick={handlePaginationNext}
+                  className="bg-white hover:bg-primary hover:text-white transition-all duration-300 ease-in-out text-black px-6 py-2 rounded-lg border border-black hover:border-primary cursor-pointer"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       </div>
 
@@ -285,7 +461,14 @@ export default function Tafsir() {
             }}
             onSubmit={onSubmit}
             formData={formData}
-            setFormData={setFormData}
+            setFormData={(newData) => {
+              // Handle special case for language changes to trigger the language change handler
+              if (newData.language !== formData.language) {
+                handleLanguageChange(newData.language);
+              } else {
+                setFormData(newData);
+              }
+            }}
             buttonText={currentEditedId ? "Save Changes" : "Add Tafsir"}
             formControls={addTafsirFormElements}
           />
