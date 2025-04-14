@@ -57,14 +57,28 @@ export default function Tafsir() {
   const [editTafsir] = useEditTafsirMutation();
   const [deleteTafsir] = useDeleteTafsirMutation();
 
-  const { data, isLoading, refetch } = useGetAllTafsirPaginatedQuery({
-    language: language,
-    bookName: bookName,
-    page: currentPage,
-    limit: 10,
-  });
+  const { data, isLoading, error, refetch } = useGetAllTafsirPaginatedQuery(
+    {
+      language: language,
+      bookName: bookName,
+      page: currentPage,
+      limit: 10,
+    },
+    {
+      skip: !bookName || !language,
+      refetchOnMountOrArgChange: true,
+      refetchOnReconnect: true,
+      forceRefetch: ({ currentArg, previousArg }) => {
+        if (!previousArg) return true;
+        return (
+          currentArg?.language !== previousArg?.language ||
+          currentArg?.bookName !== previousArg?.bookName
+        );
+      }
+    }
+  );
 
-  const allTafsir = data?.data || [];
+  const allTafsir = error ? [] : (data?.data || []);
   console.log(allTafsir);
 
   const resetForm = () => {
@@ -351,6 +365,10 @@ export default function Tafsir() {
           <div className="pb-10">
             {isLoading ? (
               <p>Loading...</p>
+            ) : error ? (
+              <p className="text-center text-2xl font-semibold text-gray-500 py-4">
+                কোন ডাটা পাওয়া যায়নি
+              </p>
             ) : allTafsir.length === 0 ? (
               <p className="text-center text-2xl font-semibold text-gray-500 py-4">
                 কোন ডাটা পাওয়া যায়নি
