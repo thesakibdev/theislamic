@@ -33,7 +33,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 const initialFormData = {
   bookName: "",
@@ -206,50 +206,51 @@ export default function Tafsir() {
   };
 
   const handleDeleteTafsir = async (tafsirId, bookName, language) => {
+    console.log(tafsirId, bookName, language);
     try {
       const result = await Swal.fire({
-        title: 'আপনি কি নিশ্চিত?',
+        title: "আপনি কি নিশ্চিত?",
         text: `"${bookName}" থেকে এই তাফসির ডিলিট করতে চান?`,
-        icon: 'warning',
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'হ্যাঁ, ডিলিট করুন!',
-        cancelButtonText: 'না, থাক',
-        background: '#fff',
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "হ্যাঁ, ডিলিট করুন!",
+        cancelButtonText: "না, থাক",
+        background: "#fff",
         customClass: {
-          title: 'text-xl font-semibold',
-          popup: 'rounded-lg',
-          confirmButton: 'rounded-md px-4 py-2',
-          cancelButton: 'rounded-md px-4 py-2'
-        }
+          title: "text-xl font-semibold",
+          popup: "rounded-lg",
+          confirmButton: "rounded-md px-4 py-2",
+          cancelButton: "rounded-md px-4 py-2",
+        },
       });
 
       if (result.isConfirmed) {
         const deleteResponse = await deleteTafsir({
+          language: language,
           id: tafsirId,
           bookName: bookName,
-          language: language,
         }).unwrap();
-        
+
         Swal.fire({
-          title: 'ডিলিট করা হয়েছে!',
-          text: deleteResponse.message || 'তাফসির সফলভাবে ডিলিট করা হয়েছে।',
-          icon: 'success',
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'ঠিক আছে'
+          title: "ডিলিট করা হয়েছে!",
+          text: deleteResponse.message || "তাফসির সফলভাবে ডিলিট করা হয়েছে।",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "ঠিক আছে",
         });
-        
+
         refetch();
       }
     } catch (error) {
       console.log(error);
       Swal.fire({
-        title: 'ত্রুটি!',
-        text: error?.data?.message || 'কিছু একটা ভুল হয়েছে! আবার চেষ্টা করুন।',
-        icon: 'error',
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'ঠিক আছে'
+        title: "ত্রুটি!",
+        text: error?.data?.message || "কিছু একটা ভুল হয়েছে! আবার চেষ্টা করুন।",
+        icon: "error",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "ঠিক আছে",
       });
     }
   };
