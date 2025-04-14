@@ -257,10 +257,41 @@ const getTafsir = async (req, res) => {
       });
     }
 
+    // First check if the book exists in database
+    const bookExists = await Tafsir.findOne({
+      bookName: { $regex: new RegExp("^" + bookName + "$", "i") }
+    });
+
+    if (!bookExists) {
+      // If book doesn't exist, invalidate cache and return error
+      invalidateCache();
+      return res.status(404).json({
+        success: false,
+        message: "Tafsir book not found in database",
+      });
+    }
+
+    // Create a main key for tracking changes
+    const mainKey = `${language || "all"}_${bookName}`;
+    
+    // Get the previous main key from cache
+    const previousMainKey = await getCache('previous_main_key');
+    
+    // If main key has changed, invalidate cache
+    if (previousMainKey && previousMainKey !== mainKey) {
+      invalidateCache();
+      // Store new main key
+      await setCache('previous_main_key', mainKey, 86400);
+    } else if (!previousMainKey) {
+      // If no previous key exists, store the current one
+      await setCache('previous_main_key', mainKey, 86400);
+    }
+
+    // Normalize bookName for cache key
+    const normalizedBookName = bookName.toLowerCase().replace(/\s+/g, '_');
+    
     // Generate a unique cache key based on query parameters
-    const cacheKey = `tafsir_${
-      language || "all"
-    }_${bookName}_${currentPage}_${itemsPerPage}`;
+    const cacheKey = `tafsir_${language || "all"}_${normalizedBookName}_${currentPage}_${itemsPerPage}`;
 
     // Try to get data from cache first
     const cachedData = await getCache(cacheKey);
@@ -358,7 +389,7 @@ const getTafsir = async (req, res) => {
     };
 
     // Store in cache (1 hour expiration - adjust as needed)
-    setCache(cacheKey, JSON.stringify(responseData), 3600);
+    setCache(cacheKey, JSON.stringify(responseData), 600);
 
     // Return response
     return res.status(200).json(responseData);
