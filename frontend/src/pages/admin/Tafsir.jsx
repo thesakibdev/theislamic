@@ -206,7 +206,6 @@ export default function Tafsir() {
   };
 
   const handleDeleteTafsir = async (tafsirId, bookName, language) => {
-    console.log(tafsirId, bookName, language);
     try {
       const result = await Swal.fire({
         title: "আপনি কি নিশ্চিত?",
@@ -352,6 +351,10 @@ export default function Tafsir() {
           <div className="pb-10">
             {isLoading ? (
               <p>Loading...</p>
+            ) : allTafsir.length === 0 ? (
+              <p className="text-center text-2xl font-semibold text-gray-500 py-4">
+                কোন ডাটা পাওয়া যায়নি
+              </p>
             ) : (
               allTafsir.map((tafsir, index) => (
                 <div
