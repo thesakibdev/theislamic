@@ -51,7 +51,34 @@ export const tafsirApi = createApi({
         url: `/admin/tafsir/get?language=${language}&bookName=${bookName}&page=${page}&limit=${limit}`,
         method: "GET",
       }),
-      providesTags: ["tafsir"],
+      // Add cache key configuration
+      serializeQueryArgs: ({ queryArgs }) => {
+        return `${queryArgs.language}_${queryArgs.bookName}`;
+      },
+      // Transform response to handle errors
+      transformResponse: (response) => {
+        if (!response.success) {
+          throw new Error(response.message || "Error fetching data");
+        }
+        return response;
+      },
+      // Handle errors by clearing cache
+      transformErrorResponse: () => {
+        return [];
+      },
+      // Merge strategy
+      merge: (currentCache, newItems) => {
+        if (!newItems.success) {
+          return undefined;
+        }
+        return newItems;
+      },
+      // Invalidate cache on error
+      invalidatesTags: (result, error, { language, bookName }) =>
+        error ? [{ type: "tafsir", id: `${language}_${bookName}` }] : [],
+      providesTags: (result, error, { language, bookName }) => [
+        { type: "tafsir", id: `${language}_${bookName}` },
+      ],
     }),
   }),
 });
