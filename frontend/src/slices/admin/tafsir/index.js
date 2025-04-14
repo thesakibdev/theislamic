@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
+console.log(baseUrl);
 
 export const tafsirApi = createApi({
   reducerPath: "tafsirApi",
@@ -34,11 +35,14 @@ export const tafsirApi = createApi({
 
     // Delete a specific tafsir
     deleteTafsir: builder.mutation({
-      query: ({ id, language, bookName }) => ({
-        url: `/admin/tafsir/edit/${language}/${id}/${bookName}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["Surah", "Verse"],
+      query: ({ id, language, bookName }) => (
+        console.log(id, language, bookName),
+        {
+          url: `/admin/tafsir/delete/${language}/${id}/${bookName}`,
+          method: "DELETE",
+        }
+      ),
+      invalidatesTags: ["tafsir"],
     }),
 
     // Fetch paginated Tafsir data
