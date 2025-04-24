@@ -51,6 +51,11 @@ export default function Header() {
 
   const menuItems = [
     {
+      icon: OpenBook,
+      text: "Tafsir",
+      path: "/tafsir",
+    },
+    {
       icon: ManPraying,
       text: "5 Pillers",
       path: "/",
@@ -122,7 +127,6 @@ export default function Header() {
     dispatch(checkAuth());
   }, [dispatch]);
 
-  console.log(user);
 
   const roles = ["admin", "creator", "editor"];
   const initialAvatar = user?.name
