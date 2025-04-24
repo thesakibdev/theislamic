@@ -2,7 +2,6 @@ const Tafsir = require("../../models/tafsir.model");
 const Surah = require("../../models/surah.model");
 const { invalidateCache, setCache, getCache } = require("../../utils/utils");
 const ResponseHandler = require("../../helper/ResponseHandler");
-const mongoose = require("mongoose");
 
 const addTafsir = async (req, res) => {
   try {
@@ -183,7 +182,6 @@ const editTafsir = async (req, res) => {
 const deleteTafsir = async (req, res) => {
   try {
     const { language, id, bookName } = req.params;
-    console.log(language, id, bookName);
 
     // Validate that all required params are provided
     if (!language || !id || !bookName) {
@@ -259,7 +257,7 @@ const getTafsir = async (req, res) => {
 
     // First check if the book exists in database
     const bookExists = await Tafsir.findOne({
-      bookName: { $regex: new RegExp("^" + bookName + "$", "i") }
+      bookName: { $regex: new RegExp("^" + bookName + "$", "i") },
     });
 
     if (!bookExists) {
@@ -273,25 +271,27 @@ const getTafsir = async (req, res) => {
 
     // Create a main key for tracking changes
     const mainKey = `${language || "all"}_${bookName}`;
-    
+
     // Get the previous main key from cache
-    const previousMainKey = await getCache('previous_main_key');
-    
+    const previousMainKey = await getCache("previous_main_key");
+
     // If main key has changed, invalidate cache
     if (previousMainKey && previousMainKey !== mainKey) {
       invalidateCache();
       // Store new main key
-      await setCache('previous_main_key', mainKey, 86400);
+      setCache("previous_main_key", mainKey, 86400);
     } else if (!previousMainKey) {
       // If no previous key exists, store the current one
-      await setCache('previous_main_key', mainKey, 86400);
+      setCache("previous_main_key", mainKey, 86400);
     }
 
     // Normalize bookName for cache key
-    const normalizedBookName = bookName.toLowerCase().replace(/\s+/g, '_');
-    
+    const normalizedBookName = bookName.toLowerCase().replace(/\s+/g, "_");
+
     // Generate a unique cache key based on query parameters
-    const cacheKey = `tafsir_${language || "all"}_${normalizedBookName}_${currentPage}_${itemsPerPage}`;
+    const cacheKey = `tafsir_${
+      language || "all"
+    }_${normalizedBookName}_${currentPage}_${itemsPerPage}`;
 
     // Try to get data from cache first
     const cachedData = await getCache(cacheKey);
@@ -403,4 +403,123 @@ const getTafsir = async (req, res) => {
   }
 };
 
-module.exports = { addTafsir, getTafsir, editTafsir, deleteTafsir };
+// client side get method
+const getAllTafsirByTotalVerseNumber = async (req, res) => {
+  try {
+    const { language = "bn", totalVerseNumber, bookName } = req.query;
+
+    // data normalization
+    const globalVerseNumber = Number(totalVerseNumber);
+
+    // Validate parameters
+    if (!globalVerseNumber) {
+      return ResponseHandler.error(res, "Verse Number Is Required", 400);
+    }
+    if (!bookName) {
+      return ResponseHandler.error(res, "Book Name Is Required", 400);
+    }
+
+    // Create a main key for tracking changes
+    const mainKey = `${
+      language || bookName || "all"
+    }_${globalVerseNumber}, ${bookName}`;
+
+    // Get the previous main key from cache
+    const previousMainKey = await getCache("previous_main_key");
+
+    // If main key has changed, invalidate cache
+    if (previousMainKey && previousMainKey !== mainKey) {
+      invalidateCache();
+      // Store new main key
+      setCache("previous_main_key", mainKey, 600);
+    } else if (!previousMainKey) {
+      // If no previous key exists, store the current one
+      setCache("previous_main_key", mainKey, 600);
+    }
+
+    // Normalize bookName for cache key
+    const normalizedBookName = bookName.toLowerCase().replace(/\s+/g, "_");
+
+    // Generate a unique cache key based on query parameters
+    const cacheKey = `tafsir_${
+      language || "all"
+    }_${normalizedBookName}_${globalVerseNumber}`;
+
+    // Try to get data from cache first
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      return res.status(200).json(JSON.parse(cachedData));
+    }
+
+    // Build query
+    const query = { bookName: bookName };
+    if (language) query.language = language;
+
+    // First get the tafsir document that matches our criteria
+    const tafsirDoc = await Tafsir.findOne(query);
+
+    if (!tafsirDoc) {
+      return ResponseHandler.error(res, "Tafsir book not found", 404);
+    }
+
+    // Find the specific tafsir entry for the verse number
+    const tafsirItem = tafsirDoc.tafsirData.find(
+      (item) => item.totalVerseNumber === globalVerseNumber
+    );
+
+    if (!tafsirItem) {
+      return ResponseHandler.error(res, "Tafsir not found for this verse", 404);
+    }
+
+    // Get the surah information for this verse
+    const surah = await Surah.findOne({
+      "verses.totalVerseNumber": globalVerseNumber,
+    });
+
+    if (!surah) {
+      return ResponseHandler.error(res, "Verse not found in any surah", 404);
+    }
+
+    // Find the specific verse in the surah
+    const verse = surah.verses.find(
+      (v) => v.totalVerseNumber === globalVerseNumber
+    );
+
+    // Format the response data
+    const formattedData = {
+      bookName: tafsirDoc.bookName,
+      language: tafsirDoc.language,
+      surahName: surah.name,
+      surahNumber: surah.surahNumber,
+      verseNumber: verse.verseNumber,
+      totalVerseNumber: tafsirItem.totalVerseNumber,
+      arabicAyah: verse.arabicAyah,
+      mainContent: tafsirItem.mainContent,
+      OtherLanguageContent: tafsirItem.OtherLanguageContent,
+      note: tafsirItem.note || "",
+      tafsirId: tafsirItem._id,
+    };
+
+    // Store in cache (10 minutes expiration)
+    setCache(cacheKey, JSON.stringify(formattedData), 600);
+
+    // Return response
+    return ResponseHandler.success(
+      res,
+      formattedData,
+      "Tafsir Fetched Successfully",
+      200
+    );
+  } catch (error) {
+    console.log(error);
+    ResponseHandler.error(res, "Something Wrong Server Side.!", 500);
+  }
+};
+
+module.exports = {
+  addTafsir,
+  getTafsir,
+  editTafsir,
+  deleteTafsir,
+  getAllTafsirByTotalVerseNumber,
+};
