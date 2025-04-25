@@ -408,6 +408,8 @@ const getAllTafsirByTotalVerseNumber = async (req, res) => {
   try {
     const { language = "bn", totalVerseNumber, bookName } = req.query;
 
+    console.log("server req query", req.query);
+
     // data normalization
     const globalVerseNumber = Number(totalVerseNumber);
 
@@ -504,12 +506,11 @@ const getAllTafsirByTotalVerseNumber = async (req, res) => {
     setCache(cacheKey, JSON.stringify(formattedData), 600);
 
     // Return response
-    return ResponseHandler.success(
-      res,
-      formattedData,
-      "Tafsir Fetched Successfully",
-      200
-    );
+    return res.status(200).json({
+      success: true,
+      message: "Tafsir Fetched Successfully",
+      tafsir: [formattedData], // now sending as an array
+    });
   } catch (error) {
     console.log(error);
     ResponseHandler.error(res, "Something Wrong Server Side.!", 500);
