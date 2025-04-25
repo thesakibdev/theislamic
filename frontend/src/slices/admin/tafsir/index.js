@@ -83,38 +83,13 @@ export const tafsirApi = createApi({
 
     // Fetch paginated Tafsir data
     getAllTafsirByVerse: builder.query({
-      query: ({ language, bookName, page = 1, limit = 10 }) => ({
-        url: `/admin/tafsir/get?language=${language}&bookName=${bookName}&page=${page}&limit=${limit}`,
-        method: "GET",
-      }),
-      // Add cache key configuration
-      serializeQueryArgs: ({ queryArgs }) => {
-        return `${queryArgs.language}_${queryArgs.bookName}`;
-      },
-      // Transform response to handle errors
-      transformResponse: (response) => {
-        if (!response.success) {
-          throw new Error(response.message || "Error fetching data");
+      query: ({ language, bookName, totalVerseNumber }) => (
+        console.log("RTK", language, bookName, totalVerseNumber),
+        {
+          url: `/admin/tafsir//get/single?language=${language}&bookName=${bookName}&totalVerseNumber=${totalVerseNumber}`,
+          method: "GET",
         }
-        return response;
-      },
-      // Handle errors by clearing cache
-      transformErrorResponse: () => {
-        return [];
-      },
-      // Merge strategy
-      merge: (currentCache, newItems) => {
-        if (!newItems.success) {
-          return undefined;
-        }
-        return newItems;
-      },
-      // Invalidate cache on error
-      invalidatesTags: (result, error, { language, bookName }) =>
-        error ? [{ type: "tafsir", id: `${language}_${bookName}` }] : [],
-      providesTags: (result, error, { language, bookName }) => [
-        { type: "tafsir", id: `${language}_${bookName}` },
-      ],
+      ),
     }),
   }),
 });
