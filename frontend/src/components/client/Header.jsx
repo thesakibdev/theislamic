@@ -53,7 +53,7 @@ export default function Header() {
     {
       icon: OpenBook,
       text: "Tafsir",
-      path: "/tafsir",
+      path: "/quran/tafsir",
     },
     {
       icon: ManPraying,
@@ -126,7 +126,6 @@ export default function Header() {
   useEffect(() => {
     dispatch(checkAuth());
   }, [dispatch]);
-
 
   const roles = ["admin", "creator", "editor"];
   const initialAvatar = user?.name
