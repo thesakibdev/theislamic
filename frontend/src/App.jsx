@@ -19,6 +19,7 @@ import RecitePage from "./pages/client/Recite";
 import ReciteLayout from "./layout/client/ReciteLayout";
 import AuthProfile from "./components/client/AuthProfile";
 import DonorPage from "./pages/client/Donor";
+import TafsirPage from "./pages/client/tafsir/TafsirPage";
 import HadithReadPage from "./pages/client/hadith/HadithReadPage";
 import HadithPage from "./pages/client/hadith/HadithPage";
 import HadithIndex from "./pages/client/hadith/HadithIndex";
@@ -72,6 +73,9 @@ export default function App() {
         <Route path="/hadith/:id/:number" element={<HadithReadPage />} />
         <Route path="/hadith/thematic" element={<HadithThematic />} />
         <Route path="/hadith/farewell" element={<Farewell />} />
+
+        {/* tafsir */}
+        <Route path="/quran/tafsir" element={<TafsirPage />} />
 
         {/* donor route */}
         <Route path="/donor" element={<DonorPage />} />
