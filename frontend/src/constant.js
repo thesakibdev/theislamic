@@ -3809,16 +3809,16 @@ export const surahNameList = [
 
 export const tafsirBooksList = [
   {
+    nameEn: "Tafsir Al-Qurtubi",
+    nameBn: "তাফসির আল-কুরতুবি",
+  },
+  {
     nameEn: "Tafseer al Kabir",
     nameBn: "তাফসির আল কাবির",
   },
   {
     nameEn: "Tafsir Ibn 'Abbas",
     nameBn: "তাফসির ইবনে আব্বাস",
-  },
-  {
-    nameEn: "Tafsir Al-Qurtubi",
-    nameBn: "তাফসির আল-কুরতুবি",
   },
   {
     nameEn: "Tafsir Ibn Kathir",
@@ -3881,4 +3881,3 @@ export const tafsirBooksList = [
     nameBn: "তাফসির আহসানুল বায়ান",
   },
 ];
-
