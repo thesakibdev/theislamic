@@ -66,13 +66,13 @@ export default function IndexPage() {
               <TabsContent value="recent">
                 {recentSurahs.length > 0 ? (
                   <div className="flex gap-4 overflow-x-auto whitespace-nowrap">
-                    {recentSurahs.map((surah) => (
+                    {recentSurahs?.map((surah, index) => (
                       <p
-                        key={surah.surahNumber}
+                        key={index}
                         className="text-md font-bold cursor-pointer hover:text-primary-foreground"
                         onClick={() => navigate(`/recite/${surah.surahNumber}`)}
                       >
-                        {surah.surahName},
+                        {surah?.surahName?.en}
                       </p>
                     ))}
                   </div>
@@ -103,10 +103,10 @@ export default function IndexPage() {
             </div>
             <TabsContent value="surah" className="w-full">
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 justify-between gap-10 w-full">
-                {surahNameList?.map((surah) => (
+                {surahNameList?.map((surah, index) => (
                   <div
+                    key={index}
                     className="flex justify-between items-center border cursor-pointer p-5 rounded-lg hover:border-primary group w-full bg-white"
-                    key={surah.id}
                     onClick={() => {
                       navigate(`/recite/${surah.surahNumber}`);
                       // Age store kora data ber kore
@@ -121,7 +121,10 @@ export default function IndexPage() {
                       ) {
                         storedSurahs.push({
                           surahNumber: surah.surahNumber,
-                          surahName: surah.surahName,
+                          surahName: {
+                            en: surah.surahName.en,
+                            ar: surah.surahName.ar,
+                          },
                         });
                       }
 
@@ -158,10 +161,10 @@ export default function IndexPage() {
                           className="text-right font-arabic text-balck text-lg rlt lg:text-2xl font-bold group-hover:text-primary"
                           dir="rtl"
                         >
-                          {surah.surahName.ar}
+                          {surah?.surahName?.ar}
                         </div>
                         <p className="font-bold text-sm text-primary-foreground group-hover:text-primary">
-                          Ayah: {surah.totalAyah}
+                          Ayah: {surah?.totalAyah}
                         </p>
                       </div>
                     </div>
