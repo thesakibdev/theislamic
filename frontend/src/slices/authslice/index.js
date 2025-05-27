@@ -1,3 +1,4 @@
+// Fix for authSlice.js
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -9,6 +10,7 @@ const initialState = {
   user: null,
   userDetails: null,
   error: null,
+  authChecked: false, // Add this flag to track if auth has been checked
 };
 
 const handlePending = (state) => {
@@ -19,6 +21,11 @@ const handlePending = (state) => {
 const handleRejected = (state, action) => {
   state.isLoading = false;
   state.error = action.error?.message || "Something went wrong";
+
+  // On auth check rejection, mark as checked but don't reset user
+  if (action.type === checkAuth.rejected.type) {
+    state.authChecked = true;
+  }
 };
 
 const handleAuthFulfilled = (state, action) => {
@@ -26,6 +33,11 @@ const handleAuthFulfilled = (state, action) => {
   state.user = action.payload.success ? action.payload.user : null;
   state.isAuthenticated = action.payload.success;
   state.error = null;
+
+  // For auth check, mark it as checked
+  if (action.type === checkAuth.fulfilled.type) {
+    state.authChecked = true;
+  }
 };
 
 const createAsyncAction = (type, request) => {
@@ -34,6 +46,10 @@ const createAsyncAction = (type, request) => {
       const response = await request(args);
       return response.data;
     } catch (error) {
+      // Handle 401 errors by not rejecting but returning a standardized response
+      if (error.response?.status === 401 && type === "auth/checkAuth") {
+        return { success: false, user: null };
+      }
       return rejectWithValue(error.response?.data || error.message);
     }
   });
@@ -72,6 +88,11 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.isAuthenticated = Boolean(action.payload);
     },
+    resetAuthState: (state) => {
+      state.isAuthenticated = false;
+      state.user = null;
+      state.authChecked = true;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -92,6 +113,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        state.authChecked = true;
       })
       .addCase(getUserDetails.pending, handlePending)
       .addCase(getUserDetails.fulfilled, (state, action) => {
@@ -103,5 +125,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser } = authSlice.actions;
+export const { setUser, resetAuthState } = authSlice.actions;
 export default authSlice.reducer;
