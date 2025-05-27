@@ -1,5 +1,5 @@
 import Banner from "../../assets/hero-banner.png";
-// import SearchBar from "../../components/client/Search";
+import SearchBar from "../../components/client/Search";
 import { Input } from "@/components/ui/input";
 import Search from "../../assets/icon/search-icon.png";
 
