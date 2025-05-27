@@ -224,7 +224,7 @@ const updateUserProfile = async (req, res) => {
 //auth middleware
 const authMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
-
+  
   if (!token) {
     return res.status(401).json({
       success: false,
