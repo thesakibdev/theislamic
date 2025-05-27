@@ -1,36 +1,37 @@
 const mongoose = require("mongoose");
 
-// tafsir.model.js
-const tafsirDataSchema = new mongoose.Schema({
+// tafsir model
+const tafsirSchema = new mongoose.Schema({
+  language: {
+    type: String,
+    required: true,
+  },
+  bookName: {
+    type: String,
+    required: true,
+  },
+  surahName: {
+    type: String,
+    required: true,
+  },
   totalVerseNumber: {
     type: Number,
     required: true,
   },
-  mainContent: {
+  arabicAyah: {
     type: String,
     required: true,
   },
-  OtherLanguageContent: {
+  content: {
     type: String,
     required: true,
   },
-  note: String,
+  note: {
+    type: String,
+    required: true,
+  },
 });
 
-const tafsirSchema = new mongoose.Schema(
-  {
-    language: { type: String, required: true },
-    bookName: { type: String, required: true },
-    tafsirData: [tafsirDataSchema],
-  },
-  { timestamps: true }
-);
-
-// Create a compound index on language and bookName
-tafsirSchema.index(
-  { language: 1, bookName: 1, "tafsirData.totalVerseNumber": 1 },
-  { unique: true }
-);
-
 const Tafsir = mongoose.model("Tafsir", tafsirSchema);
+
 module.exports = Tafsir;
