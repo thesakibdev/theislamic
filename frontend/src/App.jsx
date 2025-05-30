@@ -35,6 +35,7 @@ import { useEffect } from "react";
 import { checkAuth } from "./slices/authslice";
 // import { Skeleton } from "./components/ui/skeleton";
 import SearchResult from "./pages/client/SearchResult";
+// import TafsirPage from "./pages/client/tafsir/TafsirPage";
 
 export default function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -63,6 +64,7 @@ export default function App() {
         <Route path="/index" element={<IndexPage />} />
         <Route path="/translation" element={<Translation />} />
         <Route path="/profile" element={<AuthProfile />} />
+        {/* <Route path="/tafsir" element={<TafsirPage />} /> */}
         <Route path="/" element={<ReciteLayout />}>
           <Route path="/recite/:number" element={<RecitePage />} />
         </Route>
