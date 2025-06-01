@@ -38,8 +38,8 @@ export const tafsirApi = createApi({
 
     // Get all tafsir by pagination
     getAllTafsirByPagination: builder.query({
-      query: ({ page, limit, tafsirPage, tafsirLimit }) => ({
-        url: `/admin/tafsir/get/all?page=${page}&limit=${limit}&tafsirPage=${tafsirPage}&tafsirLimit=${tafsirLimit}`,
+      query: ({ page, limit, language }) => ({
+        url: `/admin/tafsir/get?language=${language}&limit=${limit}&page=${page}`,
         method: "GET",
       }),
       providesTags: ["Tafsir"], // সঠিক, কারণ এটি ডেটা ফেচ করে
