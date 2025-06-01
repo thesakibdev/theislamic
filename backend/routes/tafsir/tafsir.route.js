@@ -8,8 +8,8 @@ const {
 } = require("../../controllers/tafsir/tafsir.controller");
 
 router.post("/tafsir/create", createTafsir);
-router.put("/tafsir/edit", editTafsir);
-router.delete("/tafsir/delete", deleteTafsir);
+router.put("/tafsir/edit/:id", editTafsir);
+router.delete("/tafsir/delete/:id", deleteTafsir);
 router.get("/tafsir/get", paginateTafsir);
 
 module.exports = router;
