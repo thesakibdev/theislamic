@@ -90,7 +90,7 @@ export default function Header() {
     },
     {
       text: "Exegesis",
-      path: "/",
+      path: "/tafsir",
     },
     {
       text: "Word by Word",
