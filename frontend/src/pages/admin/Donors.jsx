@@ -25,7 +25,12 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Dialog, DialogContent, DialogHeader, DialogOverlay } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ImageUploader from "@/components/common/imageUploader";
 import { Label } from "@/components/ui/label";
@@ -79,7 +84,7 @@ export default function Donors() {
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading, refetch } = useGetAllDonorsQuery({
     page: currentPage,
-    limit: 5,
+    limit: 10,
   });
 
   const [addDonor] = useAddDonorMutation();
@@ -403,266 +408,277 @@ export default function Donors() {
         </div>
 
         <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <h1 className="text-2xl md:text-4xl font-semibold text-center">
               Honorable Donor List
             </h1>
 
-            {isLoading ? (
-              <p>Loading...</p>
-            ) : data?.donors?.length > 0 ? (
-              data?.donors?.map((donor, index) => (
-                <div
-                  key={donor.name}
-                  className="border p-4 rounded-md mt-3 md:mt-5"
-                >
+            <div className="h-screen overflow-y-scroll w-full bg-primaryLight px-4">
+              {isLoading ? (
+                <p>Loading...</p>
+              ) : data?.donors?.length > 0 ? (
+                data?.donors?.map((donor, index) => (
                   <div
-                    id="Donor"
-                    className="flex flex-col md:flex-row my-3 gap-5 rounded-md"
+                    key={donor.name}
+                    className="border border-gray-600 bg-white p-4 rounded-md mt-3 md:mt-5"
                   >
-                    <div className="w-full md:max-w-[190px] md:w-1/4 overflow-hidden">
-                      {donor.avatar === "" ? (
-                        <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
-                      ) : (
-                        <div
-                          className="h-96 md:h-[220px] w-full bg-cover bg-center rounded-md"
-                          style={{ backgroundImage: `url(${donor.avatar})` }}
-                        ></div>
-                      )}
-                    </div>
-                    <div className="w-full md:w-3/4">
-                      <div className="flex justify-between items-center mb-1">
-                        <p className="text-xl md:text-2xl font-bold mb-2">
-                          Name: {donor.name}
-                        </p>
-                        <div className="flex gap-2">
-                          <Button
-                            className="bg-primary text-white"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditDonor(donor);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteDonor(donor._id);
-                            }}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex gap-y-3 gap-x-5 ">
-                        <div className="w-1/2 flex flex-col gap-y-3">
-                          <p className="text-lg text-black/50">
-                            <span className="font-semibold text-black/60">
-                              Profession:
-                            </span>{" "}
-                            {donor.profession}
-                          </p>
-                          <p className="text-lg text-black/50">
-                            <span className="font-semibold text-black/60">
-                              Designation:{" "}
-                            </span>
-                            {donor.designation}
-                          </p>
-                          <p className="text-lg text-black/50">
-                            <span className="font-semibold text-black/60">
-                              City:
-                            </span>{" "}
-                            {donor.city}
-                          </p>
+                    <div
+                      id="Donor"
+                      className="flex flex-col md:flex-row my-3 gap-5 rounded-md"
+                    >
+                      <div className="w-full md:max-w-[190px] md:w-1/4 overflow-hidden">
+                        {donor.avatar === "" ? (
+                          <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
+                        ) : (
                           <div
-                            className="flex items-center gap-3 cursor-pointer group"
-                            onClick={() => toggleDonationHistory(index)}
-                          >
+                            className="h-96 md:h-[220px] w-full bg-cover bg-center rounded-md"
+                            style={{ backgroundImage: `url(${donor.avatar})` }}
+                          ></div>
+                        )}
+                      </div>
+                      <div className="w-full md:w-3/4">
+                        <div className="flex justify-between items-center mb-1">
+                          <p className="text-xl md:text-2xl font-bold mb-2">
+                            Name: {donor.name}
+                          </p>
+                          <div className="flex gap-2">
+                            <Button
+                              className="bg-primary text-white"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditDonor(donor);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteDonor(donor._id);
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="flex gap-y-3 gap-x-5 ">
+                          <div className="w-1/2 flex flex-col gap-y-3">
                             <p className="text-lg text-black/50">
                               <span className="font-semibold text-black/60">
-                                Total Donation:
+                                Profession:
                               </span>{" "}
-                              {donor.TotalDonation}
+                              {donor.profession}
                             </p>
-                            <FaAngleUp
-                              className={`transition-transform ${
-                                openHistory[index] ? "rotate-180" : ""
-                              } group-hover:text-primary duration-300`}
-                              alt="Arrow Down"
+                            <p className="text-lg text-black/50">
+                              <span className="font-semibold text-black/60">
+                                Designation:{" "}
+                              </span>
+                              {donor.designation}
+                            </p>
+                            <p className="text-lg text-black/50">
+                              <span className="font-semibold text-black/60">
+                                City:
+                              </span>{" "}
+                              {donor.city}
+                            </p>
+                            <div
+                              className="flex items-center gap-3 cursor-pointer group"
+                              onClick={() => toggleDonationHistory(index)}
+                            >
+                              <p className="text-lg text-black/50">
+                                <span className="font-semibold text-black/60">
+                                  Total Donation:
+                                </span>{" "}
+                                {donor.TotalDonation}
+                              </p>
+                              <FaAngleUp
+                                className={`transition-transform ${
+                                  openHistory[index] ? "rotate-180" : ""
+                                } group-hover:text-primary duration-300`}
+                                alt="Arrow Down"
+                              />
+                            </div>
+                          </div>
+                          <div className="w-1/2 flex flex-col gap-y-3">
+                            <p className="text-lg text-black/50">
+                              <span className="font-semibold text-black/60">
+                                Company:
+                              </span>{" "}
+                              {donor.companyName}
+                            </p>
+
+                            <p className="text-lg text-black/50">
+                              <span className="font-semibold text-black/60">
+                                Street:
+                              </span>{" "}
+                              {donor.street}
+                            </p>
+
+                            <p className="text-lg text-black/50">
+                              <span className="font-semibold text-black/60">
+                                Country:
+                              </span>{" "}
+                              {donor.country}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className={openHistory[index] ? "block my-5" : "hidden"}
+                    >
+                      <div className="flex justify-end">
+                        <Button
+                          className="text-white"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            resetForm();
+                            setDonorId(donor._id);
+                            setOpenDonationHistoryForm(true);
+                          }}
+                        >
+                          <FaPlus />
+                          <span>Add New Donation</span>
+                        </Button>
+                      </div>
+                      {donor?.donationHistory?.map((donation, index) => (
+                        <div
+                          key={index}
+                          className="border p-4 rounded-md mt-3 flex justify-between cursor-pointer"
+                        >
+                          <div className="flex gap-5">
+                            <p>
+                              <span>Amount :</span> {donation.amount}
+                            </p>
+                            <p>
+                              <span>Donate Date :</span> {donation.donateDate}
+                            </p>
+                            <p>
+                              <span>Donation Type :</span>{" "}
+                              {donation.typeOfDonation}
+                            </p>
+                          </div>
+                          <div className="flex gap-3">
+                            <div
+                              className="bg-white border p-2 rounded-md text-black hover:bg-primary hover:text-white duration-300"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenDonationHistoryForm(true);
+                                setDonationHistoryId(donation._id);
+                                setDonationHistoryData({
+                                  amount: donation.amount,
+                                  donateDate: donation.donateDate,
+                                  typeOfDonation: donation.typeOfDonation,
+                                });
+                              }}
+                            >
+                              <FaRegEdit />
+                            </div>
+                            <div
+                              className="bg-red-500 border p-2 rounded-md text-white hover:bg-primary hover:text-black duration-300"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDonorHistoryDelete(
+                                  donor._id,
+                                  donation._id
+                                );
+                              }}
+                            >
+                              <FaTrash />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <Dialog
+                      open={openDonationHistoryForm}
+                      onOpenChange={(open) => {
+                        if (!open) {
+                          setOpenDonationHistoryForm(false);
+                        }
+                      }}
+                    >
+                      <DialogOverlay className="bg-black/20" />
+                      <DialogContent
+                        onClick={(event) => event.stopPropagation()}
+                        className="bg-white dark:bg-gray-900"
+                        aria-describedby="dialog-description"
+                      >
+                        <DialogHeader>
+                          <p id="dialog-description">
+                            {donationHistoryId
+                              ? "Edit Donation History"
+                              : "Add New Donation"}
+                          </p>
+                        </DialogHeader>
+
+                        <form onSubmit={handleDonationHistory}>
+                          <div className="">
+                            <Label htmlFor="amount">Amount</Label>
+                            <Input
+                              type="text"
+                              id="amount"
+                              name="amount"
+                              value={donationHistoryData.amount}
+                              onChange={(e) =>
+                                setDonationHistoryData({
+                                  ...donationHistoryData,
+                                  amount: e.target.value,
+                                })
+                              }
+                              className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
                             />
                           </div>
-                        </div>
-                        <div className="w-1/2 flex flex-col gap-y-3">
-                          <p className="text-lg text-black/50">
-                            <span className="font-semibold text-black/60">
-                              Company:
-                            </span>{" "}
-                            {donor.companyName}
-                          </p>
-
-                          <p className="text-lg text-black/50">
-                            <span className="font-semibold text-black/60">
-                              Street:
-                            </span>{" "}
-                            {donor.street}
-                          </p>
-
-                          <p className="text-lg text-black/50">
-                            <span className="font-semibold text-black/60">
-                              Country:
-                            </span>{" "}
-                            {donor.country}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className={openHistory[index] ? "block my-5" : "hidden"}>
-                    <div className="flex justify-end">
-                      <Button
-                        className="text-white"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          resetForm();
-                          setDonorId(donor._id);
-                          setOpenDonationHistoryForm(true);
-                        }}
-                      >
-                        <FaPlus />
-                        <span>Add New Donation</span>
-                      </Button>
-                    </div>
-                    {donor?.donationHistory?.map((donation, index) => (
-                      <div
-                        key={index}
-                        className="border p-4 rounded-md mt-3 flex justify-between cursor-pointer"
-                      >
-                        <div className="flex gap-5">
-                          <p>
-                            <span>Amount :</span> {donation.amount}
-                          </p>
-                          <p>
-                            <span>Donate Date :</span> {donation.donateDate}
-                          </p>
-                          <p>
-                            <span>Donation Type :</span>{" "}
-                            {donation.typeOfDonation}
-                          </p>
-                        </div>
-                        <div className="flex gap-3">
-                          <div
-                            className="bg-white border p-2 rounded-md text-black hover:bg-primary hover:text-white duration-300"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenDonationHistoryForm(true);
-                              setDonationHistoryId(donation._id);
-                              setDonationHistoryData({
-                                amount: donation.amount,
-                                donateDate: donation.donateDate,
-                                typeOfDonation: donation.typeOfDonation,
-                              });
-                            }}
-                          >
-                            <FaRegEdit />
+                          <div className="">
+                            <Label htmlFor="date">Date</Label>
+                            <Input
+                              type="date"
+                              id="date"
+                              name="date"
+                              value={donationHistoryData.donateDate}
+                              onChange={(e) =>
+                                setDonationHistoryData({
+                                  ...donationHistoryData,
+                                  donateDate: e.target.value,
+                                })
+                              }
+                              className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                            />
                           </div>
-                          <div
-                            className="bg-red-500 border p-2 rounded-md text-white hover:bg-primary hover:text-black duration-300"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDonorHistoryDelete(donor._id, donation._id);
-                            }}
-                          >
-                            <FaTrash />
+                          <div className="">
+                            <Label htmlFor="typeOfDonation">
+                              Donation Type
+                            </Label>
+                            <Input
+                              type="text"
+                              id="typeOfDonation"
+                              name="typeOfDonation"
+                              value={donationHistoryData.typeOfDonation}
+                              onChange={(e) =>
+                                setDonationHistoryData({
+                                  ...donationHistoryData,
+                                  typeOfDonation: e.target.value,
+                                })
+                              }
+                              className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
+                            />
                           </div>
-                        </div>
-                      </div>
-                    ))}
+
+                          <Button className="mt-3 text-white">
+                            {donationHistoryId ? "Update" : "Add"}
+                          </Button>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
                   </div>
-                  <Dialog
-                    open={openDonationHistoryForm}
-                    onOpenChange={(open) => {
-                      if (!open) {
-                        setOpenDonationHistoryForm(false);
-                      }
-                    }}
-                  >
-                    <DialogOverlay className="bg-black/20" />
-                    <DialogContent
-                      onClick={(event) => event.stopPropagation()}
-                      className="bg-white dark:bg-gray-900"
-                      aria-describedby="dialog-description"
-                    >
-                      <DialogHeader>
-                        <p id="dialog-description">
-                          {donationHistoryId
-                            ? "Edit Donation History"
-                            : "Add New Donation"}
-                        </p>
-                      </DialogHeader>
-
-                      <form onSubmit={handleDonationHistory}>
-                        <div className="">
-                          <Label htmlFor="amount">Amount</Label>
-                          <Input
-                            type="text"
-                            id="amount"
-                            name="amount"
-                            value={donationHistoryData.amount}
-                            onChange={(e) =>
-                              setDonationHistoryData({
-                                ...donationHistoryData,
-                                amount: e.target.value,
-                              })
-                            }
-                            className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
-                          />
-                        </div>
-                        <div className="">
-                          <Label htmlFor="date">Date</Label>
-                          <Input
-                            type="date"
-                            id="date"
-                            name="date"
-                            value={donationHistoryData.donateDate}
-                            onChange={(e) =>
-                              setDonationHistoryData({
-                                ...donationHistoryData,
-                                donateDate: e.target.value,
-                              })
-                            }
-                            className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
-                          />
-                        </div>
-                        <div className="">
-                          <Label htmlFor="typeOfDonation">Donation Type</Label>
-                          <Input
-                            type="text"
-                            id="typeOfDonation"
-                            name="typeOfDonation"
-                            value={donationHistoryData.typeOfDonation}
-                            onChange={(e) =>
-                              setDonationHistoryData({
-                                ...donationHistoryData,
-                                typeOfDonation: e.target.value,
-                              })
-                            }
-                            className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary"
-                          />
-                        </div>
-
-                        <Button className="mt-3 text-white">
-                          {donationHistoryId ? "Update" : "Add"}
-                        </Button>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
+                ))
+              ) : (
+                <div className="max-w-2xl mx-auto flex items-center justify-center h-full">
+                  <p className="text-xl font-medium">No Donors Found</p>
                 </div>
-              ))
-            ) : (
-              <p>No Donors Found</p>
-            )}
+              )}
+            </div>
           </div>
           <div className="flex justify-center mt-3 md:mt-5">
             <Pagination className="px-4">
@@ -670,11 +686,12 @@ export default function Donors() {
                 <PaginationItem>
                   <PaginationPrevious
                     aria-label="Go to previous page"
-                    onClick={() =>
+                    onClick={() => {
                       setCurrentPage(() =>
                         currentPage == 1 ? 1 : currentPage - 1
-                      )
-                    }
+                      );
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                     className="bg-primary hover:bg-green-400 cursor-pointer text-white"
                     disabled={currentPage == 1}
                   />
@@ -685,7 +702,10 @@ export default function Donors() {
                 <PaginationItem>
                   <PaginationNext
                     aria-label="Go to next page"
-                    onClick={() => setCurrentPage(currentPage + 1)}
+                    onClick={() => {
+                      setCurrentPage(currentPage + 1);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                     className="bg-primary hover:bg-green-400 cursor-pointer text-white"
                   />
                 </PaginationItem>

@@ -301,22 +301,15 @@ const getAllDonors = async (req, res) => {
       .limit(pageLimit)
       .lean();
 
-    const donorsWithTotalDonation = donors.map((donor) => {
-      const totalDonation = (donor.donationHistory || []).reduce(
-        (acc, curr) => acc + (curr.amount || 0),
-        0
-      );
-      return { ...donor, totalDonation };
-    });
-
-    setCache(cacheKey, { donors: donorsWithTotalDonation, totalDonors }, 600);
+    // Manual calculation সরিয়ে দিন
+    setCache(cacheKey, { donors, totalDonors }, 600);
 
     res.status(200).json({
       success: true,
       currentPage,
       totalPages: Math.ceil(totalDonors / pageLimit),
       totalDonors,
-      donors: donorsWithTotalDonation,
+      donors, // direct donors return করুন
     });
   } catch (error) {
     console.error(error);

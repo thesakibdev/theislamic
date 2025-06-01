@@ -150,12 +150,13 @@ export default function AdminSidebar() {
               <div className="w-6 h-6 bg-white rounded-full"></div>
               <span>Blue</span>
             </button>
-            <button
-              className="flex items-center space-x-2 text-lg"
-              onClick={() => navigate("/")}
-            >
+            <button className="flex items-center space-x-2 text-lg">
               <div className="w-6 h-6 bg-white rounded-full"></div>
-              <span>Visit Website</span>
+              <span>
+                <a href="/" target="_blank">
+                  Visit Website
+                </a>
+              </span>
             </button>
           </div>
         </div>

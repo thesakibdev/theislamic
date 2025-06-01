@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useGetAllTafsirByPaginationQuery } from "../../../slices/admin/tafsir";
+import { useGetAllTafsirByVerseQuery } from "../../../slices/admin/tafsir";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { FaAngleUp } from "react-icons/fa";
@@ -17,7 +17,7 @@ export default function TafsirPage() {
 
   const [selectedLanguage, setSelectedLanguage] = useState("bn");
 
-  const { data, isLoading, isError } = useGetAllTafsirByPaginationQuery({
+  const { data, isLoading, isError } = useGetAllTafsirByVerseQuery({
     language: selectedLanguage,
     bookName: selectedBookName,
     totalVerseNumber: selectedTotalVerseNumber,
