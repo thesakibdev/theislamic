@@ -36,6 +36,7 @@ import { checkAuth } from "./slices/authslice";
 // import { Skeleton } from "./components/ui/skeleton";
 import SearchResult from "./pages/client/SearchResult";
 import TafsirIndexPage from "./pages/client/tafsir/TafsirIndex";
+import TafsirListPage from "./pages/client/tafsir/TafsirList";
 
 export default function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -65,6 +66,7 @@ export default function App() {
         <Route path="/translation" element={<Translation />} />
         <Route path="/profile" element={<AuthProfile />} />
         <Route path="/tafsir" element={<TafsirIndexPage />} />
+        <Route path="/tafsir-list/:surahNumber" element={<TafsirListPage />} />
         <Route path="/" element={<ReciteLayout />}>
           <Route path="/recite/:number" element={<RecitePage />} />
         </Route>
