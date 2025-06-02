@@ -37,7 +37,7 @@ export const tafsirApi = createApi({
     }),
 
     // Get all tafsir by pagination
-    getAllTafsirByPagination: builder.query({
+    getBySurah: builder.query({
       query: ({ surahNumber, language }) => ({
         url: `/admin/tafsir/get?language=${language}&surahNumber=${surahNumber}`,
         method: "GET",
@@ -51,5 +51,5 @@ export const {
   useAddTafsirMutation,
   useEditTafsirMutation,
   useDeleteTafsirMutation,
-  useGetAllTafsirByPaginationQuery,
+  useGetBySurahQuery,
 } = tafsirApi;
