@@ -6,30 +6,34 @@ const tafsirSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  bookName: {
-    type: String,
-    required: true,
-  },
   surahName: {
     type: String,
-    required: true,
   },
-  totalVerseNumber: {
+  surahNumber: {
     type: Number,
     required: true,
   },
-  arabicAyah: {
-    type: String,
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-  },
-  note: {
-    type: String,
-    required: true,
-  },
+  tafseer: [{
+    bookName: {
+      type: String,
+    },
+    totalVerseNumber: {
+      type: Number,
+      required: true,
+    },
+    arabicAyah: {
+      type: String,
+      required: true,
+    },
+    content: {
+      type: String,
+      required: true,
+    },
+    note: {
+      type: String,
+      required: true,
+    },
+  }]
 });
 
 const Tafsir = mongoose.model("Tafsir", tafsirSchema);
