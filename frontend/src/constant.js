@@ -524,6 +524,7 @@ export const surahNameList = [
     juzNumber: [1],
     totalAyah: 7,
   },
+
   {
     surahName: {
       ar: "سورة البقرة",
@@ -553,6 +554,7 @@ export const surahNameList = [
     juzNumber: [1, 2, 3],
     totalAyah: 286,
   },
+
   {
     surahName: {
       ar: "سورة آل عمران",
@@ -582,10 +584,12 @@ export const surahNameList = [
     juzNumber: [3, 4],
     totalAyah: 200,
   },
+
   {
     surahName: {
       ar: "سورة النساء",
       bn: "সুরা আন-নিসা",
+
       en: "Surah An-Nisa",
       hi: "सुरा अन-निसा",
       pt: "Surah An-Nisa",
@@ -611,6 +615,7 @@ export const surahNameList = [
     juzNumber: [4, 5, 6],
     totalAyah: 176,
   },
+
   {
     surahName: {
       ar: "سورة المائدة",
@@ -640,6 +645,7 @@ export const surahNameList = [
     juzNumber: [6, 7],
     totalAyah: 120,
   },
+
   {
     surahName: {
       ar: "سورة الأنعام",
@@ -669,6 +675,7 @@ export const surahNameList = [
     juzNumber: [7, 8],
     totalAyah: 165,
   },
+
   {
     surahName: {
       ar: "سورة الأعراف",
@@ -698,6 +705,7 @@ export const surahNameList = [
     juzNumber: [8, 9],
     totalAyah: 206,
   },
+
   {
     surahName: {
       ar: "سورة الأنفال",
@@ -727,6 +735,7 @@ export const surahNameList = [
     juzNumber: [9, 10],
     totalAyah: 75,
   },
+
   {
     surahName: {
       ar: "سورة التوبة",
@@ -756,6 +765,7 @@ export const surahNameList = [
     juzNumber: [10, 11],
     totalAyah: 129,
   },
+
   {
     surahName: {
       ar: "سورة يونس",
@@ -785,6 +795,7 @@ export const surahNameList = [
     juzNumber: [11],
     totalAyah: 109,
   },
+
   {
     surahName: {
       ar: "سورة هود",
@@ -814,6 +825,7 @@ export const surahNameList = [
     juzNumber: [11, 12],
     totalAyah: 123,
   },
+
   {
     surahName: {
       ar: "سورة يوسف",
@@ -843,6 +855,7 @@ export const surahNameList = [
     juzNumber: [12, 13],
     totalAyah: 111,
   },
+
   {
     surahName: {
       ar: "سورة الرعد",
@@ -872,6 +885,7 @@ export const surahNameList = [
     juzNumber: [13],
     totalAyah: 43,
   },
+
   {
     surahName: {
       ar: "سورة إبراهيم",
@@ -901,6 +915,7 @@ export const surahNameList = [
     juzNumber: [13],
     totalAyah: 52,
   },
+
   {
     surahName: {
       ar: "سورة الحجر",
@@ -930,6 +945,7 @@ export const surahNameList = [
     juzNumber: [14],
     totalAyah: 99,
   },
+
   {
     surahName: {
       ar: "سورة النحل",
@@ -959,6 +975,7 @@ export const surahNameList = [
     juzNumber: [14],
     totalAyah: 128,
   },
+
   {
     surahName: {
       ar: "سورة الإسراء",
@@ -988,6 +1005,7 @@ export const surahNameList = [
     juzNumber: [15],
     totalAyah: 111,
   },
+
   {
     surahName: {
       ar: "سورة الكهف",
@@ -1017,6 +1035,7 @@ export const surahNameList = [
     juzNumber: [15, 16],
     totalAyah: 110,
   },
+
   {
     surahName: {
       ar: "سورة مريم",
@@ -1046,6 +1065,7 @@ export const surahNameList = [
     juzNumber: [16],
     totalAyah: 98,
   },
+
   {
     surahName: {
       ar: "سورة طه",
@@ -1075,6 +1095,7 @@ export const surahNameList = [
     juzNumber: [16],
     totalAyah: 135,
   },
+
   {
     surahName: {
       ar: "سورة الأنبياء",
@@ -1104,6 +1125,7 @@ export const surahNameList = [
     juzNumber: [17],
     totalAyah: 112,
   },
+
   {
     surahName: {
       ar: "سورة الحج",
@@ -1133,6 +1155,7 @@ export const surahNameList = [
     juzNumber: [17],
     totalAyah: 78,
   },
+
   {
     surahName: {
       ar: "سورة المؤمنون",
@@ -1162,6 +1185,7 @@ export const surahNameList = [
     juzNumber: [18],
     totalAyah: 118,
   },
+
   {
     surahName: {
       ar: "سورة النور",
@@ -1191,6 +1215,7 @@ export const surahNameList = [
     juzNumber: [18],
     totalAyah: 64,
   },
+
   {
     surahName: {
       ar: "سورة الفرقان",
@@ -1220,6 +1245,7 @@ export const surahNameList = [
     juzNumber: [18, 19],
     totalAyah: 77,
   },
+
   {
     surahName: {
       ar: "سورة الشعراء",
@@ -1249,6 +1275,7 @@ export const surahNameList = [
     juzNumber: [19],
     totalAyah: 227,
   },
+
   {
     surahName: {
       ar: "سورة النمل",
@@ -1278,6 +1305,7 @@ export const surahNameList = [
     juzNumber: [19, 20],
     totalAyah: 93,
   },
+
   {
     surahName: {
       ar: "سورة القصص",
@@ -1307,6 +1335,7 @@ export const surahNameList = [
     juzNumber: [20],
     totalAyah: 88,
   },
+
   {
     surahName: {
       ar: "سورة العنكبوت",
@@ -1336,6 +1365,7 @@ export const surahNameList = [
     juzNumber: [20, 21],
     totalAyah: 69,
   },
+
   {
     surahName: {
       ar: "سورة الروم",
@@ -1365,6 +1395,7 @@ export const surahNameList = [
     juzNumber: [21],
     totalAyah: 60,
   },
+
   {
     surahName: {
       ar: "سورة لقمان",
@@ -1394,6 +1425,7 @@ export const surahNameList = [
     juzNumber: [21],
     totalAyah: 34,
   },
+
   {
     surahName: {
       ar: "سورة السجدة",
@@ -1423,6 +1455,7 @@ export const surahNameList = [
     juzNumber: [21],
     totalAyah: 30,
   },
+
   {
     surahName: {
       ar: "سورة الأحزاب",
@@ -1452,6 +1485,7 @@ export const surahNameList = [
     juzNumber: [21, 22],
     totalAyah: 73,
   },
+
   {
     surahName: {
       ar: "سورة سبأ",
@@ -1481,6 +1515,7 @@ export const surahNameList = [
     juzNumber: [22],
     totalAyah: 54,
   },
+
   {
     surahName: {
       ar: "سورة فاطر",
@@ -1510,6 +1545,7 @@ export const surahNameList = [
     juzNumber: [22],
     totalAyah: 45,
   },
+
   {
     surahName: {
       ar: "سورة يس",
@@ -1539,6 +1575,7 @@ export const surahNameList = [
     juzNumber: [22, 23],
     totalAyah: 83,
   },
+
   {
     surahName: {
       ar: "سورة الصافات",
@@ -1568,6 +1605,7 @@ export const surahNameList = [
     juzNumber: [23],
     totalAyah: 182,
   },
+
   {
     surahName: {
       ar: "سورة ص",
@@ -1597,6 +1635,7 @@ export const surahNameList = [
     juzNumber: [23],
     totalAyah: 88,
   },
+
   {
     surahName: {
       ar: "سورة الزمر",
@@ -1626,6 +1665,7 @@ export const surahNameList = [
     juzNumber: [23],
     totalAyah: 75,
   },
+
   {
     surahName: {
       ar: "سورة غافر",
@@ -1655,6 +1695,7 @@ export const surahNameList = [
     juzNumber: [24],
     totalAyah: 85,
   },
+
   {
     surahName: {
       ar: "سورة فصلت",
@@ -1684,6 +1725,7 @@ export const surahNameList = [
     juzNumber: [24, 25],
     totalAyah: 54,
   },
+
   {
     surahName: {
       ar: "سورة الشورى",
@@ -1713,6 +1755,7 @@ export const surahNameList = [
     juzNumber: [25],
     totalAyah: 53,
   },
+
   {
     surahName: {
       ar: "سورة الزخرف",
@@ -1742,6 +1785,7 @@ export const surahNameList = [
     juzNumber: [25],
     totalAyah: 89,
   },
+
   {
     surahName: {
       ar: "سورة الدخان",
@@ -1771,6 +1815,7 @@ export const surahNameList = [
     juzNumber: [25],
     totalAyah: 59,
   },
+
   {
     surahName: {
       ar: "سورة الجاثية",
@@ -1800,6 +1845,7 @@ export const surahNameList = [
     juzNumber: [25],
     totalAyah: 37,
   },
+
   {
     surahName: {
       ar: "سورة الأحقاف",
@@ -1825,11 +1871,11 @@ export const surahNameList = [
       ur: "سورۃ الأحقاف",
       zh: "苏拉·阿尔-艾哈卡夫",
     },
-
     surahNumber: 46,
     juzNumber: [26],
     totalAyah: 35,
   },
+
   {
     surahName: {
       ar: "سورة محمد",
@@ -1859,6 +1905,7 @@ export const surahNameList = [
     juzNumber: [26],
     totalAyah: 38,
   },
+
   {
     surahName: {
       ar: "سورة الفتح",
@@ -1888,6 +1935,7 @@ export const surahNameList = [
     juzNumber: [26],
     totalAyah: 29,
   },
+
   {
     surahName: {
       ar: "سورة الحجرات",
@@ -1917,6 +1965,7 @@ export const surahNameList = [
     juzNumber: [26],
     totalAyah: 18,
   },
+
   {
     surahName: {
       ar: "سورة ق",
@@ -1946,6 +1995,7 @@ export const surahNameList = [
     juzNumber: [26],
     totalAyah: 45,
   },
+
   {
     surahName: {
       ar: "سورة الذاريات",
@@ -1975,6 +2025,7 @@ export const surahNameList = [
     juzNumber: [26],
     totalAyah: 60,
   },
+
   {
     surahName: {
       ar: "سورة الطور",
@@ -2004,6 +2055,7 @@ export const surahNameList = [
     juzNumber: [27],
     totalAyah: 49,
   },
+
   {
     surahName: {
       ar: "سورة النجم",
@@ -2033,6 +2085,7 @@ export const surahNameList = [
     juzNumber: [27],
     totalAyah: 62,
   },
+
   {
     surahName: {
       ar: "سورة القمر",
@@ -2062,6 +2115,7 @@ export const surahNameList = [
     juzNumber: [27],
     totalAyah: 55,
   },
+
   {
     surahName: {
       ar: "سورة الرحمن",
@@ -2091,6 +2145,7 @@ export const surahNameList = [
     juzNumber: [27],
     totalAyah: 78,
   },
+
   {
     surahName: {
       ar: "سورة الواقعة",
@@ -2120,6 +2175,7 @@ export const surahNameList = [
     juzNumber: [27],
     totalAyah: 96,
   },
+
   {
     surahName: {
       ar: "سورة الحديد",
@@ -2149,6 +2205,7 @@ export const surahNameList = [
     juzNumber: [27],
     totalAyah: 29,
   },
+
   {
     surahName: {
       ar: "سورة المجادلة",
@@ -2178,6 +2235,7 @@ export const surahNameList = [
     juzNumber: [28],
     totalAyah: 22,
   },
+
   {
     surahName: {
       ar: "سورة الحشر",
@@ -2207,6 +2265,7 @@ export const surahNameList = [
     juzNumber: [28],
     totalAyah: 24,
   },
+
   {
     surahName: {
       ar: "سورة الممتحنة",
@@ -2236,6 +2295,7 @@ export const surahNameList = [
     juzNumber: [28],
     totalAyah: 13,
   },
+
   {
     surahName: {
       ar: "سورة الصف",
@@ -2265,6 +2325,7 @@ export const surahNameList = [
     juzNumber: [28],
     totalAyah: 14,
   },
+
   {
     surahName: {
       ar: "سورة الجمعة",
@@ -2294,6 +2355,7 @@ export const surahNameList = [
     juzNumber: [28],
     totalAyah: 11,
   },
+
   {
     surahName: {
       ar: "سورة المنافقون",
@@ -2323,6 +2385,7 @@ export const surahNameList = [
     juzNumber: [28],
     totalAyah: 11,
   },
+
   {
     surahName: {
       ar: "سورة التغابن",
@@ -2352,6 +2415,7 @@ export const surahNameList = [
     juzNumber: [28],
     totalAyah: 18,
   },
+
   {
     surahName: {
       ar: "سورة الطلاق",
@@ -2381,6 +2445,7 @@ export const surahNameList = [
     juzNumber: [28],
     totalAyah: 12,
   },
+
   {
     surahName: {
       ar: "سورة التحريم",
@@ -2406,11 +2471,11 @@ export const surahNameList = [
       ur: "سورۃ التحريم",
       zh: "苏拉·阿特-塔赫里姆",
     },
-
     surahNumber: 66,
     juzNumber: [28],
     totalAyah: 12,
   },
+
   {
     surahName: {
       ar: "سورة الملك",
@@ -2440,6 +2505,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 30,
   },
+
   {
     surahName: {
       ar: "سورة القلم",
@@ -2469,6 +2535,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 52,
   },
+
   {
     surahName: {
       ar: "سورة الحاقة",
@@ -2498,6 +2565,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 52,
   },
+
   {
     surahName: {
       ar: "سورة المعارج",
@@ -2527,6 +2595,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 44,
   },
+
   {
     surahName: {
       ar: "سورة نوح",
@@ -2556,6 +2625,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 28,
   },
+
   {
     surahName: {
       ar: "سورة الجن",
@@ -2585,6 +2655,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 28,
   },
+
   {
     surahName: {
       ar: "سورة المزمل",
@@ -2614,6 +2685,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 20,
   },
+
   {
     surahName: {
       ar: "سورة المدثر",
@@ -2643,6 +2715,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 56,
   },
+
   {
     surahName: {
       ar: "سورة القيامة",
@@ -2672,6 +2745,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 40,
   },
+
   {
     surahName: {
       ar: "سورة الإنسان",
@@ -2701,6 +2775,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 31,
   },
+
   {
     surahName: {
       ar: "سورة المرسلات",
@@ -2730,6 +2805,7 @@ export const surahNameList = [
     juzNumber: [29],
     totalAyah: 50,
   },
+
   {
     surahName: {
       ar: "سورة النبأ",
@@ -2755,11 +2831,11 @@ export const surahNameList = [
       ur: "سورۃ النبأ",
       zh: "苏拉·安-纳巴",
     },
-
     surahNumber: 78,
     juzNumber: [30],
     totalAyah: 40,
   },
+
   {
     surahName: {
       ar: "سورة النازعات",
@@ -2789,6 +2865,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 45,
   },
+
   {
     surahName: {
       ar: "سورة عبس",
@@ -2818,35 +2895,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 42,
   },
-  {
-    surahName: {
-      ar: "سورة التكوير",
-      bn: "সুরা আত-তাকভীর",
-      en: "Surah At-Takwir",
-      hi: "सूरा अत-तकवीर",
-      pt: "Surah At-Takwir",
-      de: "Surah At-Takwir",
-      fr: "Sourate At-Takwir",
-      es: "Sura At-Takwir",
-      tr: "Sure Tekvir",
-      it: "Sura At-Takwir",
-      nl: "Soera At-Takwir",
-      ru: "Сура Ат-Таквир",
-      tl: "Surah At-Takwir",
-      th: "ซูรอาห์ อัตตักวีร์",
-      id: "Surah At-Takwir",
-      ja: "スーラ アッタクウィール",
-      ko: "수라 앗-타크위르",
-      pl: "Surah At-Takwir",
-      vi: "Surah At-Takwir",
-      ta: "சூரா அத்-தகவீர்",
-      ur: "سورۃ التکویر",
-      zh: "苏拉·包裹",
-    },
-    surahNumber: 81,
-    juzNumber: [30],
-    totalAyah: 29,
-  },
+
   {
     surahName: {
       ar: "سورة الإنفطار",
@@ -2876,6 +2925,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 19,
   },
+
   {
     surahName: {
       ar: "سورة المطففين",
@@ -2905,6 +2955,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 36,
   },
+
   {
     surahName: {
       ar: "سورة الإنشقاق",
@@ -2934,6 +2985,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 25,
   },
+
   {
     surahName: {
       ar: "سورة البروج",
@@ -2963,6 +3015,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 22,
   },
+
   {
     surahName: {
       ar: "سورة الطارق",
@@ -2992,6 +3045,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 17,
   },
+
   {
     surahName: {
       ar: "سورة الأعلى",
@@ -3021,6 +3075,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 19,
   },
+
   {
     surahName: {
       ar: "سورة الغاشية",
@@ -3050,6 +3105,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 26,
   },
+
   {
     surahName: {
       ar: "سورة الفجر",
@@ -3075,11 +3131,11 @@ export const surahNameList = [
       ur: "سورۃ الفجر",
       zh: "苏拉·阿尔-法吉尔",
     },
-
     surahNumber: 89,
     juzNumber: [30],
     totalAyah: 30,
   },
+
   {
     surahName: {
       ar: "سورة البلد",
@@ -3109,6 +3165,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 20,
   },
+
   {
     surahName: {
       ar: "سورة الشمس",
@@ -3137,7 +3194,9 @@ export const surahNameList = [
     surahNumber: 91,
     juzNumber: [30],
     totalAyah: 15,
+    
   },
+
   {
     surahName: {
       ar: "سورة الليل",
@@ -3166,7 +3225,9 @@ export const surahNameList = [
     surahNumber: 92,
     juzNumber: [30],
     totalAyah: 21,
+    
   },
+
   {
     surahName: {
       ar: "سورة الضحى",
@@ -3195,7 +3256,9 @@ export const surahNameList = [
     surahNumber: 93,
     juzNumber: [30],
     totalAyah: 11,
+   
   },
+
   {
     surahName: {
       ar: "سورة الإنشراح",
@@ -3225,6 +3288,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 8,
   },
+
   {
     surahName: {
       ar: "سورة التين",
@@ -3254,6 +3318,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 8,
   },
+
   {
     surahName: {
       ar: "سورة العلق",
@@ -3283,6 +3348,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 19,
   },
+
   {
     surahName: {
       ar: "سورة القدر",
@@ -3312,6 +3378,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 5,
   },
+
   {
     surahName: {
       ar: "سورة البينة",
@@ -3341,6 +3408,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 8,
   },
+
   {
     surahName: {
       ar: "سورة الزلزلة",
@@ -3370,6 +3438,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 8,
   },
+
   {
     surahName: {
       ar: "سورة العاديات",
@@ -3399,6 +3468,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 11,
   },
+
   {
     surahName: {
       ar: "سورة القارعة",
@@ -3428,6 +3498,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 11,
   },
+
   {
     surahName: {
       ar: "سورة التكاثر",
@@ -3457,6 +3528,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 8,
   },
+
   {
     surahName: {
       ar: "سورة العصر",
@@ -3486,6 +3558,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 3,
   },
+
   {
     surahName: {
       ar: "سورة الهمزة",
@@ -3515,6 +3588,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 9,
   },
+
   {
     surahName: {
       ar: "سورة الفيل",
@@ -3544,6 +3618,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 5,
   },
+
   {
     surahName: {
       ar: "سورة قريش",
@@ -3573,6 +3648,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 4,
   },
+
   {
     surahName: {
       ar: "سورة الماعون",
@@ -3602,6 +3678,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 7,
   },
+
   {
     surahName: {
       ar: "سورة الكوثر",
@@ -3631,6 +3708,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 3,
   },
+
   {
     surahName: {
       ar: "سورة الكافرون",
@@ -3660,6 +3738,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 6,
   },
+
   {
     surahName: {
       ar: "سورة النصر",
@@ -3689,6 +3768,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 3,
   },
+
   {
     surahName: {
       ar: "سورة المسد",
@@ -3718,6 +3798,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 5,
   },
+
   {
     surahName: {
       ar: "سورة الإخلاص",
@@ -3747,6 +3828,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 4,
   },
+
   {
     surahName: {
       ar: "سورة الفلق",
@@ -3776,6 +3858,7 @@ export const surahNameList = [
     juzNumber: [30],
     totalAyah: 5,
   },
+
   {
     surahName: {
       ar: "سورة الناس",
