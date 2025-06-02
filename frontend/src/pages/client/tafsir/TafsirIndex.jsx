@@ -33,7 +33,7 @@ export default function TafsirIndexPage() {
               key={sura.surahNumber}
               className="border border-gray-200 rounded-lg mb-6 p-6 bg-gray-50 cursor-pointer hover:bg-gray-300 duration-300 transition-all group"
               onClick={() => {
-                navigate(`/tafsir-list/${sura.surahNumber}`)
+                navigate(`/tafsir/${sura.surahNumber}`)
               }}
             >
               <div className="font-semibold text-xl text-blue-600 group-hover:text-primary duration-300 transition-all">
