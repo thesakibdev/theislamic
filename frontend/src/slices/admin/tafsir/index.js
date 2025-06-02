@@ -5,7 +5,7 @@ const baseUrl = import.meta.env.VITE_BASE_URL;
 export const tafsirApi = createApi({
   reducerPath: "tafsirApi",
   baseQuery: fetchBaseQuery({ baseUrl, credentials: "include" }),
-  tagTypes: ["Tafsir"], // ট্যাগ টাইপ ডিফাইন করা
+  tagTypes: ["Tafsir"],
   endpoints: (builder) => ({
     // Add a new tafsir to a Tafsir collection
     addTafsir: builder.mutation({
@@ -15,13 +15,13 @@ export const tafsirApi = createApi({
         body: formData,
         headers: { "Content-Type": "application/json" },
       }),
-      invalidatesTags: ["Tafsir"], // সঠিক, কারণ এটি ডেটা মডিফাই করে
+      invalidatesTags: ["Tafsir"],
     }),
 
     // Edit a tafsir by id
     editTafsir: builder.mutation({
-      query: (formData) => ({
-        url: "/admin/tafsir/edit/:id",
+      query: (formData, tafsirId, id) => ({
+        url: `/admin/tafsir/edit/${id}/${tafsirId}`,
         method: "PUT",
         body: formData,
         headers: { "Content-Type": "application/json" },
@@ -30,19 +30,19 @@ export const tafsirApi = createApi({
 
     // Delete a tafsir by id
     deleteTafsir: builder.mutation({
-      query: (id) => ({
-        url: `/admin/tafsir/delete/${id}`,
+      query: (id, tafsirId) => ({
+        url: `/admin/tafsir/delete/${id}/${tafsirId}`,
         method: "DELETE",
       }),
     }),
 
     // Get all tafsir by pagination
     getAllTafsirByPagination: builder.query({
-      query: ({ page, limit, language }) => ({
-        url: `/admin/tafsir/get?language=${language}&limit=${limit}&page=${page}`,
+      query: ({ surahNumber, language }) => ({
+        url: `/admin/tafsir/get?language=${language}&surahNumber=${surahNumber}`,
         method: "GET",
       }),
-      providesTags: ["Tafsir"], // সঠিক, কারণ এটি ডেটা ফেচ করে
+      providesTags: ["Tafsir"],
     }),
   }),
 });
