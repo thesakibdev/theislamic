@@ -6,12 +6,12 @@ const ResponseHandler = require("../../helper/ResponseHandler");
 // Create new Tafsir
 const createTafsir = async (req, res) => {
   try {
-    const { language, bookName, totalVerseNumber, content, note } = req.body;
+    const { language, tafseer } = req.body;
+    const { bookName, totalVerseNumber, content, note } = tafseer;
 
-    const normalBookName = bookName.trim();
-    const normalContent = content.trim();
+    const normalBookName = bookName?.trim() || "";
+    const normalContent = content?.trim() || "";
 
-    // check language
     if (!["bn", "en"].includes(language)) {
       return ResponseHandler.error(
         res,
@@ -20,14 +20,30 @@ const createTafsir = async (req, res) => {
       );
     }
 
+    // Find the Surah containing this verse
     const surahInfo = await Surah.findOne({
       "verses.totalVerseNumber": totalVerseNumber,
     });
+
     if (!surahInfo) {
       return ResponseHandler.error(res, "Surah not found", 404);
     }
 
-    const existingTafsir = await Tafsir.findOne({ language, totalVerseNumber });
+    const verse = surahInfo.verses.find(
+      (v) => v.totalVerseNumber === totalVerseNumber
+    );
+
+    if (!verse) {
+      return ResponseHandler.error(res, "Verse not found", 404);
+    }
+
+    // Check if tafsir already exists for this verse and language
+    const existingTafsir = await Tafsir.findOne({
+      language,
+      surahNumber: surahInfo.surahNumber,
+      "tafsir.totalVerseNumber": totalVerseNumber,
+    });
+
     if (existingTafsir) {
       return ResponseHandler.error(
         res,
@@ -36,27 +52,54 @@ const createTafsir = async (req, res) => {
       );
     }
 
-    const verse = surahInfo.verses.find(
-      (v) => v.totalVerseNumber === totalVerseNumber
-    );
-
-    const newTafsir = new Tafsir({
+    // Check if Tafsir document for this language and surahNumber exists
+    let tafsirDoc = await Tafsir.findOne({
       language,
+      surahNumber: surahInfo.surahNumber,
+    });
+
+    const tafsirEntry = {
       bookName: normalBookName,
-      surahName: surahInfo.name,
       totalVerseNumber,
       arabicAyah: verse.arabicAyah,
       content: normalContent,
       note,
-    });
+    };
 
-    await newTafsir.save();
+    if (tafsirDoc) {
+      // ❌ Check if tafsir already exists in the array
+      const exists = tafsirDoc.tafseer.some(
+        (t) => t.totalVerseNumber === totalVerseNumber
+      );
+
+      if (exists) {
+        return ResponseHandler.error(
+          res,
+          "Tafsir already exists for this verse in this language.",
+          400
+        );
+      }
+
+      // ✅ Push new tafsir to existing doc
+      tafsirDoc.tafseer.push(tafsirEntry);
+      await tafsirDoc.save();
+    } else {
+      // Create new document
+      tafsirDoc = new Tafsir({
+        language,
+        surahName: surahInfo.name,
+        surahNumber: surahInfo.surahNumber,
+        tafseer: [tafsirEntry],
+      });
+      await tafsirDoc.save();
+    }
+
     invalidateCache();
 
     return ResponseHandler.success(
       res,
       "New Tafsir Added Successfully!",
-      newTafsir,
+      tafsirDoc,
       201
     );
   } catch (error) {
@@ -65,19 +108,19 @@ const createTafsir = async (req, res) => {
   }
 };
 
-// Update Tafsir
+// Update Specific Tafsir from tafseer array
 const editTafsir = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id, tafsirId } = req.params; // id = main Tafsir doc ID, tafsirId = tafseer._id
     const { bookName, content, note } = req.body;
 
-    const updated = await Tafsir.findByIdAndUpdate(
-      id,
+    const updated = await Tafsir.findOneAndUpdate(
+      { _id: id, "tafseer._id": tafsirId },
       {
         $set: {
-          bookName: bookName?.trim(),
-          content: content?.trim(),
-          note,
+          "tafseer.$.bookName": bookName?.trim(),
+          "tafseer.$.content": content?.trim(),
+          "tafseer.$.note": note,
         },
       },
       { new: true }
@@ -88,67 +131,58 @@ const editTafsir = async (req, res) => {
     }
 
     invalidateCache();
-
-    return ResponseHandler.success(
-      res,
-      "Tafsir updated successfully!",
-      updated,
-      200
-    );
+    return ResponseHandler.success(res, "Tafsir updated successfully!", updated, 200);
   } catch (error) {
     console.error(error);
     return ResponseHandler.error(res, "Server error.", 500);
   }
 };
 
-// Delete Tafsir
+// Delete a Specific Tafsir from tafseer array
 const deleteTafsir = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id, tafsirId } = req.params;
 
-    const deleted = await Tafsir.findByIdAndDelete(id);
-    if (!deleted) {
+    const updated = await Tafsir.findByIdAndUpdate(
+      id,
+      { $pull: { tafseer: { _id: tafsirId } } },
+      { new: true }
+    );
+
+    if (!updated) {
       return ResponseHandler.error(res, "Tafsir not found", 404);
     }
 
     invalidateCache();
-
-    return ResponseHandler.success(
-      res,
-      "Tafsir deleted successfully!",
-      deleted,
-      200
-    );
+    return ResponseHandler.success(res, "Tafsir deleted successfully!", updated, 200);
   } catch (error) {
     console.error(error);
     return ResponseHandler.error(res, "Server error.", 500);
   }
 };
 
-// Get all Tafsirs with pagination
+// Paginate Tafsir by Surah (1 page = 1 Surah)
 const paginateTafsir = async (req, res) => {
   try {
-    const { page = 1, limit = 10, language } = req.query;
+    const { surahNumber, language } = req.query;
 
-    const query = {};
+    if (!surahNumber) {
+      return ResponseHandler.error(res, "surahNumber is required", 400);
+    }
+
+    const query = { surahNumber: Number(surahNumber) };
     if (language) query.language = language;
 
-    const tafsirs = await Tafsir.find(query)
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit))
-      .sort({ totalVerseNumber: 1 });
+    const tafsir = await Tafsir.findOne(query);
 
-    const total = await Tafsir.countDocuments(query);
+    if (!tafsir) {
+      return ResponseHandler.error(res, "Tafsir not found", 404);
+    }
 
     return ResponseHandler.success(
       res,
-      "Tafsirs fetched successfully!",
-      {
-        total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        tafsirs,
-      },
+      "Surah Tafsir fetched successfully!",
+      tafsir,
       200
     );
   } catch (error) {
