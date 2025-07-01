@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useRef } from "react";
 import { useGetBySurahQuery } from "../../../slices/admin/tafsir";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,22 +22,13 @@ export default function TafsirPage() {
 
   const { data, isLoading, isError } = useGetBySurahQuery({
     language: selectedLanguage,
-    surahNumber: 1
+    surahNumber: surahNumber
   });
   const tafseerData = data?.data
   console.log(tafseerData)
 
-  // const [tafseer, setTafseer] = useState(null);
-
-  // console.log("fetched tafseer", tafseer?.tafsir);
-  // console.log("tafseer book list", tafsirBooksList);
-
-  // useEffect(() => {
-  //   if (data) {
-  //     console.log("Tafseer Data Changed", data);
-  //     setTafseer(data); // Force update state when data changes
-  //   }
-  // }, [data]);
+  const [currentAyahIndex, setCurrentAyahIndex] = useState(0);
+  const ayahSectionRef = useRef(null);
 
   const toggleNote = (index) => {
     setOpenNote((prev) => ({
@@ -49,6 +40,12 @@ export default function TafsirPage() {
   useEffect(() => {
     setOpenNote((prev) => ({ ...prev }));
   }, []);
+
+  useEffect(() => {
+    if (ayahSectionRef.current) {
+      ayahSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [currentAyahIndex]);
 
   const handleLanguageOnChange = (index) => {
     console.log("language on change", index);
@@ -143,64 +140,81 @@ export default function TafsirPage() {
                     </div>
                   </div>
                   {/* surah data */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-black text-base md:text-lg capitalize p-2 bg-[#e8f0fd] rounded-md shadow-md mb-2 md:mb-4 md:p-4">
-                    <h4 className="bg-white rounded-md p-2">
-                      <span className="font-bold pr-1">Surah Name:</span>{" "}
-                      {tafseerData?.surahName}
-                    </h4>
-                    <h5 className="bg-white rounded-md p-2">
-                      <span className="font-bold pr-1">Surah Number:</span>{" "}
-                      {tafseerData?.surahNumber}
-                    </h5>
-
-                    {tafseerData.tafseer.map((tafseer, i) => (
-                      <Fragment key={i}>
-
-                        <p className="bg-white rounded-md p-2">
-                          <span className="font-bold pr-1">Ayah:</span>{" "}
-                          {tafseer?.totalVerseNumber}
-                        </p>
-                        {tafseer?.arabicAyah && (
-                          <div className="grid grid-cols-2 items-center bg-white rounded-md p-2">
-                            <p className="font-bold">Arabic Ayah:</p>
-                            <span dir="rtl" className="text-right rtl:mr-1">
-                              {tafseer?.arabicAyah}
-                            </span>
+                  <div className="mb-2 md:mb-4 md:p-4">
+                    <div ref={ayahSectionRef} id="ayah-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-black text-base md:text-lg capitalize p-2 bg-[#e8f0fd] rounded-md shadow-md">
+                      <h4 className="bg-white rounded-md p-2">
+                        <span className="font-bold pr-1">Surah Name:</span>{" "}
+                        {tafseerData?.surahName}
+                      </h4>
+                      <h5 className="bg-white rounded-md p-2">
+                        <span className="font-bold pr-1">Surah Number:</span>{" "}
+                        {tafseerData?.surahNumber}
+                      </h5>
+                    </div>
+                    <div className="flex flex-col items-center mt-4">
+                      {tafseerData.tafseer && tafseerData.tafseer.length > 0 && (
+                        <div className="bg-white rounded-md p-4 flex flex-col gap-4 w-full shadow-md">
+                          {/* Nav bar for Ayah number and Arabic Ayah */}
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-6 border-b pb-2 mb-2">
+                            <div className="text-lg font-semibold flex-shrink-0">
+                              Ayah: {tafseerData.tafseer[currentAyahIndex]?.totalVerseNumber}
+                            </div>
+                            {tafseerData.tafseer[currentAyahIndex]?.arabicAyah && (
+                              <div className="text-lg flex items-center gap-2">
+                                <span className="font-bold">Arabic Ayah:</span>
+                                <span dir="rtl" className="text-right rtl:mr-1 text-xl font-arabic">
+                                  {tafseerData.tafseer[currentAyahIndex]?.arabicAyah}
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        )}
-
-                        {tafseer?.content && (
-                          <h6 className="bg-white rounded-md p-2 md:col-span-2">
-                            <span className="font-bold pr-1">Content:</span>{" "}
-                            {tafseer?.content}
-                          </h6>
-                        )}
-
-                        {/* note */}
-                        {tafseer?._id && tafseer.note && (
-                          <div>
-                            <Button
-                              onClick={() => toggleNote(tafseer?._id)}
-                              className="text-black font-medium text-base md:lg"
-                            >
-                              Note
-                              <FaAngleUp
-                                className={`transition-transform ${openNote[tafseer?._id] ? "rotate-180" : ""
-                                  } group-hover:text-primary duration-300`}
-                                alt="Arrow Down"
-                              />
-                            </Button>
-                            <p
-                              className={`${openNote[tafseer?._id] ? "block" : "hidden"
-                                } bg-[#dfdfff] p-2 md:p-4 mt-2 rounded-md`}
-                            >
-                              {tafseer?.note}
-                            </p>
-                          </div>
-                        )}
-                      </Fragment>
-                    ))}
-
+                          {/* Content */}
+                          {tafseerData.tafseer[currentAyahIndex]?.content && (
+                            <div className="text-base md:text-lg text-left">
+                              <span className="font-bold pr-1">Content:</span>{" "}
+                              {tafseerData.tafseer[currentAyahIndex]?.content}
+                            </div>
+                          )}
+                          {/* note */}
+                          {tafseerData.tafseer[currentAyahIndex]?._id && tafseerData.tafseer[currentAyahIndex].note && (
+                            <div>
+                              <Button
+                                onClick={() => toggleNote(tafseerData.tafseer[currentAyahIndex]?._id)}
+                                className="text-black font-medium text-base md:lg"
+                              >
+                                Note
+                                <FaAngleUp
+                                  className={`transition-transform ${openNote[tafseerData.tafseer[currentAyahIndex]?._id] ? "rotate-180" : ""} group-hover:text-primary duration-300`}
+                                  alt="Arrow Down"
+                                />
+                              </Button>
+                              <p
+                                className={`${openNote[tafseerData.tafseer[currentAyahIndex]?._id] ? "block" : "hidden"} bg-[#dfdfff] p-2 md:p-4 mt-2 rounded-md`}
+                              >
+                                {tafseerData.tafseer[currentAyahIndex]?.note}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {/* Navigation Buttons */}
+                      <div className="flex gap-4 mt-4">
+                        <Button
+                          onClick={() => setCurrentAyahIndex((prev) => prev - 1)}
+                          disabled={currentAyahIndex === 0}
+                          className="px-4 py-2 bg-primary text-white"
+                        >
+                          Previous
+                        </Button>
+                        <Button
+                          onClick={() => setCurrentAyahIndex((prev) => prev + 1)}
+                          disabled={tafseerData.tafseer && currentAyahIndex === tafseerData.tafseer.length - 1}
+                          className="px-4 py-2 bg-primary text-white"
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                   {/* main content */}
                   {/* {tafseer && tafseer?.OtherLanguageContent && (
@@ -214,137 +228,6 @@ export default function TafsirPage() {
               </main>
             }
           </div>
-          // tafseer.map((tafsir, index) => (
-          //   <main
-          //     key={index}
-          //     className="bg-white p-2 md:p-4 rounded-md min-h-screen overflow-y-auto"
-          //   >
-          //     {/* heading */}
-          //     <div className="bg-primaryLight py-2 mb-3 rounded-md shadow-md">
-          //       <div className="max-w-2xl mx-auto">
-          //         {/* <h1>{"আল-কুরআন (তাফসীর)"}</h1> */}
-          //         <h1 className="text-2xl md:text-4xl font-semibold text-center">
-          //           {"Al-Quran (commentary)"}
-          //         </h1>
-          //       </div>
-          //     </div>
-
-          //     {/* tafsir */}
-          //     <div className="my-2 md:my-4">
-          //       {/* filter items */}
-          //       <div className="flex justify-between text-black text-base md:text-lg capitalize p-2 bg-[#e3e7f3] rounded-md shadow-md mb-2 md:mb-4 md:p-4">
-          //         <div className="flex gap-3">
-          //           <select
-          //             value={selectedLanguage}
-          //             onChange={(e) => {
-          //               setSelectedLanguage(e.target.value);
-          //               handleLanguageOnChange(e.target.value);
-          //             }}
-          //             className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
-          //           >
-          //             <option className="bg-primary/50 text-white" value={"en"}>
-          //               {"English"}
-          //             </option>
-          //             <option className="bg-primary/50 text-white" value={"bn"}>
-          //               {"Bangla"}
-          //             </option>
-          //           </select>
-
-          //           <select
-          //             value={selectedBookName}
-          //             onChange={(e) => setSelectedBookName(e.target.value)}
-          //             className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
-          //           >
-          //             {tafsirBooksList &&
-          //               tafsirBooksList.map((book, index) => (
-          //                 <option
-          //                   className="bg-primary/50 text-white"
-          //                   key={index}
-          //                   value={
-          //                     selectedLanguage === "en"
-          //                       ? book?.nameEn
-          //                       : book?.nameBn
-          //                   }
-          //                 >
-          //                   {selectedLanguage === "en"
-          //                     ? book.nameEn
-          //                     : book.nameBn}
-          //                 </option>
-          //               ))}
-          //           </select>
-          //         </div>
-          //       </div>
-          //       {/* surah data */}
-          //       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-black text-base md:text-lg capitalize p-2 bg-[#e8f0fd] rounded-md shadow-md mb-2 md:mb-4 md:p-4">
-          //         {tafseer && tafseer?.surahName && (
-          //           <h4 className="bg-white rounded-md p-2">
-          //             <span className="font-bold pr-1">Surah Name:</span>{" "}
-          //             {tafseer?.surahName}
-          //           </h4>
-          //         )}
-          //         {tafseer && tafseer?.surahNumber && (
-          //           <h5 className="bg-white rounded-md p-2">
-          //             <span className="font-bold pr-1">Surah Number:</span>{" "}
-          //             {tafseer?.surahNumber}
-          //           </h5>
-          //         )}
-
-          //         {tafseer && tafseer?.verseNumber && (
-          //           <p className="bg-white rounded-md p-2">
-          //             <span className="font-bold pr-1">Ayah:</span>{" "}
-          //             {tafseer?.verseNumber}
-          //           </p>
-          //         )}
-          //         {tafseer && tafseer?.arabicAyah && (
-          //           <div className="grid grid-cols-2 items-center bg-white rounded-md p-2">
-          //             <p className="font-bold">Arabic Ayah:</p>
-          //             <span dir="rtl" className="text-right rtl:mr-1">
-          //               {tafseer?.arabicAyah}
-          //             </span>
-          //           </div>
-          //         )}
-
-          //         {tafseer && tafseer?.mainContent && (
-          //           <h6 className="bg-white rounded-md p-2 md:col-span-2">
-          //             <span className="font-bold pr-1">Content:</span>{" "}
-          //             {tafseer?.mainContent}
-          //           </h6>
-          //         )}
-          //       </div>
-          //       {/* main content */}
-          //       {tafseer && tafseer?.OtherLanguageContent && (
-          //         <div className="p-2 bg-[#e9f0f6] border-b border-[#e9f0f6] mb-2 md:mb-4 md:p-4 rounded-md">
-          //           <p className="text-base sm:text-lg md:text-xl font-bangla">
-          //             {tafseer?.OtherLanguageContent}
-          //           </p>
-          //         </div>
-          //       )}
-
-          //       {/* note */}
-          //       {tafseer && tafseer?.tafsirId && tafseer.note && (
-          //         <div>
-          //           <Button
-          //             onClick={() => toggleNote(tafseer?.tafsirId)}
-          //             className="text-black font-medium text-base md:lg"
-          //           >
-          //             Note
-          //             <FaAngleUp
-          //               className={`transition-transform ${openNote[tafseer?.tafsirId] ? "rotate-180" : ""
-          //                 } group-hover:text-primary duration-300`}
-          //               alt="Arrow Down"
-          //             />
-          //           </Button>
-          //           <p
-          //             className={`${openNote[tafseer?.tafsirId] ? "block" : "hidden"
-          //               } bg-[#dfdfff] p-2 md:p-4 mt-2 rounded-md`}
-          //           >
-          //             {tafseer?.note}
-          //           </p>
-          //         </div>
-          //       )}
-          //     </div>
-          //   </main>
-          // ))
         )}
       </div>
     </section>
