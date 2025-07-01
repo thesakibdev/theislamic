@@ -15,10 +15,14 @@ export default function AdminSidebar() {
       name: "Hadith",
       link: "hadith",
     },
-    // {
-    //   name: "Tafsir",
-    //   link: "tafsir",
-    // },
+    {
+      name: "Accounting",
+      link: "accounting",
+    },
+    {
+      name: "Tafsir",
+      link: "tafsir",
+    },
     // {
     //   name: "Salat",
     //   link: "salat",

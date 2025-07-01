@@ -37,6 +37,7 @@ import { checkAuth } from "./slices/authslice";
 import SearchResult from "./pages/client/SearchResult";
 import TafsirIndexPage from "./pages/client/tafsir/TafsirIndex";
 import TafsirPage from "./pages/client/tafsir/TafsirPage";
+import Accounting from "./pages/admin/Accounting";
 
 export default function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -107,6 +108,7 @@ export default function App() {
         <Route path="tafsir" element={<Tafsir />} />
         <Route path="donors" element={<Donors />} />
         <Route path="i-wall" element={<Blog />} />
+        <Route path="accounting" element={<Accounting />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
