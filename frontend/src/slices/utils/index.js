@@ -8,17 +8,54 @@ export const utilsApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl, credentials: "include" }),
   tagTypes: ["Language", "BookList"],
   endpoints: (builder) => ({
-    // globalSearch
+    // Global search using new SearchIndex
     search: builder.query({
       query: (searchParams) => {
-        const { query, page = 1, limit = 20 } = searchParams;
+        const { query, type, language, surahNumber, page = 1, limit = 50 } = searchParams;
         return {
           url: `/search`,
-          params: { query, page, limit },
+          params: { query, type, language, surahNumber, page, limit },
         };
       },
       transformResponse: (response) => {
-        // ফেরত আসা ডাটা প্রসেস করা (যদি প্রয়োজন হয়)
+        return response.data;
+      },
+    }),
+
+    // Search suggestions using new SearchIndex
+    searchSuggestions: builder.query({
+      query: (searchParams) => {
+        const { query, limit = 10 } = searchParams;
+        return {
+          url: `/search/suggestions`,
+          params: { query, limit },
+        };
+      },
+      transformResponse: (response) => {
+        return response.data;
+      },
+    }),
+
+    // Search history
+    searchHistory: builder.query({
+      query: (params) => {
+        const { limit = 20 } = params || {};
+        return {
+          url: `/search/history`,
+          params: { limit },
+        };
+      },
+      transformResponse: (response) => {
+        return response.data;
+      },
+    }),
+
+    // Search statistics
+    searchStats: builder.query({
+      query: () => ({
+        url: `/search/stats`,
+      }),
+      transformResponse: (response) => {
         return response.data;
       },
     }),
@@ -62,6 +99,9 @@ export const utilsApi = createApi({
 // Export the auto-generated hook
 export const {
   useSearchQuery,
+  useSearchSuggestionsQuery,
+  useSearchHistoryQuery,
+  useSearchStatsQuery,
   useGetAllLanguagesQuery,
   useGetAllBookListQuery,
   useCounterQuery,

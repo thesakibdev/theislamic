@@ -20,7 +20,6 @@ const bookListRouter = require("./routes/utils/bookList.route");
 const donorRouter = require("./routes/donor/donor.route");
 const globalSearchRouter = require("./routes/utils/search.route");
 const reportRouter = require("./routes/report/report.route");
-const searchRouter = require("./routes/search/search.route");
 const tafsirRouter = require("./routes/tafsir/tafsir.route");
 dotenv.config();
 
@@ -101,9 +100,6 @@ app.use("/api/v1/admin/analytics", counterRouter);
 app.use("/api/v1/utils", languageRouter);
 app.use("/api/v1/utils", bookListRouter);
 app.use("/api/v1/utils", globalSearchRouter);
-
-// search route
-app.use("/api/v1", searchRouter);
 
 // report route
 app.use("/api/v1/report", reportRouter);

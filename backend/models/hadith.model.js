@@ -105,15 +105,15 @@ hadithSchema
   }, "Duplicate hadith number in the same chapter");
 
 // Enhanced text search index
-// hadithSchema.index({
-//   bookName: "text",
-//   "parts.chapters.hadithList.internationalNumber": "text",
-//   "parts.chapters.hadithList.note": "text",
-//   "parts.chapters.hadithList.keywords": "text",
-//   "parts.chapters.hadithList.translation": "text",
-//   "parts.chapters.hadithList.transliteration": "text",
-//   "parts.chapters.hadithList.hadithArabic": "text",
-// });
+hadithSchema.index({
+  bookName: "text",
+  "parts.chapters.hadithList.internationalNumber": "text",
+  "parts.chapters.hadithList.note": "text",
+  "parts.chapters.hadithList.keywords": "text",
+  "parts.chapters.hadithList.translation": "text",
+  "parts.chapters.hadithList.transliteration": "text",
+  "parts.chapters.hadithList.hadithArabic": "text",
+});
 
 const Hadith = mongoose.model("Hadith", hadithSchema);
 

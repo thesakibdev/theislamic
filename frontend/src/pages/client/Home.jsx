@@ -16,8 +16,8 @@ export default function Home() {
             <h1 className="text-white font-bold text-4xl text-center">
               This Website is Under Construction
             </h1>
-            {/* <SearchBar className="mt-5 sm:mt-7 md:mt-10" /> */}
-            <div className="mt-[70px] relative">
+            <SearchBar className="mt-5 sm:mt-7 md:mt-10" />
+            {/* <div className="mt-[70px] relative">
               <Input
                 placeholder="What you want to know from Quran & Hadith?"
                 className="w-full py-5 pl-16 rounded-full placeholder:text-xs md:placeholder:text-base"
@@ -27,7 +27,7 @@ export default function Home() {
                 alt="search"
                 className="absolute top-2 left-[20px]"
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </section>

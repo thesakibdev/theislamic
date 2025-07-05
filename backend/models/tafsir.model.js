@@ -36,6 +36,16 @@ const tafsirSchema = new mongoose.Schema({
   }]
 });
 
+// Full-Text Search Index
+tafsirSchema.index({
+  surahName: "text",
+  surahNumber: "text",
+  "tafseer.bookName": "text",
+  "tafseer.content": "text",
+  "tafseer.note": "text",
+  "tafseer.arabicAyah": "text"
+});
+
 const Tafsir = mongoose.model("Tafsir", tafsirSchema);
 
 module.exports = Tafsir;
