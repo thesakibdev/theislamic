@@ -26,6 +26,7 @@ const initialFormData = {
   description: "",
   thumbnail: null,
   thumbnailId: null,
+  category: "",
   shortDesc: "",
   slug: "",
   metaDesc: "",
@@ -157,6 +158,7 @@ export default function Blog() {
     setCurrentEditedId(blog._id);
     setFormData({
       title: blog.title || "",
+      category: blog.category || "",
       shortDesc: blog.shortDesc || "",
       slug: blog.slug || "",
       metaDesc: blog.metaDesc || "",
@@ -251,6 +253,7 @@ export default function Blog() {
                     <Button
                       onClick={() => handleEditBlog(blog)}
                       disabled={isEditingBlog || isAddingBlog}
+                      className="text-white hover:text-black"
                     >
                       Edit
                     </Button>
@@ -378,6 +381,23 @@ export default function Blog() {
                 onChange={handleInputChange}
               />
             </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium"
+              >
+                Category <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="text"
+                name="category"
+                id="category"
+                placeholder="Category"
+                value={formData.category}
+                onChange={handleInputChange}
+              />
+            </div>
           </div>
 
           <div className="mt-8 space-y-2">
@@ -393,7 +413,7 @@ export default function Blog() {
           <div className="mt-8 flex space-x-4">
             <Button
               type="submit"
-              className="px-6"
+              className="px-6 text-white hover:text-black"
               disabled={isSubmitting || imageLoadingState}
             >
               {isSubmitting
