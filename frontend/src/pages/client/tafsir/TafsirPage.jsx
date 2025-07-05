@@ -75,9 +75,9 @@ export default function TafsirPage() {
             <p>Loading...</p>
           </div>
         ) : isError ? (
-          <p className="text-center text-2xl font-semibold text-gray-500 py-4">
+          <div className="text-center text-2xl font-semibold text-gray-500 py-4 h-screen flex items-center justify-center">
             কোন ডাটা পাওয়া যায়নি
-          </p>
+          </div>
         ) : (
           <div className="">
             {tafseerData &&
