@@ -1,326 +1,366 @@
-import { FaEdit } from "react-icons/fa";
-import { RiDeleteBinLine } from "react-icons/ri";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useForm } from "react-hook-form";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { Button } from "../../components/ui/button";
+import { toast } from "react-toastify";
+import RTE from "../../components/common/RTE";
+import { Input } from "@/components/ui/input";
+import {
+  useAddTafsirMutation,
+  useEditTafsirMutation,
+  useDeleteTafsirMutation,
+  useGetBySurahQuery
+} from "../../slices/admin/tafsir";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
+
+const initialFormData = {
+  language: "",
+  bookName: "",
+  totalVerseNumber: "",
+  content: "",
+  note: "",
+};
 
 export default function Tafsir() {
-  const {
-    register,
-    reset,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const [formData, setFormData] = useState(initialFormData);
+  const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const addTafsir = (data) => {
-    console.log("Form data", data);
-    reset();
+  const RTERef = useRef(null);
+
+  const [addTafsir, { isLoading: isAddingTafsir }] = useAddTafsirMutation();
+  const [editTafsir, { isLoading: isEditingTafsir }] = useEditTafsirMutation();
+  const [deleteTafsir, { isLoading: isDeletingTafsir }] = useDeleteTafsirMutation();
+  const {
+    data: tafsirData,
+    isLoading,
+    error,
+  } = useGetBySurahQuery({
+    language: "bn",
+    surahNumber: 1,
+  });
+
+  const tafsir = useMemo(() => tafsirData || [], [tafsirData]);
+
+  const totalPages = useMemo(() => tafsirData?.totalPages || 1, [tafsirData]);
+
+  // Handle form field changes
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const allTafsir = [
-    {
-      id: "01",
-      Name: "Al-Fatihah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      id: "02",
-      Name: "Al-Baqarah",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      id: "03",
-      Name: "Al-Imran",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      id: "04",
-      Name: "An-Nisa",
-      btn: "Edit",
-      delete: "Delete",
-    },
-    {
-      id: "004",
-      Name: "An-Nisa",
-      btn: "Edit",
-      delete: "Delete",
-    },
-  ];
+  // Reset form to initial state
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setCurrentEditedId(null);
+    if (RTERef.current) {
+      RTERef.current.setContent("");
+    }
+  };
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!isFormValid()) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const RTEContent = RTERef.current?.getContent() || "";
+
+      const TotalVerseNumber = Number(formData.totalVerseNumber);
+      const updatedFormData = {
+        language: formData.language,
+        tafseer: {
+          bookName: formData.bookName,
+          totalVerseNumber: TotalVerseNumber,
+          content: RTEContent,
+          note: formData.note,
+        }
+      };
+
+      if (currentEditedId !== null) {
+        const editResponse = await editTafsir({
+          id: currentEditedId,
+          ...updatedFormData,
+        }).unwrap();
+        toast.success(editResponse.message || "Tafsir updated successfully!");
+        resetForm();
+      } else {
+        const addResponse = await addTafsir(updatedFormData).unwrap();
+        toast.success(addResponse.message || "Tafsir added successfully!");
+        resetForm();
+      }
+    } catch (error) {
+      const errorMessage = error.data?.message || "Error submitting data!";
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isFormValid = () => {
+    if (!RTERef.current) return false;
+
+    const RTEContent = RTERef.current.getContent().trim();
+    const requiredFields = [
+      formData.language.trim(),
+      formData.bookName.trim(),
+      formData.totalVerseNumber.trim(),
+      RTEContent,
+    ];
+
+    return requiredFields.every((field) => field !== "" && field.length > 0);
+  };
+
+  // Set RTE content when editing a blog
+  useEffect(() => {
+    if (RTERef.current && formData.content) {
+      RTERef.current.setContent(formData.content);
+    }
+  }, [formData.content]);
+
+
+  const handleEditTafsir = (tafsir) => {
+    if (!tafsir) return;
+
+    setCurrentEditedId(tafsir._id);
+    setFormData({
+      language: tafsir.language || "",
+      bookName: tafsir.bookName || "",
+      totalVerseNumber: tafsir.totalVerseNumber || "",
+      content: tafsir.content || "",
+      note: tafsir.note || "",
+    });
+
+
+    // Scroll to form
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  };
+
+  const handleDeleteTafsir = async (id) => {
+    if (!id) return;
+
+    try {
+      const userConfirmed = window.confirm(
+        "Are you sure you want to delete this tafsir? This action cannot be undone."
+      );
+
+      if (userConfirmed) {
+        const deleteResponse = await deleteTafsir({ id }).unwrap();
+        toast.success(deleteResponse.message || "Tafsir deleted successfully");
+      }
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to delete tafsir");
+    }
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
-    <Tabs defaultValue="add-tafsir" className="pl-8 scrollbar-none pr-12">
-      {/* Tabs List */}
-      <TabsList className="rounded-none rounded-bl-sm rounded-br-sm">
-        <TabsTrigger className="text-white font-medium" value="add-tafsir">
-          Add Tafsir
-        </TabsTrigger>
-        <TabsTrigger className="text-white font-medium" value="all-tafsir">
-          All Tafsir
-        </TabsTrigger>
-      </TabsList>
+    <div className="container mx-auto px-4">
+      <h1 className="text-3xl font-semibold text-center my-8">
+        Tafsir Management
+      </h1>
 
-      {/* Add tafsir Tab Content */}
-      <TabsContent value="add-tafsir">
-        <main>
-          <div className="pb-20">
-            <form onSubmit={handleSubmit(addTafsir)} className="space-y-10">
-              {/* Input Fields */}
-              <div className="py-10 px-16 bg-primary-foreground rounded-lg shadow-lg">
-                {/* Meta Data Section */}
-                <h2 className="text-4xl font-bold mb-6 text-center text-primary">
-                  Meta Data
-                </h2>
-                <div className="grid grid-cols-3 gap-5 mt-10">
-                  <div className="flex flex-col gap-2 relative">
-                    <label className="block text-base font-semibold text-black">
-                      Surah Name
-                    </label>
-                    {errors.surahName && (
-                      <span className="absolute top-0 right-2 transition-transform duration-300 font-medium text-red-500 text-sm">
-                        {errors.surahName.message}
-                      </span>
-                    )}
-                    <input
-                      {...register("surahName", {
-                        required: "Surah Name is required",
-                      })}
-                      placeholder="Name"
-                      className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-1 focus:ring-primary focus:outline-none"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2 relative">
-                    <label className="block text-base font-semibold text-black">
-                      Surah No.
-                    </label>
-                    {errors.surahNumber && (
-                      <span className="absolute top-0 right-2 transition-transform duration-300 font-medium text-red-500 text-sm">
-                        {errors.surahNumber.message}
-                      </span>
-                    )}
-                    <input
-                      {...register("surahNumber", {
-                        required: "Surah No. is required",
-                      })}
-                      placeholder="No."
-                      type="number"
-                      className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-1 focus:ring-primary focus:outline-none"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2 relative">
-                    <label className="block text-base font-semibold text-black">
-                      Verse Number
-                    </label>
-                    {errors.verseNumber && (
-                      <span className="absolute top-0 right-2 transition-transform duration-300 font-medium text-red-500 text-sm">
-                        {errors.verseNumber.message}
-                      </span>
-                    )}
-                    <input
-                      {...register("verseNumber", {
-                        required: " Verse Number is required",
-                      })}
-                      type="number"
-                      placeholder="Number"
-                      className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-1 focus:ring-primary focus:outline-none"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2 relative">
-                    <label className="block text-base font-semibold text-black">
-                      Keywords
-                    </label>
-                    {errors.keywords && (
-                      <span className="absolute top-0 right-2 transition-transform duration-300 font-medium text-red-500 text-sm">
-                        {errors.keywords.message}
-                      </span>
-                    )}
-                    <input
-                      {...register("keywords", {
-                        required: "Keywords is required",
-                      })}
-                      placeholder="keywords"
-                      type="text"
-                      className="w-full px-4 py-2 rounded-md border bg-adminInput outline-none focus:ring-1 focus:ring-primary focus:outline-none"
-                    />
-                  </div>
-                </div>
+      {/* Tafsir Cards */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, index) => (
+            <Card key={index} className="h-64">
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-2/3" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="p-4 border rounded-md bg-red-50 text-red-500">
+          Failed to load tafsir. {error.message || "Please try again later."}
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-10">
+            {tafsir.length > 0 ? (
+              tafsir.map((tafsir) => (
+                <Card key={tafsir._id} className="overflow-hidden border">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xl font-bold">
+                      {tafsir.language}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <p className="text-sm text-gray-600">{tafsir.bookName}</p>
+                    <p className="text-sm text-gray-600">{tafsir.totalVerseNumber}</p>
+                    <div className="text-xs text-gray-500">
+                      <p>Note: {tafsir.note}</p>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <Button
+                      onClick={() => handleEditTafsir(tafsir)}
+                      disabled={isEditingTafsir || isAddingTafsir}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDeleteTafsir(tafsir._id)}
+                      disabled={isDeletingTafsir}
+                    >
+                      Delete
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-10">
+                <p className="text-gray-500">
+                  No tafsir found. Create your first tafsir below.
+                </p>
               </div>
-              {/* Verse Section */}
-              <div className="py-10 px-16 bg-primary-foreground rounded-lg shadow-lg">
-                <h2 className="text-4xl font-bold mb-6 text-center text-primary">
-                  Verse
-                </h2>
-                <div className="grid grid-cols-2 gap-6 mt-2">
-                  <div className="relative">
-                    <label className="block text-base font-semibold text-black mb-2">
-                      Tafsri Name
-                    </label>
-                    {errors.tafsirName && (
-                      <span className="absolute top-0 right-2 transition-transform duration-300 font-medium text-red-500 text-sm">
-                        {errors.tafsirName.message}
-                      </span>
-                    )}
-                    <textarea
-                      {...register("tafsirName", {
-                        required: "Tafsir Name is required",
-                      })}
-                      placeholder="Write here..."
-                      rows="4"
-                      className="w-full px-4 py-2 rounded-md resize-none border bg-adminInput outline-none focus:ring-2 focus:ring-primary-foreground"
-                    />
-                  </div>
-                  <div className="relative">
-                    <label className="block text-base font-semibold text-black mb-2">
-                      Tafsir Content
-                    </label>
-                    {errors.tafsirContent && (
-                      <span className="absolute top-0 right-2 transition-transform duration-300 font-medium text-red-500 text-sm">
-                        {errors.tafsirContent.message}
-                      </span>
-                    )}
-                    <textarea
-                      {...register("tafsirContent", {
-                        required: "Tafsir Content is required",
-                      })}
-                      placeholder="Write here..."
-                      rows="4"
-                      className="w-full px-4 py-2 resize-none rounded-md border bg-adminInput outline-none focus:ring-2 focus:ring-primary-foreground"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end space-x-4 mt-6">
-                <button
-                  type="button"
-                  onClick={() => reset()}
-                  className="px-20 py-5 bg-gray-400 text-white text-xl font-semibold rounded-md hover:bg-gray-500 focus:outline-none cursor-pointer"
-                  disabled
-                >
-                  Reset
-                </button>
-                <button
-                  type="submit"
-                  className="px-20 py-5 bg-primary text-xl font-semibold text-white rounded-md hover:bg-green-700 focus:outline-none"
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
+            )}
           </div>
-        </main>
-      </TabsContent>
 
-      {/* All Quran Tab Content */}
-      <TabsContent value="all-tafsir">
-        <div className="mt-12">
-          <div>
-            {/* heading */}
-            <div className="flex items-center justify-between py-5">
-              <div className="flex items-center w-full">
-                <p className="font-semibold text-2xl w-36 font-sans">No.</p>
-                <p className="font-semibold text-2xl font-sans">Name</p>
-              </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center my-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Tafsir Form */}
+      <div className="my-10 p-6 border rounded-lg shadow-sm">
+        <h2 className="text-2xl font-medium mb-6">
+          {currentEditedId ? "Edit Tafsir" : "Add New Tafsir"}
+        </h2>
+
+        <form onSubmit={onSubmit} className="mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label htmlFor="language" className="block text-sm font-medium">
+                Language <span className="text-red-500">*</span>
+              </label>
               <select
-                className="bg-none text-sm text-black font-semibold rounded-md max-w-32 px-5 py-3 bg-white border outline-none border-black block w-full shadow-sm cursor-pointer transition ease-in-out duration-300"
-                name="filter"
-                id=""
+                name="language"
+                id="language"
+                value={formData.language}
+                onChange={handleInputChange}
+                className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
               >
-                <option value="all">Filter</option>
-                <option value="quranAyatArabic">Quran Ayat Arabic</option>
-                <option value="quranAyatEnglish">Quran Ayat English</option>
+                <option value="" className="bg-primary/50 text-white">Select Language</option>
+                <option value="en" className="bg-primary/50 text-white">English</option>
+                <option value="bn" className="bg-primary/50 text-white">Bengali</option>
               </select>
             </div>
 
-            {/* content */}
-            <div className="pb-10">
-              {allTafsir.map((quran, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between py-2"
-                >
-                  <div className="flex items-center">
-                    <div className="font-semibold text-2xl w-36 font-sans">
-                      {quran.id}
-                    </div>
-                    <div className="font-semibold text-2xl font-sans">
-                      {quran.Name}
-                    </div>
-                  </div>
-                  {/* Action Buttons */}
-                  <div className="flex gap-12">
-                    <button className="px-6 py-2 flex items-center gap-2 text-xl font-semibold text-white bg-primary rounded-md hover:bg-primary-foreground hover:text-black transition duration-200">
-                      {quran.btn}
-                      <FaEdit className="text-xl font-semibold" />
-                    </button>
-                    <button className="px-6 py-2 font-semibold text-xl flex items-center gap-2 text-white bg-deleteRed rounded-md hover:bg-red-600 transition duration-200">
-                      {quran.delete} <RiDeleteBinLine />
-                    </button>
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-2">
+              <label htmlFor="bookName" className="block text-sm font-medium">
+                Book Name <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="text"
+                name="bookName"
+                id="bookName"
+                placeholder="Book Name"
+                value={formData.bookName}
+                onChange={handleInputChange}
+              />
             </div>
+
+            <div className="space-y-2">
+              <label htmlFor="totalVerseNumber" className="block text-sm font-medium">
+                Total Verse Number <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="text"
+                name="totalVerseNumber"
+                id="totalVerseNumber"
+                placeholder="Total Verse Number"
+                value={formData.totalVerseNumber}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="note" className="block text-sm font-medium">
+                Note <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="text"
+                name="note"
+                id="note"
+                placeholder="Note"
+                value={formData.note}
+                onChange={handleInputChange}
+              />
+            </div>
+
           </div>
 
-          <div>
-            {/* Heading */}
-            <div>
-              <table className="table-auto w-full">
-                <thead>
-                  <tr>
-                    <th className=" py-2 text-left font-semibold text-2xl font-sans w-36">
-                      No.
-                    </th>
-                    <th className=" py-2 text-left font-semibold text-2xl font-sans">
-                      Name
-                    </th>
-                    <th className=" py-2 font-semibold text-2xl font-sans text-right">
-                      <select
-                        name="filter"
-                        className="bg-none text-sm text-black font-semibold rounded-md max-w-32 px-5 py-3 bg-white border outline-none border-black shadow-sm cursor-pointer transition ease-in-out duration-300"
-                        id=""
-                      >
-                        <option value="all">Filter</option>
-                        <option value="quranAyatArabic">
-                          Quran Ayat Arabic
-                        </option>
-                        <option value="quranAyatEnglish">
-                          Quran Ayat English
-                        </option>
-                      </select>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allTafsir.map((quran, index) => (
-                    <tr key={index}>
-                      <td className=" py-2 text-xl font-semibold text-left font-sans">
-                        {quran.id}
-                      </td>
-                      <td className=" py-2 text-xl font-semibold text-left font-sans">
-                        {quran.Name}
-                      </td>
-                      <td className=" py-2 text-xl font-semibold text-right">
-                        <div className="flex justify-end items-center gap-12">
-                          <button className="px-6 py-2 flex items-center gap-2 text-xl font-semibold text-white bg-primary rounded-md hover:bg-primary-foreground hover:text-black transition duration-200">
-                            {quran.btn}
-                            <FaEdit className="text-xl font-semibold" />
-                          </button>
-                          <button className="px-6 py-2 font-semibold text-xl flex items-center gap-2 text-white bg-deleteRed rounded-md hover:bg-red-600 transition duration-200">
-                            {quran.delete} <RiDeleteBinLine />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className="mt-8 space-y-2">
+            <label htmlFor="content" className="block text-sm font-medium">
+              Tafsir Content <span className="text-red-500">*</span>
+            </label>
+            <RTE
+              onInit={(_, editor) => (RTERef.current = editor)}
+              initialValue={formData.content}
+            />
           </div>
-        </div>
-      </TabsContent>
-    </Tabs>
+
+          <div className="mt-8 flex space-x-4">
+            <Button
+              type="submit"
+              className="px-6 text-white"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? "Saving..."
+                : currentEditedId
+                  ? "Update Tafsir"
+                  : "Publish Tafsir"}
+            </Button>
+
+            {currentEditedId && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={resetForm}
+                disabled={isSubmitting}
+                className="text-white"
+              >
+                Cancel Edit Tafsir
+              </Button>
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
