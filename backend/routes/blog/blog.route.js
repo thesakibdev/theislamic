@@ -6,6 +6,7 @@ const {
   fetchAllBlog,
   editBlog,
   handleImageUpload,
+  fetchBlogById,
 } = require("../../controllers/blog/blog.controller");
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router.post("/add", addBlog);
 router.put("/edit/:id", editBlog);
 router.delete("/delete/:id", deleteBlog);
 router.get("/get", fetchAllBlog);
+router.get("/get/:id", fetchBlogById);
 
 module.exports = router;

@@ -77,7 +77,7 @@ const addBlog = async (req, res) => {
 };
 
 const fetchAllBlog = async (req, res) => {
-  const { page = 1, limit = 6 } = req.query;
+  const { page = 1, limit = 10 } = req.query;
   try {
     const currentPage = parseInt(page, 10) || 1;
     const pageLimit = parseInt(limit, 10) || 1;
@@ -102,6 +102,12 @@ const fetchAllBlog = async (req, res) => {
       message: "Some error from fetching blog",
     });
   }
+};
+
+const fetchBlogById = async (req, res) => {
+  const { id } = req.params;
+  const blog = await Blog.findById(id);
+  res.status(200).json(blog);
 };
 
 const editBlog = async (req, res) => {
@@ -194,4 +200,5 @@ module.exports = {
   editBlog,
   deleteBlog,
   handleImageUpload,
+  fetchBlogById,
 };

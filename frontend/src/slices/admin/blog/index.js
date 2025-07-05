@@ -41,6 +41,13 @@ export const blogApi = createApi({
       }),
       providesTags: ["Blog"],
     }),
+    getBlogById: builder.query({
+      query: ({ id }) => ({
+        url: `admin/blog/get/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Blog"],
+    }),
   }),
 });
 
@@ -50,4 +57,5 @@ export const {
   useEditBlogMutation,
   useDeleteBlogMutation,
   useGetAllBlogsQuery,
+  useGetBlogByIdQuery,
 } = blogApi;

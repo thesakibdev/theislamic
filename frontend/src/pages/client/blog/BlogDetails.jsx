@@ -12,6 +12,9 @@ import blogAvatar from "../../../assets/auth-profile-bg.png";
 import { FaRegCommentDots, FaRegFolder } from "react-icons/fa";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
+import { useGetBlogByIdQuery } from "../../../slices/admin/blog";
+
 
 const ratingOptions = [
   {
@@ -47,6 +50,7 @@ const ratingOptions = [
 ];
 
 export default function BlogDetails() {
+  const { id } = useParams();
   const {
     register,
     handleSubmit,
@@ -67,16 +71,19 @@ export default function BlogDetails() {
     setRating(null);
   };
 
+  const { data: blog, isLoading, isError } = useGetBlogByIdQuery({ id });
+  console.log(blog);
+
   return (
     <section className="pt-16 px-4 md:px-0">
       <div className="max-w-5xl mx-auto py-5">
         <div className="bg-primary-foreground/20 flex flex-col justify-center p-4 rounded-lg">
           <h2 className="text-3xl font-bold text-black mb-4">
-            How to Spend the Perfect Day on Croatia’s Most Magical Island
+            {blog?.title}
           </h2>
           <div className="overflow-hidden rounded-lg max-h-[500px] object-center">
             <img
-              src={blogThumbnail}
+              src={blog?.thumbnail}
               alt="Blog Thumbnail"
               className="object-cover w-full rounded-lg "
             />
@@ -85,7 +92,7 @@ export default function BlogDetails() {
         <div className="flex justify-center items-center mt-3 gap-5">
           <div className="flex items-center gap-2">
             <Calendar className="w-6 h-6 inline-block" />
-            <span className="text-sm">July 14, 2021</span>
+            <span className="text-sm">{blog?.createdAt.split("T")[0]}</span>
           </div>
           <div className="flex items-center gap-2">
             <FaRegCommentDots className="w-6 h-6 inline-block" />
@@ -93,49 +100,10 @@ export default function BlogDetails() {
           </div>
           <div className="flex items-center gap-2">
             <FaRegFolder className="w-6 h-6 inline-block" />
-            <span className="text-sm">Category: It</span>
+            <span className="text-sm capitalize">Category: {blog?.category}</span>
           </div>
         </div>
-        <div className="flex flex-col gap-3 mt-5">
-          <p className="font-semibold text-xl">
-            Don’t wait. The purpose of our lives is to be happy!
-          </p>
-          <p className="text-justify text-lg font-normal">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit
-            repudiandae aut nihil, possimus placeat tenetur aperiam aliquam, ex
-            suscipit alias, nam quibusdam culpa error! Amet perferendis quaerat,
-            voluptate cumque autem quos fugiat assumenda ipsum neque eaque?
-            Perferendis, blanditiis magnam doloribus molestias quos ex molestiae
-            voluptates suscipit placeat incidunt maiores deleniti! Voluptatibus
-            veniam hic eligendi, iusto, consectetur id tenetur laudantium
-            aliquid harum, officiis autem minima ea. Delectus error eos numquam
-            porro repudiandae ea illum perferendis, nihil, ipsum excepturi minus
-            temporibus, aliquam amet. Atque, consequuntur omnis nihil dolores
-            numquam sunt tempore distinctio ipsum laborum vero maxime.
-            Temporibus quia commodi voluptas nobis eaque et minus fugit nihil
-            odit quod nisi, voluptatum quas, aspernatur ipsa id deserunt? Autem
-            velit molestiae quia delectus ex veritatis numquam culpa tenetur
-            provident eius? Iusto iure perspiciatis dolores nemo tenetur
-            consectetur, non architecto eos quis ad nesciunt aspernatur earum
-            veritatis magni mollitia corrupti omnis illo debitis eius accusamus!
-            Quos alias illum sapiente deserunt omnis explicabo nemo laudantium
-            aperiam repellendus at, ad architecto animi facere quo ratione,
-            fugit earum nam assumenda dicta non! Molestiae modi earum qui in,
-            corrupti voluptas dolorem nihil dolor, ducimus magnam illo expedita
-            optio? Quia eveniet ducimus ut distinctio enim nulla consectetur
-            delectus. Reprehenderit cumque ipsa perferendis eos dicta
-            recusandae, rem tempora officia aspernatur nam sapiente numquam
-            explicabo, quisquam dolorum vitae quo nemo atque laboriosam nulla
-            quos eligendi, corporis unde? Quos laudantium vero voluptas
-            cupiditate sapiente enim totam veniam saepe accusantium dolorem
-            ullam, eaque asperiores quidem nihil perferendis fugiat omnis
-            laboriosam veritatis nesciunt doloremque minus animi? Rem provident
-            illo magnam assumenda id quidem nam iure saepe nulla ipsa sint
-            fugiat repellendus, eveniet pariatur quisquam neque explicabo at
-            porro? Ab aspernatur reiciendis temporibus eius qui a consectetur
-            repellendus. Aut fugit et laudantium.
-          </p>
-        </div>
+        <div className="mt-5" dangerouslySetInnerHTML={{ __html: blog?.description }}></div>
         {/* comments */}
         <div className="my-4">
           <h2 className="text-2xl font-bold"> Comments</h2>

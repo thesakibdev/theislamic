@@ -81,7 +81,7 @@ export default function App() {
         <Route path="/donate-checkout" element={<DonateCheckout />} />
         {/* blogs */}
         <Route path="/blogs" element={<Blogs />} />
-        <Route path="/blog-details" element={<BlogDetails />} />
+        <Route path="/blog-details/:id" element={<BlogDetails />} />
       </Route>
 
       {/* auth Register and Login route */}
