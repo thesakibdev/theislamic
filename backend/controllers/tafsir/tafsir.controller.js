@@ -111,11 +111,11 @@ const createTafsir = async (req, res) => {
 // Update Specific Tafsir from tafseer array
 const editTafsir = async (req, res) => {
   try {
-    const { id, tafsirId } = req.params; // id = main Tafsir doc ID, tafsirId = tafseer._id
+    const { parentId, tafsirId } = req.params; // id = main Tafsir doc ID, tafsirId = tafseer._id
     const { bookName, content, note } = req.body;
 
     const updated = await Tafsir.findOneAndUpdate(
-      { _id: id, "tafseer._id": tafsirId },
+      { _id: parentId, "tafseer._id": tafsirId },
       {
         $set: {
           "tafseer.$.bookName": bookName?.trim(),
@@ -142,7 +142,6 @@ const editTafsir = async (req, res) => {
 const deleteTafsir = async (req, res) => {
   try {
     const { parentId, tafsirId } = req.params;
-    console.log(parentId, tafsirId);
 
     const updated = await Tafsir.findByIdAndUpdate(
       parentId,

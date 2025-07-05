@@ -20,19 +20,20 @@ export const tafsirApi = createApi({
 
     // Edit a tafsir by id
     editTafsir: builder.mutation({
-      query: (formData, tafsirId, id) => ({
-        url: `/admin/tafsir/edit/${id}/${tafsirId}`,
+      query: ({ formData, tafsirId, parentId }) => {
+        return {
+        url: `/admin/tafsir/edit/${parentId}/${tafsirId}`,
         method: "PUT",
-        body: formData,
-        headers: { "Content-Type": "application/json" },
-      }),
+          body: formData,
+          headers: { "Content-Type": "application/json" },
+        };
+      },
       invalidatesTags: ["Tafsir"],
     }),
 
     // Delete a tafsir by id
     deleteTafsir: builder.mutation({
       query: ({ parentId, tafsirId }) => {
-        console.log(parentId, tafsirId);
         return {
           url: `/admin/tafsir/delete/${parentId}/${tafsirId}`,
           method: "DELETE",

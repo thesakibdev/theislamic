@@ -9,7 +9,7 @@ const {
 } = require("../../controllers/tafsir/tafsir.controller");
 
 router.post("/tafsir/create", createTafsir);
-router.put("/tafsir/edit/:id/:tafsirId", editTafsir);
+router.put("/tafsir/edit/:parentId/:tafsirId", editTafsir);
 router.delete("/tafsir/delete/:parentId/:tafsirId", deleteTafsir);
 router.get("/tafsir/get", paginateTafsir);
 router.get("/tafsir-list", getAllTafsir);

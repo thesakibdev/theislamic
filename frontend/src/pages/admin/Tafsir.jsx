@@ -27,6 +27,7 @@ const initialFormData = {
 export default function Tafsir() {
   const [formData, setFormData] = useState(initialFormData);
   const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [parentId, setParentId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -44,7 +45,6 @@ export default function Tafsir() {
     language: "bn",
     page: currentPage,
   });
-  console.log("tafsirData =>", tafsirData);
   const tafsir = tafsirData?.data?.tafseer || [];
 
 
@@ -61,10 +61,12 @@ export default function Tafsir() {
   const resetForm = () => {
     setFormData(initialFormData);
     setCurrentEditedId(null);
+    setParentId(null);
     if (RTERef.current) {
       RTERef.current.setContent("");
     }
   };
+
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -89,18 +91,26 @@ export default function Tafsir() {
           note: formData.note,
         }
       };
+      const editData = {
+        bookName: formData.bookName,
+        content: RTEContent,
+        note: formData.note,
+      }
 
       if (currentEditedId !== null) {
         const editResponse = await editTafsir({
-          id: currentEditedId,
-          ...updatedFormData,
+          parentId: parentId,
+          tafsirId: currentEditedId,
+          formData: editData,
         }).unwrap();
         toast.success(editResponse.message || "Tafsir updated successfully!");
         resetForm();
+        refetch();
       } else {
         const addResponse = await addTafsir(updatedFormData).unwrap();
         toast.success(addResponse.message || "Tafsir added successfully!");
         resetForm();
+        refetch();
       }
     } catch (error) {
       const errorMessage = error.data?.message || "Error submitting data!";
@@ -117,7 +127,7 @@ export default function Tafsir() {
     const requiredFields = [
       formData.language.trim(),
       formData.bookName.trim(),
-      formData.totalVerseNumber.trim(),
+      formData.note.trim(),
       RTEContent,
     ];
 
@@ -136,6 +146,7 @@ export default function Tafsir() {
     if (!tafsir) return;
 
     setCurrentEditedId(tafsir._id);
+    setParentId(tafsir.parentId);
     setFormData({
       language: tafsir.language || "",
       bookName: tafsir.bookName || "",
@@ -151,8 +162,6 @@ export default function Tafsir() {
 
   const handleDeleteTafsir = async (parentId, tafsirId) => {
     if (!parentId || !tafsirId) return;
-    console.log("parentId =>", parentId);
-    console.log("tafsirId =>", tafsirId);
 
     try {
       const userConfirmed = window.confirm(
