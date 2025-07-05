@@ -16,10 +16,6 @@ export default function AdminSidebar() {
       link: "hadith",
     },
     {
-      name: "Accounting",
-      link: "accounting",
-    },
-    {
       name: "Tafsir",
       link: "tafsir",
     },

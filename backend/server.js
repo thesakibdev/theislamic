@@ -22,8 +22,6 @@ const globalSearchRouter = require("./routes/utils/search.route");
 const reportRouter = require("./routes/report/report.route");
 const searchRouter = require("./routes/search/search.route");
 const tafsirRouter = require("./routes/tafsir/tafsir.route");
-const accountRouter = require("./routes/account/account.route");
-
 dotenv.config();
 
 const app = express();
@@ -109,9 +107,6 @@ app.use("/api/v1", searchRouter);
 
 // report route
 app.use("/api/v1/report", reportRouter);
-
-// accounting route
-app.use("/api/v1/accounting", accountRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
