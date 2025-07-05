@@ -57,13 +57,9 @@ export default function Blog() {
     limit: 6,
   });
 
-  console.log("blogsData", blogsData);
-
   const blogs = useMemo(() => blogsData || [], [blogsData]);
-  console.log("blogs", blogs);
 
   const totalPages = useMemo(() => blogsData?.totalPages || 1, [blogsData]);
-  console.log("totalPages", totalPages);
 
   const [imageLoadingState, setImageLoadingState] = useState(false);
 
@@ -109,8 +105,6 @@ export default function Blog() {
         thumbnailId: imagePublicId,
         author: user?.id,
       };
-
-      console.log(updatedFormData);
 
       if (currentEditedId !== null) {
         const editResponse = await editBlog({
