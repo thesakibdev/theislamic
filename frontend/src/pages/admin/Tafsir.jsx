@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "../../components/ui/button";
 import { toast } from "react-toastify";
 import RTE from "../../components/common/RTE";
@@ -7,17 +7,14 @@ import {
   useAddTafsirMutation,
   useEditTafsirMutation,
   useDeleteTafsirMutation,
-  useGetBySurahQuery
+  useGetAllTafsirQuery
 } from "../../slices/admin/tafsir";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
 
 const initialFormData = {
   language: "",
@@ -42,14 +39,13 @@ export default function Tafsir() {
     data: tafsirData,
     isLoading,
     error,
-  } = useGetBySurahQuery({
+  } = useGetAllTafsirQuery({
     language: "bn",
-    surahNumber: 1,
+    page: currentPage,
   });
+  console.log("tafsirData =>", tafsirData);
+  const tafsir = tafsirData?.data?.tafseer || [];
 
-  const tafsir = useMemo(() => tafsirData || [], [tafsirData]);
-
-  const totalPages = useMemo(() => tafsirData?.totalPages || 1, [tafsirData]);
 
   // Handle form field changes
   const handleInputChange = (event) => {
@@ -152,8 +148,10 @@ export default function Tafsir() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   };
 
-  const handleDeleteTafsir = async (id) => {
-    if (!id) return;
+  const handleDeleteTafsir = async (id, tafsirId) => {
+    if (!id || !tafsirId) return;
+    console.log("id =>", id);
+    console.log("tafsirId =>", tafsirId);
 
     try {
       const userConfirmed = window.confirm(
@@ -161,7 +159,7 @@ export default function Tafsir() {
       );
 
       if (userConfirmed) {
-        const deleteResponse = await deleteTafsir({ id }).unwrap();
+        const deleteResponse = await deleteTafsir({ id: parentId, tafsirId: id }).unwrap();
         toast.success(deleteResponse.message || "Tafsir deleted successfully");
       }
     } catch (error) {
@@ -200,38 +198,18 @@ export default function Tafsir() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-5">
             {tafsir.length > 0 ? (
               tafsir.map((tafsir) => (
-                <Card key={tafsir._id} className="overflow-hidden border">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl font-bold">
-                      {tafsir.language}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <p className="text-sm text-gray-600">{tafsir.bookName}</p>
-                    <p className="text-sm text-gray-600">{tafsir.totalVerseNumber}</p>
-                    <div className="text-xs text-gray-500">
-                      <p>Note: {tafsir.note}</p>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <Button
-                      onClick={() => handleEditTafsir(tafsir)}
-                      disabled={isEditingTafsir || isAddingTafsir}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDeleteTafsir(tafsir._id)}
-                      disabled={isDeletingTafsir}
-                    >
-                      Delete
-                    </Button>
-                  </CardFooter>
-                </Card>
+                <div className="bg-white p-4 rounded-lg shadow-md" key={tafsir._id}>
+                  <h3 className="text-lg font-semibold">{tafsir.surahName}</h3>
+                  <p className="text-sm text-gray-600">Total Verse: {tafsir.totalVerseNumber}</p>
+                  <p className="text-sm text-gray-600">{tafsir.bookName}</p>
+                  <div className="flex gap-2">
+                    <Button onClick={() => handleEditTafsir(tafsir)} variant="outline">Edit</Button>
+                    <Button onClick={() => handleDeleteTafsir(tafsir._id, tafsir.parentId)} variant="destructive">Delete</Button>
+                  </div>
+                </div>
               ))
             ) : (
               <div className="col-span-full text-center py-10">
@@ -241,17 +219,6 @@ export default function Tafsir() {
               </div>
             )}
           </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center my-6">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          )}
         </>
       )}
 

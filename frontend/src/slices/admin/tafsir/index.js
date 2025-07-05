@@ -44,6 +44,14 @@ export const tafsirApi = createApi({
       }),
       providesTags: ["Tafsir"],
     }),
+
+    // Get all tafsir
+    getAllTafsir: builder.query({
+      query: ({ language, page }) => ({
+        url: `/admin/tafsir-list?language=${language}&page=${page}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -52,4 +60,5 @@ export const {
   useEditTafsirMutation,
   useDeleteTafsirMutation,
   useGetBySurahQuery,
+  useGetAllTafsirQuery,
 } = tafsirApi;

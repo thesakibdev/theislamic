@@ -191,9 +191,54 @@ const paginateTafsir = async (req, res) => {
   }
 };
 
+const getAllTafsir = async (req, res) => {
+  try {
+    const { language, page = 1 } = req.query;
+    if (!language) {
+      return ResponseHandler.error(res, "Language is required.", 400);
+    }
+    const pageSize = 10;
+    // Find all tafsir docs for the language
+    const tafsirDocs = await Tafsir.find({ language });
+    // Flatten all tafseer arrays into one array
+    let allTafseer = [];
+    tafsirDocs.forEach(doc => {
+      if (Array.isArray(doc.tafseer)) {
+        doc.tafseer.forEach(t => {
+          allTafseer.push({
+            ...t._doc,
+            surahName: doc.surahName,
+            surahNumber: doc.surahNumber,
+            language: doc.language,
+            parentId: doc._id,
+          });
+        });
+      }
+    });
+    // Sort by totalVerseNumber ascending
+    allTafseer.sort((a, b) => a.totalVerseNumber - b.totalVerseNumber);
+    // Pagination
+    const total = allTafseer.length;
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    const paginated = allTafseer.slice(start, end);
+    const tafseer = paginated
+    return ResponseHandler.success(res, "Tafsir fetched successfully!", {
+      total,
+      page: Number(page),
+      pageSize,
+      tafseer,
+    }, 200);
+  } catch (error) {
+    console.error(error);
+    return ResponseHandler.error(res, "Server error.", 500);
+  }
+}
+
 module.exports = {
   createTafsir,
   editTafsir,
   deleteTafsir,
   paginateTafsir,
+  getAllTafsir,
 };
