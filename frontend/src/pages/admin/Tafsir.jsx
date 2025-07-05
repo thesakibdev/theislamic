@@ -39,6 +39,7 @@ export default function Tafsir() {
     data: tafsirData,
     isLoading,
     error,
+    refetch,
   } = useGetAllTafsirQuery({
     language: "bn",
     page: currentPage,
@@ -143,14 +144,14 @@ export default function Tafsir() {
       note: tafsir.note || "",
     });
 
-
     // Scroll to form
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    refetch();
   };
 
-  const handleDeleteTafsir = async (id, tafsirId) => {
-    if (!id || !tafsirId) return;
-    console.log("id =>", id);
+  const handleDeleteTafsir = async (parentId, tafsirId) => {
+    if (!parentId || !tafsirId) return;
+    console.log("parentId =>", parentId);
     console.log("tafsirId =>", tafsirId);
 
     try {
@@ -159,8 +160,9 @@ export default function Tafsir() {
       );
 
       if (userConfirmed) {
-        const deleteResponse = await deleteTafsir({ id: parentId, tafsirId: id }).unwrap();
+        const deleteResponse = await deleteTafsir({ parentId, tafsirId }).unwrap();
         toast.success(deleteResponse.message || "Tafsir deleted successfully");
+        refetch();
       }
     } catch (error) {
       toast.error(error?.data?.message || "Failed to delete tafsir");
@@ -207,7 +209,7 @@ export default function Tafsir() {
                   <p className="text-sm text-gray-600">{tafsir.bookName}</p>
                   <div className="flex gap-2">
                     <Button onClick={() => handleEditTafsir(tafsir)} variant="outline">Edit</Button>
-                    <Button onClick={() => handleDeleteTafsir(tafsir._id, tafsir.parentId)} variant="destructive">Delete</Button>
+                    <Button onClick={() => handleDeleteTafsir(tafsir.parentId, tafsir._id)} variant="destructive">Delete</Button>
                   </div>
                 </div>
               ))

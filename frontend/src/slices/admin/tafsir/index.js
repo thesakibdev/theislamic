@@ -26,14 +26,20 @@ export const tafsirApi = createApi({
         body: formData,
         headers: { "Content-Type": "application/json" },
       }),
+      invalidatesTags: ["Tafsir"],
     }),
 
     // Delete a tafsir by id
     deleteTafsir: builder.mutation({
-      query: (id, tafsirId) => ({
-        url: `/admin/tafsir/delete/${id}/${tafsirId}`,
-        method: "DELETE",
-      }),
+      query: ({ parentId, tafsirId }) => {
+        console.log(parentId, tafsirId);
+        return {
+          url: `/admin/tafsir/delete/${parentId}/${tafsirId}`,
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        };
+      },
+      invalidatesTags: ["Tafsir"],
     }),
 
     // Get all tafsir by pagination

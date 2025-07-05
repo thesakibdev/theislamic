@@ -10,7 +10,7 @@ const {
 
 router.post("/tafsir/create", createTafsir);
 router.put("/tafsir/edit/:id/:tafsirId", editTafsir);
-router.delete("/tafsir/delete/:id/:tafsirId", deleteTafsir);
+router.delete("/tafsir/delete/:parentId/:tafsirId", deleteTafsir);
 router.get("/tafsir/get", paginateTafsir);
 router.get("/tafsir-list", getAllTafsir);
 

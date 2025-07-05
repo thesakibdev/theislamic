@@ -141,10 +141,11 @@ const editTafsir = async (req, res) => {
 // Delete a Specific Tafsir from tafseer array
 const deleteTafsir = async (req, res) => {
   try {
-    const { id, tafsirId } = req.params;
+    const { parentId, tafsirId } = req.params;
+    console.log(parentId, tafsirId);
 
     const updated = await Tafsir.findByIdAndUpdate(
-      id,
+      parentId,
       { $pull: { tafseer: { _id: tafsirId } } },
       { new: true }
     );
