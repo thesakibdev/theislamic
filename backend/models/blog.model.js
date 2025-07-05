@@ -14,6 +14,9 @@ const BlogSchema = new mongoose.Schema(
     thumbnailId: {
       type: String,
     },
+    category: {
+      type: String,
+    },
     shortDesc: {
       type: String,
     },

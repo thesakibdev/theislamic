@@ -39,6 +39,7 @@ const addBlog = async (req, res) => {
       description,
       thumbnail,
       thumbnailId,
+      category,
       shortDesc,
       slug,
       metaDesc,
@@ -50,6 +51,7 @@ const addBlog = async (req, res) => {
       description,
       thumbnail,
       thumbnailId,
+      category,
       shortDesc,
       slug,
       metaDesc,
@@ -109,6 +111,7 @@ const editBlog = async (req, res) => {
       title,
       description,
       thumbnail,
+      category,
       shortDesc,
       slug,
       metaDesc,
@@ -127,6 +130,7 @@ const editBlog = async (req, res) => {
     findBlog.title = title || findBlog.title;
     findBlog.description = description || findBlog.description;
     findBlog.thumbnail = thumbnail || findBlog.thumbnail;
+    findBlog.category = category || findBlog.category;
     findBlog.shortDesc = shortDesc || findBlog.shortDesc;
     findBlog.slug = slug || findBlog.slug;
     findBlog.metaDesc = metaDesc || findBlog.metaDesc;
