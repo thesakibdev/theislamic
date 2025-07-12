@@ -21,6 +21,7 @@ const donorRouter = require("./routes/donor/donor.route");
 const globalSearchRouter = require("./routes/utils/search.route");
 const reportRouter = require("./routes/report/report.route");
 const tafsirRouter = require("./routes/tafsir/tafsir.route");
+const searchRouter = require("./routes/search/search.route");
 dotenv.config();
 
 const app = express();
@@ -100,6 +101,10 @@ app.use("/api/v1/admin/analytics", counterRouter);
 app.use("/api/v1/utils", languageRouter);
 app.use("/api/v1/utils", bookListRouter);
 app.use("/api/v1/utils", globalSearchRouter);
+app.use("/api/v1/utils", searchRouter);
+
+// search route
+app.use("/api/v1/global", searchRouter);
 
 // report route
 app.use("/api/v1/report", reportRouter);
