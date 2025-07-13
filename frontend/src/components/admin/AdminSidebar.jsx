@@ -31,6 +31,10 @@ export default function AdminSidebar() {
       name: "Donors",
       link: "donors",
     },
+    {
+      name: "Account",
+      link: "account",
+    },
     // {
     //   name: "About Us",
     //   link: "about-us",

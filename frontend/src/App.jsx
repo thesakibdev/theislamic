@@ -30,6 +30,7 @@ import BlogDetails from "./pages/client/blog/BlogDetails";
 import Blogs from "./pages/client/blog/Blogs";
 import Translation from "./pages/client/Translation";
 import Dashboard from "./pages/admin/Dashboard";
+import Account from "./pages/admin/Account";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { checkAuth } from "./slices/authslice";
@@ -105,6 +106,7 @@ export default function App() {
         <Route path="hadith" element={<Hadith />} />
         <Route path="tafsir" element={<Tafsir />} />
         <Route path="donors" element={<Donors />} />
+        <Route path="account" element={<Account />} />
         <Route path="i-wall" element={<Blog />} />
       </Route>
       <Route path="*" element={<NotFound />} />

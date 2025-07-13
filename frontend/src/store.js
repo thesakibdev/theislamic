@@ -7,6 +7,7 @@ import { utilsApi } from "./slices/utils";
 import { hadithApi } from "./slices/admin/hadith";
 import { donorApi } from "./slices/admin/donor";
 import { tafsirApi } from "./slices/admin/tafsir";
+import { accountApi } from "./slices/admin/account";
 import utilityReducer from "./slices/utils/utilitySlice";
 import authReducer from "./slices/authslice";
 
@@ -21,6 +22,7 @@ export const store = configureStore({
     [hadithApi.reducerPath]: hadithApi.reducer,
     [donorApi.reducerPath]: donorApi.reducer,
     [tafsirApi.reducerPath]: tafsirApi.reducer,
+    [accountApi.reducerPath]: accountApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -30,7 +32,8 @@ export const store = configureStore({
       .concat(utilsApi.middleware)
       .concat(hadithApi.middleware)
       .concat(donorApi.middleware)
-      .concat(tafsirApi.middleware),
+      .concat(tafsirApi.middleware)
+      .concat(accountApi.middleware),
 });
 
 // Optional for better query features like refetchOnFocus/refetchOnReconnect
