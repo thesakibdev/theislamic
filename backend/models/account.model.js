@@ -28,7 +28,7 @@ const transactionSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  donorData: {
+  donorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Donor",
     required: true,

@@ -1,11 +1,12 @@
 const Account = require("../../models/account.model");
 const User = require("../../models/user.model");
 const ResponseHandler = require("../../helper/ResponseHandler");
+const axios = require("axios");
 
 // Create a new transaction
 const createTransaction = async (req, res) => {
   try {
-    const { type, amount, comment, category, editor } = req.body;
+    const { type, amount, comment, category, editor, donorId } = req.body;
     
     // Validate required fields
     if (!type || !amount || !editor) {
@@ -51,6 +52,27 @@ const createTransaction = async (req, res) => {
 
     account.updatedAt = new Date();
     await account.save();
+
+    // If donorId is provided, call donor add-history API
+    if (donorId) {
+      try {
+        // Prepare donor API URL (assuming same server)
+        const donorApiUrl = `${process.env.BACKEND_URL || "http://localhost:5000"}/api/v1/donor/add-history/${donorId}`;
+        // Prepare donor history payload
+        const donorPayload = {
+          amount: parseFloat(amount),
+          donateDate: new Date().toISOString(),
+          typeOfDonation: category || "other"
+        };
+        // Call donor API (no await, fire-and-forget, or you can await if you want to ensure success)
+        await axios.post(donorApiUrl, donorPayload, {
+          headers: { "Content-Type": "application/json" }
+        });
+      } catch (donorErr) {
+        // Log but don't fail the main transaction
+        console.error("Failed to add transaction to donor history:", donorErr.message);
+      }
+    }
 
     return ResponseHandler.success(
       res,
