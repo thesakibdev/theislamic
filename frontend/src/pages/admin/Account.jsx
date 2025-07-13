@@ -8,6 +8,7 @@ import {
   useUpdateTransactionMutation,
   useDeleteTransactionMutation 
 } from "@/slices/admin/account";
+import { useGetMinimalDonorsQuery } from "@/slices/admin/donor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,16 +20,20 @@ import Loading from "@/components/common/Loading";
 
 export default function Account() {
   const { user } = useSelector((state) => state.auth);
-  const [selectedAccount, setSelectedAccount] = useState(null);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedDonorId, setSelectedDonorId] = useState("");
 
   const { data: accountsData, isLoading: accountsLoading } = useGetAllAccountsQuery({
     page: currentPage,
     limit: 10
   });
+
+  // Use RTK Query for minimal donors
+  const { data: minimalDonors = [], isLoading: donorsLoading } = useGetMinimalDonorsQuery();
+  console.log("minimalDonors", minimalDonors);
 
   const [createTransaction, { isLoading: creating }] = useCreateTransactionMutation();
   const [updateTransaction, { isLoading: updating }] = useUpdateTransactionMutation();
@@ -39,18 +44,17 @@ export default function Account() {
 
   const handleCreateTransaction = async (data) => {
     try {
-      if (!selectedAccount) {
-        toast.error("Please select an account first");
-        return;
-      }
-
-      await createTransaction({
+      const payload = {
         ...data,
-        editor: { _id: user.id }
-      }).unwrap();
-
+        editor: { _id: user.id },
+      };
+      if (selectedDonorId) {
+        payload.donorId = selectedDonorId;
+      }
+      await createTransaction(payload).unwrap();
       toast.success("Transaction created successfully");
       setIsAddDialogOpen(false);
+      setSelectedDonorId("");
       reset();
     } catch (error) {
       toast.error(error?.data?.message || "Failed to create transaction");
@@ -104,13 +108,13 @@ export default function Account() {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-BD', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'BDT'
     }).format(amount);
   };
 
-  if (accountsLoading) return <Loading />;
+  // if (accountsLoading) return <Loading />;
 
   return (
     <div className="p-6 space-y-6">
@@ -118,7 +122,7 @@ export default function Account() {
         <h1 className="text-3xl font-bold">Account Management</h1>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
+            <Button className="flex items-center gap-2 text-white hover:bg-blue-600 duration-300">
               <Plus className="w-4 h-4" />
               Add Transaction
             </Button>
@@ -128,22 +132,31 @@ export default function Account() {
               <DialogTitle>Add New Transaction</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(handleCreateTransaction)} className="space-y-4">
+              {/* Donor selection dropdown */}
               <div>
-                <Label htmlFor="account">Select Account</Label>
-                <Select onValueChange={(value) => setSelectedAccount(value)}>
+                <Label htmlFor="donor">Donor (optional)</Label>
+                <Select
+                  value={selectedDonorId || undefined}
+                  onValueChange={setSelectedDonorId}
+                  disabled={donorsLoading}
+                >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select an account" />
+                    <SelectValue placeholder="Select donor (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    {accountsData?.accounts?.map((account) => (
-                      <SelectItem key={account._id} value={account._id}>
-                        {account.user?.name || account.user?.email} - Balance: {formatCurrency(account.balance)}
+                    {minimalDonors.map((donor) => (
+                      <SelectItem key={donor._id} value={donor._id}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {donor.avatar && (
+                            <img src={donor.avatar} alt={donor.name} style={{ width: 24, height: 24, borderRadius: '50%' }} />
+                          )}
+                          {donor.name} {donor.phone ? `(${donor.phone})` : donor.email ? `(${donor.email})` : ''}
+                        </span>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-
               <div>
                 <Label htmlFor="type">Transaction Type</Label>
                 <Select onValueChange={(value) => setValue("type", value)}>
@@ -157,7 +170,6 @@ export default function Account() {
                 </Select>
                 {errors.type && <p className="text-red-500 text-sm">{errors.type.message}</p>}
               </div>
-
               <div>
                 <Label htmlFor="amount">Amount</Label>
                 <Input
@@ -167,7 +179,6 @@ export default function Account() {
                 />
                 {errors.amount && <p className="text-red-500 text-sm">{errors.amount.message}</p>}
               </div>
-
               <div>
                 <Label htmlFor="category">Category</Label>
                 <Select onValueChange={(value) => setValue("category", value)}>
@@ -182,12 +193,10 @@ export default function Account() {
                   </SelectContent>
                 </Select>
               </div>
-
               <div>
                 <Label htmlFor="comment">Comment</Label>
                 <Input {...register("comment")} placeholder="Optional comment" />
               </div>
-
               <Button type="submit" disabled={creating} className="w-full">
                 {creating ? "Creating..." : "Create Transaction"}
               </Button>
@@ -308,7 +317,7 @@ export default function Account() {
       </Card>
 
       {/* Selected Account Transactions */}
-      {selectedAccount && (
+      {/* {selectedAccount && (
         <Card>
           <CardHeader>
             <CardTitle>
@@ -381,7 +390,7 @@ export default function Account() {
             </div>
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Edit Transaction Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

@@ -317,6 +317,16 @@ const getAllDonors = async (req, res) => {
   }
 };
 
+// Minimal donor list for dropdowns
+const getMinimalDonorList = async (req, res) => {
+  try {
+    const donors = await Donor.find({}, '_id name avatar phone email');
+    res.json({ success: true, donors });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   createDonor,
   handleImageUpload,
@@ -326,4 +336,5 @@ module.exports = {
   editDonationHistory,
   addNewDonationHistory,
   deleteDonorHistory,
+  getMinimalDonorList,
 };

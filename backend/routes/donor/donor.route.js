@@ -10,6 +10,7 @@ const {
   editDonationHistory,
   addNewDonationHistory,
   deleteDonorHistory,
+  getMinimalDonorList,
 } = require("../../controllers/donor/donor.controller");
 const checkUserRole = require("../../middleware/authCheck.middleware");
 
@@ -23,5 +24,6 @@ router.put("/edit/history/:donorId/:historyId", editDonationHistory);
 router.delete("/delete/:id", deleteDonor);
 router.delete("/delete/history/:donorId/:historyId", deleteDonorHistory);
 router.get("/get", getAllDonors);
+router.get("/list-minimal", getMinimalDonorList);
 
 module.exports = router;

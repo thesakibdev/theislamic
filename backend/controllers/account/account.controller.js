@@ -2,15 +2,17 @@ const Account = require("../../models/account.model");
 const User = require("../../models/user.model");
 const ResponseHandler = require("../../helper/ResponseHandler");
 const axios = require("axios");
+const mongoose = require("mongoose");
 
 // Create a new transaction
 const createTransaction = async (req, res) => {
   try {
-    const { type, amount, comment, category, editor, donorId } = req.body;
-    
+    const { type, amount, comment, category, donorId } = req.body;
+    console.log("req.body", req.body);
+
     // Validate required fields
-    if (!type || !amount || !editor) {
-      return ResponseHandler.error(res, "Type, amount, and editor are required", 400);
+    if (!type || !amount || !donorId) {
+      return ResponseHandler.error(res, "Type, amount, and donorId are required", 400);
     }
 
     // Validate type
@@ -18,16 +20,25 @@ const createTransaction = async (req, res) => {
       return ResponseHandler.error(res, "Type must be either 'income' or 'expense'", 400);
     }
 
-    const user = await User.findById(editor._id);
+    // Always convert donorId to ObjectId if present
+    let donorObjectId;
+    if (donorId) {
+      if (mongoose.Types.ObjectId.isValid(donorId)) {
+        donorObjectId = new mongoose.Types.ObjectId(donorId);
+      } else {
+        return ResponseHandler.error(res, "Invalid donorId format", 400);
+      }
+    }
+
+    const user = req.user;
     if (!user) {
       return ResponseHandler.error(res, "User not found", 404);
     }
 
     // Get or create account for the user
-    let account = await Account.findOne({ user: editor._id });
-    
+    let account = await Account.findOne({ user: user._id });
     if (!account) {
-      account = new Account({ user: editor._id, balance: 0 });
+      account = new Account({ user: user._id, balance: 0 });
     }
 
     // Create transaction
@@ -37,7 +48,8 @@ const createTransaction = async (req, res) => {
       comment: comment || "",
       category: category || "other",
       date: new Date(),
-      editor: editor._id
+      editor: user._id,
+      donorId: donorObjectId
     };
 
     // Add transaction to account
@@ -56,20 +68,16 @@ const createTransaction = async (req, res) => {
     // If donorId is provided, call donor add-history API
     if (donorId) {
       try {
-        // Prepare donor API URL (assuming same server)
         const donorApiUrl = `${process.env.BACKEND_URL || "http://localhost:5000"}/api/v1/donor/add-history/${donorId}`;
-        // Prepare donor history payload
         const donorPayload = {
           amount: parseFloat(amount),
           donateDate: new Date().toISOString(),
           typeOfDonation: category || "other"
         };
-        // Call donor API (no await, fire-and-forget, or you can await if you want to ensure success)
         await axios.post(donorApiUrl, donorPayload, {
           headers: { "Content-Type": "application/json" }
         });
       } catch (donorErr) {
-        // Log but don't fail the main transaction
         console.error("Failed to add transaction to donor history:", donorErr.message);
       }
     }
@@ -92,8 +100,8 @@ const getTransactions = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
 
     const account = await Account.findOne({ user: userId })
-      .populate('transactions.editor', 'name email')
-      .populate('user', 'name email');
+      .populate("transactions.editor", "name email")
+      .populate("user", "name email");
 
     if (!account) {
       return ResponseHandler.error(res, "Account not found", 404);
@@ -118,7 +126,7 @@ const getTransactions = async (req, res) => {
         currentPage: parseInt(page),
         totalPages,
         hasNextPage: endIndex < totalTransactions,
-        hasPrevPage: page > 1
+        hasPrevPage: page > 1,
       },
       "Transactions retrieved successfully"
     );
@@ -140,11 +148,11 @@ const getAccountSummary = async (req, res) => {
 
     // Calculate summary statistics
     const totalIncome = account.transactions
-      .filter(t => t.type === "income")
+      .filter((t) => t.type === "income")
       .reduce((sum, t) => sum + t.amount, 0);
 
     const totalExpense = account.transactions
-      .filter(t => t.type === "expense")
+      .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + t.amount, 0);
 
     const summary = {
@@ -152,9 +160,10 @@ const getAccountSummary = async (req, res) => {
       totalIncome,
       totalExpense,
       totalTransactions: account.transactions.length,
-      lastTransaction: account.transactions.length > 0 
-        ? account.transactions[account.transactions.length - 1] 
-        : null
+      lastTransaction:
+        account.transactions.length > 0
+          ? account.transactions[account.transactions.length - 1]
+          : null,
     };
 
     return ResponseHandler.success(
@@ -175,7 +184,7 @@ const updateTransaction = async (req, res) => {
     const { type, amount, comment, category } = req.body;
 
     const account = await Account.findOne({
-      "transactions._id": transactionId
+      "transactions._id": transactionId,
     });
 
     if (!account) {
@@ -234,7 +243,7 @@ const deleteTransaction = async (req, res) => {
     const { transactionId } = req.params;
 
     const account = await Account.findOne({
-      "transactions._id": transactionId
+      "transactions._id": transactionId,
     });
 
     if (!account) {
@@ -275,8 +284,8 @@ const getAllAccounts = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
 
     const accounts = await Account.find()
-      .populate('user', 'name email')
-      .populate('transactions.editor', 'name email')
+      .populate("user", "name email")
+      .populate("transactions.editor", "name email")
       .sort({ updatedAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -289,7 +298,7 @@ const getAllAccounts = async (req, res) => {
         accounts,
         totalPages: Math.ceil(total / limit),
         currentPage: page,
-        total
+        total,
       },
       "Accounts retrieved successfully"
     );
@@ -299,11 +308,11 @@ const getAllAccounts = async (req, res) => {
   }
 };
 
-module.exports = { 
+module.exports = {
   createTransaction,
   getTransactions,
   getAccountSummary,
   updateTransaction,
   deleteTransaction,
-  getAllAccounts
+  getAllAccounts,
 };

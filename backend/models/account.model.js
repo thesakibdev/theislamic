@@ -36,12 +36,6 @@ const transactionSchema = new mongoose.Schema({
 });
 
 const accountSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-    unique: true,
-  },
   transactions: [transactionSchema],
   balance: {
     type: Number,

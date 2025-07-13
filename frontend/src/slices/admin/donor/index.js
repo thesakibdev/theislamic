@@ -68,6 +68,16 @@ export const donorApi = createApi({
       }),
       providesTags: ["Donor"],
     }),
+
+    // Minimal donor list for dropdowns
+    getMinimalDonors: builder.query({
+      query: () => ({
+        url: "/donor/list-minimal",
+        method: "GET",
+      }),
+      providesTags: ["Donor"],
+      transformResponse: (response) => response.donors || [],
+    }),
   }),
 });
 
@@ -80,4 +90,5 @@ export const {
   useAddNewDonationHistoryMutation,
   useEditDonationHistoryMutation,
   useDeleteDonorHistoryMutation,
+  useGetMinimalDonorsQuery,
 } = donorApi;
