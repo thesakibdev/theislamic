@@ -3,21 +3,20 @@ const router = express.Router();
 const {
   createTransaction,
   getTransactions,
-  getAccountSummary,
+  getTransactionSummary,
   updateTransaction,
   deleteTransaction,
-  getAllAccounts,
 } = require("../../controllers/account/account.controller");
 const checkUserRole = require("../../middleware/authCheck.middleware");
 
 // Create a new transaction
 router.post("/create", checkUserRole(['admin', "creator", "editor"]), createTransaction);
 
-// Get all transactions for a user
-router.get("/transactions/:userId", checkUserRole(['admin', "creator", "editor"]), getTransactions);
+// Get all transactions
+router.get("/transactions", checkUserRole(['admin', "creator", "editor"]), getTransactions);
 
-// Get account summary
-router.get("/summary/:userId", checkUserRole(['admin', "creator", "editor"]), getAccountSummary);
+// Get transaction summary
+router.get("/summary", checkUserRole(['admin', "creator", "editor"]), getTransactionSummary);
 
 // Update a transaction
 router.put("/transaction/:transactionId", checkUserRole(['admin', "creator", "editor"]), updateTransaction);
@@ -25,7 +24,5 @@ router.put("/transaction/:transactionId", checkUserRole(['admin', "creator", "ed
 // Delete a transaction
 router.delete("/transaction/:transactionId", checkUserRole(['admin', "creator", "editor"]), deleteTransaction);
 
-// Get all accounts (admin only)
-router.get("/all", checkUserRole(['admin', "creator", "editor"]), getAllAccounts);
 
 module.exports = router; 

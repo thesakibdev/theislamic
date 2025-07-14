@@ -31,15 +31,7 @@ const transactionSchema = new mongoose.Schema({
   donorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Donor",
-    required: true,
-  },
-});
-
-const accountSchema = new mongoose.Schema({
-  transactions: [transactionSchema],
-  balance: {
-    type: Number,
-    default: 0,
+    default: null,
   },
   createdAt: {
     type: Date,
@@ -51,6 +43,6 @@ const accountSchema = new mongoose.Schema({
   },
 });
 
-const Account = mongoose.model("Account", accountSchema);
+const Transaction = mongoose.model("Transaction", transactionSchema);
 
-module.exports = Account;
+module.exports = Transaction;
