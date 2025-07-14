@@ -18,22 +18,24 @@ export const accountApi = createApi({
       invalidatesTags: ["Account", "Transaction"],
     }),
 
-    // Get all transactions for a user
+    // Get all transactions
     getTransactions: builder.query({
-      query: ({ userId, page = 1, limit = 10 }) => ({
-        url: `/account/transactions/${userId}?page=${page}&limit=${limit}`,
+      query: ({ page = 1, limit = 10 } = {}) => ({
+        url: `/account/transactions?page=${page}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["Transaction"],
+      transformResponse: (response) => response.transactions ? response : { transactions: [], ...response },
     }),
 
     // Get account summary
     getAccountSummary: builder.query({
-      query: (userId) => ({
-        url: `/account/summary/${userId}`,
+      query: () => ({
+        url: `/account/summary`,
         method: "GET",
       }),
       providesTags: ["Account"],
+      transformResponse: (response) => response.summary ? response.summary : response,
     }),
 
     // Update a transaction

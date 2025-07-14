@@ -2,44 +2,92 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { 
+import {
   useGetAllAccountsQuery,
   useCreateTransactionMutation,
   useUpdateTransactionMutation,
-  useDeleteTransactionMutation 
+  useDeleteTransactionMutation,
+  useGetTransactionsQuery,
+  useGetAccountSummaryQuery,
 } from "@/slices/admin/account";
 import { useGetMinimalDonorsQuery } from "@/slices/admin/donor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Edit, Trash2, DollarSign, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  Eye,
+} from "lucide-react";
 import Loading from "@/components/common/Loading";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import AccountSummary from "@/components/admin/AccountSummary";
+import TransactionsTable from "@/components/admin/TransactionsTable";
 
 export default function Account() {
   const { user } = useSelector((state) => state.auth);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isIncomeBreakdownDialogOpen, setIsIncomeBreakdownDialogOpen] =
+    useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDonorId, setSelectedDonorId] = useState("");
 
-  const { data: accountsData, isLoading: accountsLoading } = useGetAllAccountsQuery({
-    page: currentPage,
-    limit: 10
-  });
+  const { data: accountsData, isLoading: accountsLoading } =
+    useGetAllAccountsQuery({
+      page: currentPage,
+      limit: 10,
+    });
 
   // Use RTK Query for minimal donors
-  const { data: minimalDonors = [], isLoading: donorsLoading } = useGetMinimalDonorsQuery();
+  const { data: minimalDonors = [], isLoading: donorsLoading } =
+    useGetMinimalDonorsQuery();
   console.log("minimalDonors", minimalDonors);
 
-  const [createTransaction, { isLoading: creating }] = useCreateTransactionMutation();
-  const [updateTransaction, { isLoading: updating }] = useUpdateTransactionMutation();
-  const [deleteTransaction, { isLoading: deleting }] = useDeleteTransactionMutation();
+  // Transactions and summary hooks
+  const { data: transactionsData, isLoading: transactionsLoading } =
+    useGetTransactionsQuery({ page: currentPage, limit: 10 });
+  const { data: summary, isLoading: summaryLoading } =
+    useGetAccountSummaryQuery();
+  console.log("summary", summary);
+  console.log("transactionsData", transactionsData);
 
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm();
+  const [createTransaction, { isLoading: creating }] =
+    useCreateTransactionMutation();
+  const [updateTransaction, { isLoading: updating }] =
+    useUpdateTransactionMutation();
+  const [deleteTransaction, { isLoading: deleting }] =
+    useDeleteTransactionMutation();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm();
   const transactionType = watch("type");
 
   const handleCreateTransaction = async (data) => {
@@ -65,7 +113,7 @@ export default function Account() {
     try {
       await updateTransaction({
         transactionId: editingTransaction._id,
-        ...data
+        ...data,
       }).unwrap();
 
       toast.success("Transaction updated successfully");
@@ -98,23 +146,97 @@ export default function Account() {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-BD', {
-      style: 'currency',
-      currency: 'BDT'
+    return new Intl.NumberFormat("en-BD", {
+      style: "currency",
+      currency: "BDT",
     }).format(amount);
   };
 
   // if (accountsLoading) return <Loading />;
+
+  // ExcelJS download handler
+  const handleDownloadExcel = async () => {
+    if (!transactionsData?.transactions?.length) return;
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Transactions");
+
+    // Define columns
+    worksheet.columns = [
+      { header: "Date", key: "date", width: 22 },
+      { header: "Type", key: "type", width: 12 },
+      { header: "Amount", key: "amount", width: 16 },
+      { header: "Category", key: "category", width: 16 },
+      { header: "Comment", key: "comment", width: 24 },
+      { header: "Editor", key: "editor", width: 20 },
+    ];
+
+    // Add rows
+    transactionsData.transactions.forEach((t) => {
+      worksheet.addRow({
+        date: formatDate(t.date),
+        type: t.type.charAt(0).toUpperCase() + t.type.slice(1),
+        amount: (t.type === "income" ? "+" : "-") + t.amount,
+        category: t.category,
+        comment: t.comment || "-",
+        editor: t.editor?.name || "N/A",
+      });
+    });
+
+    // Style header row
+    const headerRow = worksheet.getRow(1);
+    headerRow.height = 24;
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 13 };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF2563EB" }, // Tailwind blue-600
+      };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+    });
+
+    // Style data rows
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return;
+      row.height = 20;
+      row.eachCell((cell) => {
+        cell.font = { size: 12 };
+        cell.alignment = { vertical: "middle", horizontal: "center" };
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+      });
+    });
+
+    // Auto filter
+    worksheet.autoFilter = {
+      from: 'A1',
+      to: 'F1'
+    };
+
+    // Download
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buffer]), "transactions.xlsx");
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -131,7 +253,10 @@ export default function Account() {
             <DialogHeader>
               <DialogTitle>Add New Transaction</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit(handleCreateTransaction)} className="space-y-4">
+            <form
+              onSubmit={handleSubmit(handleCreateTransaction)}
+              className="space-y-4"
+            >
               {/* Donor selection dropdown */}
               <div>
                 <Label htmlFor="donor">Donor (optional)</Label>
@@ -146,11 +271,30 @@ export default function Account() {
                   <SelectContent>
                     {minimalDonors.map((donor) => (
                       <SelectItem key={donor._id} value={donor._id}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                          }}
+                        >
                           {donor.avatar && (
-                            <img src={donor.avatar} alt={donor.name} style={{ width: 24, height: 24, borderRadius: '50%' }} />
+                            <img
+                              src={donor.avatar}
+                              alt={donor.name}
+                              style={{
+                                width: 24,
+                                height: 24,
+                                borderRadius: "50%",
+                              }}
+                            />
                           )}
-                          {donor.name} {donor.phone ? `(${donor.phone})` : donor.email ? `(${donor.email})` : ''}
+                          {donor.name}{" "}
+                          {donor.phone
+                            ? `(${donor.phone})`
+                            : donor.email
+                            ? `(${donor.email})`
+                            : ""}
                         </span>
                       </SelectItem>
                     ))}
@@ -168,16 +312,25 @@ export default function Account() {
                     <SelectItem value="expense">Expense</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.type && <p className="text-red-500 text-sm">{errors.type.message}</p>}
+                {errors.type && (
+                  <p className="text-red-500 text-sm">{errors.type.message}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="amount">Amount</Label>
                 <Input
                   type="number"
                   step="0.01"
-                  {...register("amount", { required: "Amount is required", min: 0 })}
+                  {...register("amount", {
+                    required: "Amount is required",
+                    min: 0,
+                  })}
                 />
-                {errors.amount && <p className="text-red-500 text-sm">{errors.amount.message}</p>}
+                {errors.amount && (
+                  <p className="text-red-500 text-sm">
+                    {errors.amount.message}
+                  </p>
+                )}
               </div>
               <div>
                 <Label htmlFor="category">Category</Label>
@@ -195,7 +348,10 @@ export default function Account() {
               </div>
               <div>
                 <Label htmlFor="comment">Comment</Label>
-                <Input {...register("comment")} placeholder="Optional comment" />
+                <Input
+                  {...register("comment")}
+                  placeholder="Optional comment"
+                />
               </div>
               <Button type="submit" disabled={creating} className="w-full">
                 {creating ? "Creating..." : "Create Transaction"}
@@ -206,191 +362,21 @@ export default function Account() {
       </div>
 
       {/* Account Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Accounts</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{accountsData?.total || 0}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(accountsData?.accounts?.reduce((sum, account) => sum + account.balance, 0) || 0)}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
-            <TrendingDown className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {accountsData?.accounts?.reduce((sum, account) => sum + account.transactions.length, 0) || 0}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Accounts Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Accounts</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-4 py-2 text-left">User</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Balance</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Total Transactions</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Last Updated</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {accountsData?.accounts?.map((account) => (
-                  <tr key={account._id} className="hover:bg-gray-50">
-                    <td className="border border-gray-300 px-4 py-2">
-                      <div>
-                        <div className="font-medium">{account.user?.name || "N/A"}</div>
-                        <div className="text-sm text-gray-500">{account.user?.email || "N/A"}</div>
-                      </div>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <span className={`font-bold ${account.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatCurrency(account.balance)}
-                      </span>
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">{account.transactions.length}</td>
-                    <td className="border border-gray-300 px-4 py-2">{formatDate(account.updatedAt)}</td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedAccount(account)}
-                        className="mr-2"
-                      >
-                        View Transactions
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {accountsData?.totalPages > 1 && (
-            <div className="flex justify-center mt-4 space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </Button>
-              <span className="flex items-center px-4">
-                Page {currentPage} of {accountsData.totalPages}
-              </span>
-              <Button
-                variant="outline"
-                onClick={() => setCurrentPage(prev => Math.min(accountsData.totalPages, prev + 1))}
-                disabled={currentPage === accountsData.totalPages}
-              >
-                Next
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Selected Account Transactions */}
-      {/* {selectedAccount && (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              Transactions for {selectedAccount.user?.name || selectedAccount.user?.email}
-              <span className="ml-2 text-sm font-normal">
-                (Balance: {formatCurrency(selectedAccount.balance)})
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border border-gray-300 px-4 py-2 text-left">Date</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Type</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Amount</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Category</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Comment</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Editor</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedAccount.transactions
-                    .sort((a, b) => new Date(b.date) - new Date(a.date))
-                    .map((transaction) => (
-                    <tr key={transaction._id} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-4 py-2">{formatDate(transaction.date)}</td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          transaction.type === 'income' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {transaction.type}
-                        </span>
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        <span className={`font-bold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                          {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
-                        </span>
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2 capitalize">{transaction.category}</td>
-                      <td className="border border-gray-300 px-4 py-2">{transaction.comment || '-'}</td>
-                      <td className="border border-gray-300 px-4 py-2">{transaction.editor?.name || 'N/A'}</td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        <div className="flex space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openEditDialog(transaction)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeleteTransaction(transaction._id)}
-                            disabled={deleting}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      )} */}
+      <AccountSummary
+        summary={summary}
+        onIncomeBreakdownOpen={() => setIsIncomeBreakdownDialogOpen(true)}
+      />
+      {/* Transactions Table (Excel-like) */}
+      {transactionsData?.transactions?.length > 0 && (
+        <TransactionsTable
+          transactionsData={transactionsData}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          onDownloadExcel={handleDownloadExcel}
+          formatCurrency={formatCurrency}
+          formatDate={formatDate}
+        />
+      )}
 
       {/* Edit Transaction Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -398,7 +384,10 @@ export default function Account() {
           <DialogHeader>
             <DialogTitle>Edit Transaction</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit(handleUpdateTransaction)} className="space-y-4">
+          <form
+            onSubmit={handleSubmit(handleUpdateTransaction)}
+            className="space-y-4"
+          >
             <div>
               <Label htmlFor="type">Transaction Type</Label>
               <Select onValueChange={(value) => setValue("type", value)}>
@@ -417,7 +406,10 @@ export default function Account() {
               <Input
                 type="number"
                 step="0.01"
-                {...register("amount", { required: "Amount is required", min: 0 })}
+                {...register("amount", {
+                  required: "Amount is required",
+                  min: 0,
+                })}
               />
             </div>
 
@@ -447,6 +439,162 @@ export default function Account() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Income Breakdown Details Dialog */}
+      <Dialog
+        open={isIncomeBreakdownDialogOpen}
+        onOpenChange={setIsIncomeBreakdownDialogOpen}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+              Income Breakdown Details
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-sm font-medium">Sadaqah</span>
+                  </div>
+                  <div className="text-xl font-bold text-green-600">
+                    {formatCurrency(summary?.incomeBreakdown?.sadaqah || 0)}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {summary?.incomeBreakdown?.sadaqah > 0
+                      ? `${(
+                          (summary.incomeBreakdown.sadaqah /
+                            summary.totalIncome) *
+                          100
+                        ).toFixed(1)}% of total income`
+                      : "0% of total income"}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <span className="text-sm font-medium">Zakat</span>
+                  </div>
+                  <div className="text-xl font-bold text-red-600">
+                    {formatCurrency(summary?.incomeBreakdown?.zakat || 0)}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {summary?.incomeBreakdown?.zakat > 0
+                      ? `${(
+                          (summary.incomeBreakdown.zakat /
+                            summary.totalIncome) *
+                          100
+                        ).toFixed(1)}% of total income`
+                      : "0% of total income"}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm font-medium">Fitrah</span>
+                  </div>
+                  <div className="text-xl font-bold text-blue-600">
+                    {formatCurrency(summary?.incomeBreakdown?.fitrah || 0)}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {summary?.incomeBreakdown?.fitrah > 0
+                      ? `${(
+                          (summary.incomeBreakdown.fitrah /
+                            summary.totalIncome) *
+                          100
+                        ).toFixed(1)}% of total income`
+                      : "0% of total income"}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <span className="text-sm font-medium">Other</span>
+                  </div>
+                  <div className="text-xl font-bold text-yellow-600">
+                    {formatCurrency(summary?.incomeBreakdown?.other || 0)}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {summary?.incomeBreakdown?.other > 0
+                      ? `${(
+                          (summary.incomeBreakdown.other /
+                            summary.totalIncome) *
+                          100
+                        ).toFixed(1)}% of total income`
+                      : "0% of total income"}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Total Summary */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-semibold">Total Income</span>
+                  <span className="text-2xl font-bold text-green-600">
+                    {formatCurrency(summary?.totalIncome || 0)}
+                  </span>
+                </div>
+                <div className="mt-2 text-sm text-gray-600">
+                  Breakdown of all income categories and their percentages
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Additional Statistics */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-sm text-gray-600">Highest Category</div>
+                <div className="text-lg font-semibold">
+                  {(() => {
+                    const breakdown = summary?.incomeBreakdown || {};
+                    const categories = Object.entries(breakdown);
+                    if (categories.length === 0) return "N/A";
+
+                    const maxCategory = categories.reduce(
+                      (max, [key, value]) =>
+                        value > max.value ? { key, value } : max,
+                      { key: categories[0][0], value: categories[0][1] }
+                    );
+
+                    return (
+                      maxCategory.key.charAt(0).toUpperCase() +
+                      maxCategory.key.slice(1)
+                    );
+                  })()}
+                </div>
+              </div>
+
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-sm text-gray-600">
+                  Categories with Income
+                </div>
+                <div className="text-lg font-semibold">
+                  {(() => {
+                    const breakdown = summary?.incomeBreakdown || {};
+                    return Object.values(breakdown).filter((value) => value > 0)
+                      .length;
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
-} 
+}

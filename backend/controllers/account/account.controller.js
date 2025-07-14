@@ -1,4 +1,4 @@
-const Transaction = require("../../models/account.model");
+const Transaction = require("../../models/transactions.model");
 const User = require("../../models/user.model");
 const ResponseHandler = require("../../helper/ResponseHandler");
 const axios = require("axios");
@@ -19,6 +19,15 @@ const createTransaction = async (req, res) => {
       return ResponseHandler.error(
         res,
         "Type must be either 'income' or 'expense'",
+        400
+      );
+    }
+
+    // Validate category
+    if (category && !["sadaqah", "zakat", "fitrah", "other"].includes(category)) {
+      return ResponseHandler.error(
+        res,
+        "Category must be either 'sadaqah', 'zakat', 'fitrah', or 'other'",
         400
       );
     }
@@ -75,8 +84,8 @@ const createTransaction = async (req, res) => {
 
     return ResponseHandler.success(
       res,
-      { transaction },
-      "Transaction created successfully"
+      "Transaction created successfully",
+      { transaction }
     );
   } catch (error) {
     console.log("error from server", error);
@@ -87,19 +96,25 @@ const createTransaction = async (req, res) => {
 // Get all transactions
 const getTransactions = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, type, category } = req.query;
 
-    const transactions = await Transaction.find()
+    // Build filter object
+    const filter = {};
+    if (type) filter.type = type;
+    if (category) filter.category = category;
+
+    const transactions = await Transaction.find(filter)
       .populate("editor", "name email")
       .populate("donorId", "name phone")
       .sort({ date: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    const total = await Transaction.countDocuments();
+    const total = await Transaction.countDocuments(filter);
 
     return ResponseHandler.success(
       res,
+      "Transactions retrieved successfully",
       {
         transactions,
         totalTransactions: total,
@@ -107,8 +122,7 @@ const getTransactions = async (req, res) => {
         totalPages: Math.ceil(total / limit),
         hasNextPage: page * limit < total,
         hasPrevPage: page > 1,
-      },
-      "Transactions retrieved successfully"
+      }
     );
   } catch (error) {
     console.log("error from server", error);
@@ -116,38 +130,70 @@ const getTransactions = async (req, res) => {
   }
 };
 
-// Get transaction summary
+// Get transaction summary with detailed breakdowns
 const getTransactionSummary = async (req, res) => {
   try {
-    // Calculate summary statistics
+    // Calculate total income (from sadaqah, zakat, fitrah, and other income)
     const totalIncome = await Transaction.aggregate([
       { $match: { type: "income" } },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
+    // Calculate total expense (only from "other" category)
     const totalExpense = await Transaction.aggregate([
-      { $match: { type: "expense" } },
+      { $match: { type: "expense", category: "other" } },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
+    // Calculate breakdown by category for income
+    const incomeByCategory = await Transaction.aggregate([
+      { $match: { type: "income" } },
+      { $group: { _id: "$category", total: { $sum: "$amount" } } },
+    ]);
+
+    // Calculate total transactions
     const totalTransactions = await Transaction.countDocuments();
 
+    // Get last transaction
     const lastTransaction = await Transaction.findOne()
       .sort({ date: -1 })
       .populate("editor", "name email")
       .populate("donorId", "name phone");
 
+    // Calculate net balance
+    const totalIncomeAmount = totalIncome.length > 0 ? totalIncome[0].total : 0;
+    const totalExpenseAmount = totalExpense.length > 0 ? totalExpense[0].total : 0;
+    const netBalance = totalIncomeAmount - totalExpenseAmount;
+
+    // Format category breakdowns for income
+    const formatIncomeBreakdown = (categoryData) => {
+      const breakdown = {
+        sadaqah: 0,
+        zakat: 0,
+        fitrah: 0,
+        other: 0,
+      };
+      
+      categoryData.forEach(item => {
+        breakdown[item._id] = item.total;
+      });
+      
+      return breakdown;
+    };
+
     const summary = {
-      totalIncome: totalIncome.length > 0 ? totalIncome[0].total : 0,
-      totalExpense: totalExpense.length > 0 ? totalExpense[0].total : 0,
+      totalIncome: totalIncomeAmount,
+      totalExpense: totalExpenseAmount,
+      netBalance,
       totalTransactions,
       lastTransaction,
+      incomeBreakdown: formatIncomeBreakdown(incomeByCategory)
     };
 
     return ResponseHandler.success(
       res,
-      summary,
-      "Transaction summary retrieved successfully"
+      "Transaction summary retrieved successfully",
+      { summary }
     );
   } catch (error) {
     console.log("error from server", error);
@@ -167,6 +213,15 @@ const updateTransaction = async (req, res) => {
       return ResponseHandler.error(res, "Transaction not found", 404);
     }
 
+    // Validate category if provided
+    if (category && !["sadaqah", "zakat", "fitrah", "other"].includes(category)) {
+      return ResponseHandler.error(
+        res,
+        "Category must be either 'sadaqah', 'zakat', 'fitrah', or 'other'",
+        400
+      );
+    }
+
     // Update transaction
     transaction.type = type || transaction.type;
     transaction.amount = amount ? parseFloat(amount) : transaction.amount;
@@ -178,8 +233,8 @@ const updateTransaction = async (req, res) => {
 
     return ResponseHandler.success(
       res,
-      { transaction },
-      "Transaction updated successfully"
+      "Transaction updated successfully",
+      { transaction }
     );
   } catch (error) {
     console.log("error from server", error);
@@ -200,8 +255,8 @@ const deleteTransaction = async (req, res) => {
 
     return ResponseHandler.success(
       res,
-      { message: "Transaction deleted successfully" },
-      "Transaction deleted successfully"
+      "Transaction deleted successfully",
+      { message: "Transaction deleted successfully" }
     );
   } catch (error) {
     console.log("error from server", error);
