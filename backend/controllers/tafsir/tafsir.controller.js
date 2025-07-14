@@ -99,7 +99,7 @@ const createTafsir = async (req, res) => {
     return ResponseHandler.success(
       res,
       "New Tafsir Added Successfully!",
-      tafsirDoc,
+      { tafsir: tafsirDoc },
       201
     );
   } catch (error) {
@@ -182,7 +182,7 @@ const paginateTafsir = async (req, res) => {
     return ResponseHandler.success(
       res,
       "Surah Tafsir fetched successfully!",
-      tafsir,
+      { tafsir },
       200
     );
   } catch (error) {
