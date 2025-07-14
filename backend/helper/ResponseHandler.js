@@ -1,9 +1,9 @@
 class ResponseHandler {
-  static success(res, message, data = null, status = 200) {
+  static success(res, message, payload = {}, status = 200) {
     return res.status(status).json({
       success: true,
       message,
-      data,
+      ...payload,
     });
   }
 
