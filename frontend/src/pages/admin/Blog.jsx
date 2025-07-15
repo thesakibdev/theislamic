@@ -20,6 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const initialFormData = {
   title: "",
@@ -42,6 +43,7 @@ export default function Blog() {
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("blogs");
 
   const { user } = useSelector((state) => state.auth);
   const RTERef = useRef(null);
@@ -174,8 +176,8 @@ export default function Blog() {
       setImagePublicId(blog.thumbnailId);
     }
 
-    // Scroll to form
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    // Switch to form tab
+    setActiveTab("form");
   };
 
   const handleDeleteBlog = async (id) => {
@@ -205,237 +207,253 @@ export default function Blog() {
         Blog Management
       </h1>
 
-      {/* Blog Cards */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {[...Array(6)].map((_, index) => (
-            <Card key={index} className="h-64">
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-2/3" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : error ? (
-        <div className="p-4 border rounded-md bg-red-50 text-red-500">
-          Failed to load blogs. {error.message || "Please try again later."}
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 my-6 md:my-10">
-            {blogs.length > 0 ? (
-              blogs.map((blog) => (
-                <Card key={blog._id} className="overflow-hidden border">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl font-bold">
-                      {blog.title}
-                    </CardTitle>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="blogs">All Blogs</TabsTrigger>
+          <TabsTrigger value="form">
+            {currentEditedId ? "Edit Blog" : "Add New Blog"}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="blogs" className="space-y-6">
+          {/* Blog Cards */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {[...Array(6)].map((_, index) => (
+                <Card key={index} className="h-64">
+                  <CardHeader>
+                    <Skeleton className="h-6 w-3/4" />
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    {blog.thumbnail && (
-                      <img
-                        src={blog.thumbnail}
-                        alt={blog.title}
-                        className="w-full h-32 object-cover rounded-md mb-2"
-                      />
-                    )}
-                    <p className="text-sm text-gray-600">{blog.shortDesc}</p>
-                    <div className="text-xs text-gray-500">
-                      <p>Slug: {blog.slug}</p>
-                      <p>Meta: {blog.metaDesc?.substring(0, 60)}...</p>
-                    </div>
+                  <CardContent>
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-2/3" />
                   </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <Button
-                      onClick={() => handleEditBlog(blog)}
-                      disabled={isEditingBlog || isAddingBlog}
-                      className="text-white hover:text-black"
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDeleteBlog(blog._id)}
-                      disabled={isDeletingBlog}
-                    >
-                      Delete
-                    </Button>
-                  </CardFooter>
                 </Card>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-10">
-                <p className="text-gray-500">
-                  No blogs found. Create your first blog below.
-                </p>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="p-4 border rounded-md bg-red-50 text-red-500">
+              Failed to load blogs. {error.message || "Please try again later."}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 my-6 md:my-10">
+                {blogs.length > 0 ? (
+                  blogs.map((blog) => (
+                    <Card key={blog._id} className="overflow-hidden border">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl font-bold">
+                          {blog.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {blog.thumbnail && (
+                          <img
+                            src={blog.thumbnail}
+                            alt={blog.title}
+                            className="w-full h-32 object-cover rounded-md mb-2"
+                          />
+                        )}
+                        <p className="text-sm text-gray-600">{blog.shortDesc}</p>
+                        <div className="text-xs text-gray-500">
+                          <p>Slug: {blog.slug}</p>
+                          <p>Meta: {blog.metaDesc?.substring(0, 60)}...</p>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex justify-between">
+                        <Button
+                          onClick={() => handleEditBlog(blog)}
+                          disabled={isEditingBlog || isAddingBlog}
+                          className="text-white hover:text-black"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleDeleteBlog(blog._id)}
+                          disabled={isDeletingBlog}
+                        >
+                          Delete
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-10">
+                    <p className="text-gray-500">
+                      No blogs found. Create your first blog below.
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center my-4 md:my-6">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </div>
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center my-4 md:my-6">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
+            </>
           )}
-        </>
-      )}
+        </TabsContent>
 
-      {/* Blog Form */}
-      <div className="my-6 md:my-10 p-4 md:p-6 border rounded-lg shadow-sm">
-        <h2 className="text-xl md:text-2xl font-medium mb-4 md:mb-6">
-          {currentEditedId ? "Edit Blog" : "Add New Blog"}
-        </h2>
+        <TabsContent value="form" className="space-y-6">
+          {/* Blog Form */}
+          <div className="p-4 md:p-6 border rounded-lg shadow-sm">
+            <h2 className="text-xl md:text-2xl font-medium mb-4 md:mb-6">
+              {currentEditedId ? "Edit Blog" : "Add New Blog"}
+            </h2>
 
-        <ImageUploader
-          uploadEndpoint={`${baseUrl}/admin/blog/upload-image`}
-          imageFile={imageFile}
-          setImageFile={setImageFile}
-          imageLoadingState={imageLoadingState}
-          uploadedImageUrl={uploadedImageUrl}
-          setImagePublicId={setImagePublicId}
-          setUploadedImageUrl={setUploadedImageUrl}
-          setImageLoadingState={setImageLoadingState}
-          isEditMode={currentEditedId !== null}
-        />
-
-        <form onSubmit={onSubmit} className="mt-6 md:mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <div className="space-y-2">
-              <label htmlFor="title" className="block text-sm font-medium">
-                Title <span className="text-red-500">*</span>
-              </label>
-              <Input
-                type="text"
-                name="title"
-                id="title"
-                placeholder="Blog Title"
-                value={formData.title}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="shortDesc" className="block text-sm font-medium">
-                Short Description <span className="text-red-500">*</span>
-              </label>
-              <Input
-                type="text"
-                name="shortDesc"
-                id="shortDesc"
-                placeholder="Brief summary of the blog"
-                value={formData.shortDesc}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="slug" className="block text-sm font-medium">
-                Slug <span className="text-red-500">*</span>
-              </label>
-              <Input
-                type="text"
-                name="slug"
-                id="slug"
-                placeholder="URL-friendly name (e.g., my-blog-post)"
-                value={formData.slug}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="metaDesc" className="block text-sm font-medium">
-                Meta Description <span className="text-red-500">*</span>
-              </label>
-              <Input
-                type="text"
-                name="metaDesc"
-                id="metaDesc"
-                placeholder="SEO description"
-                value={formData.metaDesc}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label
-                htmlFor="metaKeyword"
-                className="block text-sm font-medium"
-              >
-                Meta Keywords <span className="text-red-500">*</span>
-              </label>
-              <Input
-                type="text"
-                name="metaKeyword"
-                id="metaKeyword"
-                placeholder="Comma-separated keywords"
-                value={formData.metaKeyword}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label
-                htmlFor="category"
-                className="block text-sm font-medium"
-              >
-                Category <span className="text-red-500">*</span>
-              </label>
-              <Input
-                type="text"
-                name="category"
-                id="category"
-                placeholder="Category"
-                value={formData.category}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-
-          <div className="mt-6 md:mt-8 space-y-2">
-            <label htmlFor="description" className="block text-sm font-medium">
-              Blog Content <span className="text-red-500">*</span>
-            </label>
-            <RTE
-              onInit={(_, editor) => (RTERef.current = editor)}
-              initialValue={formData.description}
+            <ImageUploader
+              uploadEndpoint={`${baseUrl}/admin/blog/upload-image`}
+              imageFile={imageFile}
+              setImageFile={setImageFile}
+              imageLoadingState={imageLoadingState}
+              uploadedImageUrl={uploadedImageUrl}
+              setImagePublicId={setImagePublicId}
+              setUploadedImageUrl={setUploadedImageUrl}
+              setImageLoadingState={setImageLoadingState}
+              isEditMode={currentEditedId !== null}
             />
-          </div>
 
-          <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-4">
-            <Button
-              type="submit"
-              className="px-6 text-white hover:text-black"
-              disabled={isSubmitting || imageLoadingState}
-            >
-              {isSubmitting
-                ? "Saving..."
-                : currentEditedId
-                ? "Update Blog"
-                : "Publish Blog"}
-            </Button>
+            <form onSubmit={onSubmit} className="mt-6 md:mt-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="space-y-2">
+                  <label htmlFor="title" className="block text-sm font-medium">
+                    Title <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="text"
+                    name="title"
+                    id="title"
+                    placeholder="Blog Title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                  />
+                </div>
 
-            {currentEditedId && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={resetForm}
-                disabled={isSubmitting}
-              >
-                Cancel Edit
-              </Button>
-            )}
+                <div className="space-y-2">
+                  <label htmlFor="shortDesc" className="block text-sm font-medium">
+                    Short Description <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="text"
+                    name="shortDesc"
+                    id="shortDesc"
+                    placeholder="Brief summary of the blog"
+                    value={formData.shortDesc}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="slug" className="block text-sm font-medium">
+                    Slug <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="text"
+                    name="slug"
+                    id="slug"
+                    placeholder="URL-friendly name (e.g., my-blog-post)"
+                    value={formData.slug}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="metaDesc" className="block text-sm font-medium">
+                    Meta Description <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="text"
+                    name="metaDesc"
+                    id="metaDesc"
+                    placeholder="SEO description"
+                    value={formData.metaDesc}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="metaKeyword"
+                    className="block text-sm font-medium"
+                  >
+                    Meta Keywords <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="text"
+                    name="metaKeyword"
+                    id="metaKeyword"
+                    placeholder="Comma-separated keywords"
+                    value={formData.metaKeyword}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="category"
+                    className="block text-sm font-medium"
+                  >
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="text"
+                    name="category"
+                    id="category"
+                    placeholder="Category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 md:mt-8 space-y-2">
+                <label htmlFor="description" className="block text-sm font-medium">
+                  Blog Content <span className="text-red-500">*</span>
+                </label>
+                <RTE
+                  onInit={(_, editor) => (RTERef.current = editor)}
+                  initialValue={formData.description}
+                />
+              </div>
+
+              <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-4">
+                <Button
+                  type="submit"
+                  className="px-6 text-white hover:text-black"
+                  disabled={isSubmitting || imageLoadingState}
+                >
+                  {isSubmitting
+                    ? "Saving..."
+                    : currentEditedId
+                    ? "Update Blog"
+                    : "Publish Blog"}
+                </Button>
+
+                {currentEditedId && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      resetForm();
+                      setActiveTab("blogs");
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    Cancel Edit
+                  </Button>
+                )}
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
