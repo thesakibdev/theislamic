@@ -32,6 +32,10 @@ export default function AdminSidebar() {
       link: "donors",
     },
     {
+      name: "Comments",
+      link: "comments",
+    },
+    {
       name: "Account",
       link: "account",
     },
