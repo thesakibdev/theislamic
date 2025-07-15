@@ -24,8 +24,8 @@ export default function TafsirPage() {
     language: selectedLanguage,
     surahNumber: surahNumber
   });
-  const tafseerData = data?.data
-  console.log(tafseerData)
+  const tafseerData = data?.tafsir
+  console.log("tafseerData", tafseerData)
 
   const [currentAyahIndex, setCurrentAyahIndex] = useState(0);
   const ayahSectionRef = useRef(null);
@@ -53,7 +53,7 @@ export default function TafsirPage() {
     if (index === "en") {
       setSelectedBookName(defaultTafseerBook?.nameEn);
     } else {
-      selectedBookName(defaultTafseerBook?.nameBn);
+      setSelectedBookName(defaultTafseerBook?.nameBn);
     }
   };
 
@@ -114,29 +114,6 @@ export default function TafsirPage() {
                           {"Bangla"}
                         </option>
                       </select>
-
-                      {/* <select
-                        value={selectedBookName}
-                        onChange={(e) => setSelectedBookName(e.target.value)}
-                        className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
-                      >
-                        {tafsirBooksList &&
-                          tafsirBooksList.map((book, index) => (
-                            <option
-                              className="bg-primary/50 text-white"
-                              key={index}
-                              value={
-                                selectedLanguage === "en"
-                                  ? book?.nameEn
-                                  : book?.nameBn
-                              }
-                            >
-                              {selectedLanguage === "en"
-                                ? book.nameEn
-                                : book.nameBn}
-                            </option>
-                          ))}
-                      </select> */}
                     </div>
                   </div>
                   {/* surah data */}
@@ -172,7 +149,12 @@ export default function TafsirPage() {
                           {tafseerData.tafseer[currentAyahIndex]?.content && (
                             <div className="text-base md:text-lg text-left">
                               <span className="font-bold pr-1">Content:</span>{" "}
-                              {tafseerData.tafseer[currentAyahIndex]?.content}
+                              <div 
+                                dangerouslySetInnerHTML={{ 
+                                  __html: tafseerData.tafseer[currentAyahIndex]?.content 
+                                }}
+                                className="mt-2"
+                              />
                             </div>
                           )}
                           {/* note */}
