@@ -409,36 +409,36 @@ export default function Donors() {
 
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h1 className="text-2xl md:text-4xl font-semibold text-center">
+            <h1 className="text-xl md:text-2xl lg:text-4xl font-semibold text-center mb-4 md:mb-6">
               Honorable Donor List
             </h1>
 
-            <div className="h-screen overflow-y-scroll w-full bg-primaryLight px-4">
+            <div className="h-screen overflow-y-scroll w-full bg-primaryLight px-2 md:px-4">
               {isLoading ? (
                 <p>Loading...</p>
               ) : data?.donors?.length > 0 ? (
                 data?.donors?.map((donor, index) => (
                   <div
                     key={donor.name}
-                    className="border border-gray-600 bg-white p-4 rounded-md mt-3 md:mt-5"
+                    className="border border-gray-600 bg-white p-3 md:p-4 rounded-md mt-3 md:mt-5"
                   >
                     <div
                       id="Donor"
-                      className="flex flex-col md:flex-row my-3 gap-5 rounded-md"
+                      className="flex flex-col md:flex-row my-3 gap-4 md:gap-5 rounded-md"
                     >
                       <div className="w-full md:max-w-[190px] md:w-1/4 overflow-hidden">
                         {donor.avatar === "" ? (
-                          <div className="w-full h-96 md:h-[200px] mx-auto bg-gray-300"></div>
+                          <div className="w-full h-48 md:h-96 lg:h-[200px] mx-auto bg-gray-300 rounded-md"></div>
                         ) : (
                           <div
-                            className="h-96 md:h-[220px] w-full bg-cover bg-center rounded-md"
+                            className="h-48 md:h-96 lg:h-[220px] w-full bg-cover bg-center rounded-md"
                             style={{ backgroundImage: `url(${donor.avatar})` }}
                           ></div>
                         )}
                       </div>
                       <div className="w-full md:w-3/4">
-                        <div className="flex justify-between items-center mb-1">
-                          <p className="text-xl md:text-2xl font-bold mb-2">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1 gap-2">
+                          <p className="text-lg md:text-xl lg:text-2xl font-bold mb-2">
                             Name: {donor.name}
                           </p>
                           <div className="flex gap-2">
@@ -462,21 +462,21 @@ export default function Donors() {
                             </Button>
                           </div>
                         </div>
-                        <div className="flex gap-y-3 gap-x-5 ">
-                          <div className="w-1/2 flex flex-col gap-y-3">
-                            <p className="text-lg text-black/50">
+                        <div className="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                          <div className="w-full lg:w-1/2 flex flex-col gap-y-3">
+                            <p className="text-sm md:text-lg text-black/50">
                               <span className="font-semibold text-black/60">
                                 Profession:
                               </span>{" "}
                               {donor.profession}
                             </p>
-                            <p className="text-lg text-black/50">
+                            <p className="text-sm md:text-lg text-black/50">
                               <span className="font-semibold text-black/60">
                                 Designation:{" "}
                               </span>
                               {donor.designation}
                             </p>
-                            <p className="text-lg text-black/50">
+                            <p className="text-sm md:text-lg text-black/50">
                               <span className="font-semibold text-black/60">
                                 City:
                               </span>{" "}
@@ -486,7 +486,7 @@ export default function Donors() {
                               className="flex items-center gap-3 cursor-pointer group"
                               onClick={() => toggleDonationHistory(index)}
                             >
-                              <p className="text-lg text-black/50">
+                              <p className="text-sm md:text-lg text-black/50">
                                 <span className="font-semibold text-black/60">
                                   Total Donation:
                                 </span>{" "}
@@ -500,22 +500,22 @@ export default function Donors() {
                               />
                             </div>
                           </div>
-                          <div className="w-1/2 flex flex-col gap-y-3">
-                            <p className="text-lg text-black/50">
+                          <div className="w-full lg:w-1/2 flex flex-col gap-y-3">
+                            <p className="text-sm md:text-lg text-black/50">
                               <span className="font-semibold text-black/60">
                                 Company:
                               </span>{" "}
                               {donor.companyName}
                             </p>
 
-                            <p className="text-lg text-black/50">
+                            <p className="text-sm md:text-lg text-black/50">
                               <span className="font-semibold text-black/60">
                                 Street:
                               </span>{" "}
                               {donor.street}
                             </p>
 
-                            <p className="text-lg text-black/50">
+                            <p className="text-sm md:text-lg text-black/50">
                               <span className="font-semibold text-black/60">
                                 Country:
                               </span>{" "}
@@ -545,17 +545,17 @@ export default function Donors() {
                       {donor?.donationHistory?.map((donation, index) => (
                         <div
                           key={index}
-                          className="border p-4 rounded-md mt-3 flex justify-between cursor-pointer"
+                          className="border p-3 md:p-4 rounded-md mt-3 flex flex-col sm:flex-row justify-between cursor-pointer gap-3"
                         >
-                          <div className="flex gap-5">
-                            <p>
-                              <span>Amount :</span> {donation.amount}
+                          <div className="flex flex-col sm:flex-row gap-2 md:gap-5">
+                            <p className="text-sm md:text-base">
+                              <span className="font-semibold">Amount:</span> {donation.amount}
                             </p>
-                            <p>
-                              <span>Donate Date :</span> {donation.donateDate}
+                            <p className="text-sm md:text-base">
+                              <span className="font-semibold">Donate Date:</span> {donation.donateDate}
                             </p>
-                            <p>
-                              <span>Donation Type :</span>{" "}
+                            <p className="text-sm md:text-base">
+                              <span className="font-semibold">Donation Type:</span>{" "}
                               {donation.typeOfDonation}
                             </p>
                           </div>
@@ -718,7 +718,7 @@ export default function Donors() {
         open={openAddDonorForm}
         onOpenChange={(isOpen) => setOpenAddDonorForm(isOpen)}
       >
-        <SheetContent side="right" className="overflow-auto w-[90%]">
+        <SheetContent side="right" className="overflow-auto w-full md:w-[90%]">
           <SheetHeader>
             <SheetTitle>
               {currentEditedId ? "Edit Donor" : "Add Donor"}
@@ -738,8 +738,8 @@ export default function Donors() {
 
           <CommonForm
             allClasses={{
-              formClass:
-                "grid grid-cols-2 gap-5 mt-10 py-10 px-16 bg-primary-foreground rounded-lg shadow-lg",
+                          formClass:
+              "grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mt-6 md:mt-10 py-6 md:py-10 px-4 md:px-16 bg-primary-foreground rounded-lg shadow-lg",
               inputClass:
                 "w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary",
               checkBoxClass:

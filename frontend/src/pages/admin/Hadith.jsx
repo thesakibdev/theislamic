@@ -238,9 +238,9 @@ export default function Hadith() {
 
   return (
     <>
-      <div className="mt-12">
-        <div className="flex justify-between container mx-auto px-4 sm:px-0">
-          <div className="flex gap-3">
+      <div className="mt-6 md:mt-12">
+        <div className="flex flex-col sm:flex-row justify-between container mx-auto px-4 gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
@@ -293,7 +293,7 @@ export default function Hadith() {
         open={openAddHadithForm}
         onOpenChange={(isOpen) => setOpenAddHadithForm(isOpen)}
       >
-        <SheetContent side="right" className="overflow-auto w-[90%]">
+        <SheetContent side="right" className="overflow-auto w-full md:w-[90%]">
           <SheetHeader>
             <SheetTitle>
               {currentEditedId ? "Edit Hadith" : "Add Hadith"}
@@ -303,7 +303,7 @@ export default function Hadith() {
             layout={4}
             allClasses={{
               formClass:
-                "grid grid-cols-2 gap-5 mt-10 py-10 px-16 bg-primary-foreground rounded-lg shadow-lg",
+                "grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mt-6 md:mt-10 py-6 md:py-10 px-4 md:px-16 bg-primary-foreground rounded-lg shadow-lg",
               inputClass:
                 "w-full px-4 py-2 rounded-md border bg-adminInput resize-none outline-none focus:ring-2 focus:ring-primary",
               textareaClass:

@@ -32,6 +32,7 @@ import Translation from "./pages/client/Translation";
 import Dashboard from "./pages/admin/Dashboard";
 import Account from "./pages/admin/Account";
 import Comments from "./pages/admin/Comments";
+import Theme from "./pages/admin/Theme";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { checkAuth } from "./slices/authslice";
@@ -109,6 +110,7 @@ export default function App() {
         <Route path="donors" element={<Donors />} />
         <Route path="comments" element={<Comments />} />
         <Route path="account" element={<Account />} />
+        <Route path="theme" element={<Theme />} />
         <Route path="i-wall" element={<Blog />} />
       </Route>
       <Route path="*" element={<NotFound />} />

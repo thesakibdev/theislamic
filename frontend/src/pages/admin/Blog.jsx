@@ -201,13 +201,13 @@ export default function Blog() {
 
   return (
     <div className="container mx-auto px-4">
-      <h1 className="text-3xl font-semibold text-center my-8">
+      <h1 className="text-2xl md:text-3xl font-semibold text-center my-4 md:my-8">
         Blog Management
       </h1>
 
       {/* Blog Cards */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {[...Array(6)].map((_, index) => (
             <Card key={index} className="h-64">
               <CardHeader>
@@ -226,7 +226,7 @@ export default function Blog() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 my-6 md:my-10">
             {blogs.length > 0 ? (
               blogs.map((blog) => (
                 <Card key={blog._id} className="overflow-hidden border">
@@ -278,7 +278,7 @@ export default function Blog() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center my-6">
+            <div className="flex justify-center my-4 md:my-6">
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -290,8 +290,8 @@ export default function Blog() {
       )}
 
       {/* Blog Form */}
-      <div className="my-10 p-6 border rounded-lg shadow-sm">
-        <h2 className="text-2xl font-medium mb-6">
+      <div className="my-6 md:my-10 p-4 md:p-6 border rounded-lg shadow-sm">
+        <h2 className="text-xl md:text-2xl font-medium mb-4 md:mb-6">
           {currentEditedId ? "Edit Blog" : "Add New Blog"}
         </h2>
 
@@ -307,8 +307,8 @@ export default function Blog() {
           isEditMode={currentEditedId !== null}
         />
 
-        <form onSubmit={onSubmit} className="mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={onSubmit} className="mt-6 md:mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-2">
               <label htmlFor="title" className="block text-sm font-medium">
                 Title <span className="text-red-500">*</span>
@@ -400,7 +400,7 @@ export default function Blog() {
             </div>
           </div>
 
-          <div className="mt-8 space-y-2">
+          <div className="mt-6 md:mt-8 space-y-2">
             <label htmlFor="description" className="block text-sm font-medium">
               Blog Content <span className="text-red-500">*</span>
             </label>
@@ -410,7 +410,7 @@ export default function Blog() {
             />
           </div>
 
-          <div className="mt-8 flex space-x-4">
+          <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-4">
             <Button
               type="submit"
               className="px-6 text-white hover:text-black"

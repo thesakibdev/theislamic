@@ -111,26 +111,26 @@ const Comments = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6 flex justify-between items-start">
+    <div className="p-4 md:p-6">
+      <div className="mb-4 md:mb-6 flex flex-col sm:flex-row justify-between items-start gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
             Comment Management
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm md:text-base text-gray-600">
             Manage and moderate comments from your blog posts
           </p>
         </div>
         <button
           onClick={handleUpdateAllStats}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+          className="bg-blue-500 text-white px-3 md:px-4 py-2 rounded-md hover:bg-blue-600 transition-colors text-sm md:text-base"
         >
           Update All Blog Stats
         </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4 md:mb-6">
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg">
@@ -175,8 +175,8 @@ const Comments = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="bg-white p-3 md:p-4 rounded-lg shadow mb-4 md:mb-6">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-4">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Status Filter
@@ -215,8 +215,8 @@ const Comments = () => {
         {commentsData?.comments?.length > 0 ? (
           <div className="divide-y divide-gray-200">
             {commentsData.comments.map((comment) => (
-              <div key={comment._id} className="p-6">
-                <div className="flex items-start justify-between">
+              <div key={comment._id} className="p-4 md:p-6">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold text-gray-900">
@@ -225,13 +225,13 @@ const Comments = () => {
                       {getStatusBadge(comment.isApproved)}
                     </div>
                     
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-4 text-sm text-gray-500 mb-3">
                       <span>{comment.email}</span>
-                      <span>•</span>
+                      <span className="hidden sm:inline">•</span>
                       <span>{formatDate(comment.createdAt)}</span>
                       {comment.rating && (
                         <>
-                          <span>•</span>
+                          <span className="hidden sm:inline">•</span>
                           <span>Rated: {comment.rating}</span>
                         </>
                       )}
@@ -268,7 +268,7 @@ const Comments = () => {
                     )}
                   </div>
 
-                  <div className="ml-4 flex gap-2">
+                  <div className="sm:ml-4 flex gap-2">
                     {!comment.isApproved && (
                       <button
                         onClick={() => handleApprove(comment._id)}
@@ -298,8 +298,8 @@ const Comments = () => {
 
         {/* Pagination */}
         {commentsData?.pagination && commentsData.pagination.totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-200">
-            <div className="flex items-center justify-between">
+          <div className="px-4 md:px-6 py-4 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
               <div className="text-sm text-gray-700">
                 Showing page {currentPage} of {commentsData.pagination.totalPages} (
                 {commentsData.pagination.totalComments} total comments)

@@ -184,13 +184,13 @@ export default function Tafsir() {
 
   return (
     <div className="container mx-auto px-4">
-      <h1 className="text-3xl font-semibold text-center my-8">
+      <h1 className="text-2xl md:text-3xl font-semibold text-center my-4 md:my-8">
         Tafsir Management
       </h1>
 
       {/* Tafsir Cards */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {[...Array(6)].map((_, index) => (
             <Card key={index} className="h-64">
               <CardHeader>
@@ -209,16 +209,16 @@ export default function Tafsir() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 my-4 md:my-5">
             {tafsir.length > 0 ? (
               tafsir.map((tafsir) => (
                 <div className="bg-white p-4 rounded-lg shadow-md" key={tafsir._id}>
-                  <h3 className="text-lg font-semibold">{tafsir.surahName}</h3>
-                  <p className="text-sm text-gray-600">Total Verse: {tafsir.totalVerseNumber}</p>
-                  <p className="text-sm text-gray-600">{tafsir.bookName}</p>
-                  <div className="flex gap-2">
-                    <Button onClick={() => handleEditTafsir(tafsir)} variant="outline">Edit</Button>
-                    <Button onClick={() => handleDeleteTafsir(tafsir.parentId, tafsir._id)} variant="destructive">Delete</Button>
+                  <h3 className="text-base md:text-lg font-semibold">{tafsir.surahName}</h3>
+                  <p className="text-xs md:text-sm text-gray-600">Total Verse: {tafsir.totalVerseNumber}</p>
+                  <p className="text-xs md:text-sm text-gray-600">{tafsir.bookName}</p>
+                  <div className="flex flex-col sm:flex-row gap-2 mt-3">
+                    <Button onClick={() => handleEditTafsir(tafsir)} variant="outline" className="text-xs md:text-sm">Edit</Button>
+                    <Button onClick={() => handleDeleteTafsir(tafsir.parentId, tafsir._id)} variant="destructive" className="text-xs md:text-sm">Delete</Button>
                   </div>
                 </div>
               ))
@@ -234,13 +234,13 @@ export default function Tafsir() {
       )}
 
       {/* Tafsir Form */}
-      <div className="my-10 p-6 border rounded-lg shadow-sm">
-        <h2 className="text-2xl font-medium mb-6">
+      <div className="my-6 md:my-10 p-4 md:p-6 border rounded-lg shadow-sm">
+        <h2 className="text-xl md:text-2xl font-medium mb-4 md:mb-6">
           {currentEditedId ? "Edit Tafsir" : "Add New Tafsir"}
         </h2>
 
-        <form onSubmit={onSubmit} className="mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={onSubmit} className="mt-6 md:mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-2">
               <label htmlFor="language" className="block text-sm font-medium">
                 Language <span className="text-red-500">*</span>
@@ -302,7 +302,7 @@ export default function Tafsir() {
 
           </div>
 
-          <div className="mt-8 space-y-2">
+          <div className="mt-6 md:mt-8 space-y-2">
             <label htmlFor="content" className="block text-sm font-medium">
               Tafsir Content <span className="text-red-500">*</span>
             </label>
@@ -312,7 +312,7 @@ export default function Tafsir() {
             />
           </div>
 
-          <div className="mt-8 flex space-x-4">
+          <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-4">
             <Button
               type="submit"
               className="px-6 text-white"
