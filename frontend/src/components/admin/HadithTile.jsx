@@ -1,6 +1,7 @@
 import { useGetHadithsQuery } from "../../slices/admin/hadith";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const HadithDisplay = ({ bookName, language }) => {
+const HadithDisplay = ({ bookName, language, onHadithClick }) => {
   // Use RTK Query hook with pagination parameters
   const { data, error, isLoading, isFetching, refetch } = useGetHadithsQuery({
     bookName: bookName,
@@ -12,20 +13,20 @@ const HadithDisplay = ({ bookName, language }) => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-40">
-        <div className="text-center">
-          <div className="spinner-border" role="status">
-            <span className="sr-only">Loading...</span>
+      <div className="space-y-4">
+        {[...Array(6)].map((_, index) => (
+          <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/2" />
           </div>
-          <p className="mt-2">Loading hadiths...</p>
-        </div>
+        ))}
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded mt-10">
+      <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded">
         <p>Error loading hadith data: {error.message}</p>
         <button
           onClick={() => refetch()}
@@ -37,8 +38,36 @@ const HadithDisplay = ({ bookName, language }) => {
     );
   }
 
+  // Flatten all hadiths into a single list for easier rendering
+  const getAllHadiths = () => {
+    const allHadiths = [];
+    
+    hadithData?.parts?.forEach((part) => {
+      part?.chapters?.forEach((chapter) => {
+        chapter?.hadithList?.forEach((hadith) => {
+          allHadiths.push({
+            ...hadith,
+            partInfo: {
+              partNumber: part.partNumber,
+              partName: part.partName,
+            },
+            chapterInfo: {
+              chapterNumber: chapter.chapterNumber,
+              chapterName: chapter.chapterName,
+            },
+            bookName: hadithData.bookName,
+          });
+        });
+      });
+    });
+    
+    return allHadiths;
+  };
+
+  const hadiths = getAllHadiths();
+
   return (
-    <div className="mt-10 container mx-auto px-4 sm:px-0">
+    <div className="mt-4">
       {/* Loading indicator for page changes */}
       {isFetching && !isLoading && (
         <div className="bg-blue-50 text-blue-700 p-2 rounded mb-4 text-center">
@@ -46,119 +75,42 @@ const HadithDisplay = ({ bookName, language }) => {
         </div>
       )}
 
-      {/* Hadith Display */}
-      <div className="border border-gray-300 p-4">
-        <div className="border border-gray-300 p-4 mb-4">
-          <h2 className="text-xl font-bold mb-2">
-            Book: {hadithData?.bookName}
-          </h2>
-          {hadithData?.parts?.map((part, partIndex) => (
+      {/* Hadith List */}
+      {hadiths.length > 0 ? (
+        <div className="divide-y divide-gray-200">
+          {hadiths.map((hadith, index) => (
             <div
-              key={partIndex}
-              className="border-l-4 border-blue-500 pl-4 mb-4"
+              key={`${hadith.partInfo?.partNumber}-${hadith.chapterInfo?.chapterNumber}-${hadith.hadithNumber}-${index}`}
+              className="p-4 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
+              onClick={() => onHadithClick && onHadithClick(hadith)}
             >
-              <h3 className="text-lg font-semibold">
-                Part {part?.partNumber}: {part?.partName}
-              </h3>
-
-              {part?.chapters?.map((chapter, chapterIndex) => (
-                <div
-                  key={chapterIndex}
-                  className="border-l-4 border-green-500 pl-4 mt-3 mb-4"
-                >
-                  <h4 className="font-medium">
-                    Chapter {chapter?.chapterNumber}: {chapter?.chapterName}
-                  </h4>
-
-                  {chapter?.hadithList?.length > 0 ? (
-                    <div className="space-y-4 mt-2">
-                      {chapter.hadithList.map((hadithItem, hadithIndex) => (
-                        <div
-                          key={hadithIndex}
-                          className="border border-gray-300 p-4 rounded-lg bg-gray-50"
-                        >
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div className="col-span-2 md:col-span-1">
-                              <p className="font-bold">
-                                #{hadithItem?.hadithNumber}
-                              </p>
-                              <p className="text-gray-600">
-                                International Number:{" "}
-                                {hadithItem?.internationalNumber || "N/A"}
-                              </p>
-                            </div>
-
-                            <div className="col-span-2 md:col-span-1">
-                              <p className="text-sm text-gray-600">
-                                Reference: {hadithItem?.referenceBook || "N/A"}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                Narrator: {hadithItem?.narrator || "N/A"}
-                              </p>
-                            </div>
-
-                            {hadithItem?.hadithArabic && (
-                              <div className="col-span-2 mt-2 mb-2 p-2 bg-blue-50 rounded rtl text-right">
-                                <p className="text-lg">
-                                  {hadithItem.hadithArabic}
-                                </p>
-                              </div>
-                            )}
-                            {hadithItem?.hadithText && (
-                              <div className="col-span-2 mt-2 mb-2 p-2 bg-blue-50 rounded text-left">
-                                <span className="font-semibold text-base uppercase">
-                                  {language}:
-                                </span>
-                                <p className="text-lg">
-                                  {hadithItem.hadithText}
-                                </p>
-                              </div>
-                            )}
-
-                            {hadithItem?.translation && (
-                              <div className="col-span-2 mb-2">
-                                <p className="font-medium">Translation:</p>
-                                <p>{hadithItem.translation}</p>
-                              </div>
-                            )}
-
-                            {hadithItem?.transliteration && (
-                              <div className="col-span-2 mb-2">
-                                <p className="font-medium">Transliteration:</p>
-                                <p className="italic">
-                                  {hadithItem.transliteration}
-                                </p>
-                              </div>
-                            )}
-
-                            {hadithItem?.note && (
-                              <div className="col-span-2 p-2 bg-yellow-50 rounded">
-                                <p className="font-medium">Note:</p>
-                                <p>{hadithItem.note}</p>
-                              </div>
-                            )}
-
-                            {hadithItem?.similarities && (
-                              <div className="col-span-2">
-                                <p className="font-medium">Similarities:</p>
-                                <p>{hadithItem.similarities}</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 italic mt-2">
-                      No hadiths found in this chapter
-                    </p>
-                  )}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <div className="text-lg font-semibold text-gray-900">
+                    # Hadith No : {hadith.hadithNumber}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Part {hadith.partInfo?.partNumber}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Chapter {hadith.chapterInfo?.chapterNumber}
+                  </div>
                 </div>
-              ))}
+                
+                <div className="text-xs text-gray-500">
+                  {hadith.internationalNumber && `Int: ${hadith.internationalNumber}`}
+                </div>
+              </div>
             </div>
           ))}
         </div>
-      </div>
+      ) : (
+        <div className="text-center py-10">
+          <p className="text-gray-500">
+            No hadith found for the selected book and language. Add your first hadith below.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

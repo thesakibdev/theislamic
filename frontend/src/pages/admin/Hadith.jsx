@@ -1,6 +1,3 @@
-// import { FaEdit } from "react-icons/fa";
-// import { RiDeleteBinLine } from "react-icons/ri";
-
 import { useAddHadithMutation } from "../../slices/admin/hadith";
 
 import CommonForm from "@/components/common/Form";
@@ -15,6 +12,13 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import HadithDisplay from "@/components/admin/HadithTile";
 import { languagesList, booksList } from "../../constant";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const initialFormData = {
   bookName: "",
@@ -39,13 +43,25 @@ export default function Hadith() {
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const [bookName, setBookName] = useState("bukhari");
-  const [language, setLanguage] = useState("en");
+  const [language, setLanguage] = useState("bn");
+  const [selectedHadith, setSelectedHadith] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const [addHadith] = useAddHadithMutation();
 
   const resetForm = () => {
     setFormData(initialFormData);
     setOpenAddHadithForm(false);
+  };
+
+  const handleHadithClick = (hadith) => {
+    setSelectedHadith(hadith);
+    setIsDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedHadith(null);
   };
 
   const onSubmit = async (event) => {
@@ -237,58 +253,178 @@ export default function Hadith() {
   ];
 
   return (
-    <>
-      <div className="mt-6 md:mt-12">
-        <div className="flex flex-col sm:flex-row justify-between container mx-auto px-4 gap-4">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
-            >
-              {languagesList &&
-                languagesList.map((language) => (
-                  <option
-                    className="bg-primary/50 text-white"
-                    key={language?.code}
-                    value={language?.code}
-                  >
-                    {language?.name}
-                  </option>
-                ))}
-            </select>
+    <div className="container mx-auto px-4">
+      <div className="bg-gray-300 p-4 rounded-lg">
+        <h1 className="text-2xl md:text-3xl font-semibold text-center my-4 md:my-8">
+          Hadith Management
+        </h1>
 
-            <select
-              value={bookName}
-              onChange={(e) => setBookName(e.target.value)}
-              className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
+        {/* Language and Book Selection */}
+        <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
+              >
+                {languagesList &&
+                  languagesList.map((lang) => (
+                    <option
+                      className="bg-primary/50 text-white"
+                      key={lang?.code}
+                      value={lang?.code}
+                    >
+                      {lang?.name}
+                    </option>
+                  ))}
+              </select>
+
+              <select
+                value={bookName}
+                onChange={(e) => setBookName(e.target.value)}
+                className="px-4 py-2 rounded-md border bg-white focus:ring-2 focus:ring-primary"
+              >
+                {booksList &&
+                  booksList.map((book, index) => (
+                    <option
+                      className="bg-primary/50 text-white"
+                      key={index}
+                      value={book?.id}
+                    >
+                      {book?.nameEn}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <Button
+              className="bg-primary text-white"
+              onClick={() => {
+                setOpenAddHadithForm(true);
+                setCurrentEditedId(null);
+                setFormData(initialFormData);
+              }}
             >
-              {booksList &&
-                booksList.map((book, index) => (
-                  <option
-                    className="bg-primary/50 text-white"
-                    key={index}
-                    value={book?.id}
-                  >
-                    {book?.nameEn}
-                  </option>
-                ))}
-            </select>
+              Add New Hadith
+            </Button>
           </div>
-          <Button
-            className="bg-primary text-white"
-            onClick={() => {
-              setOpenAddHadithForm(true);
-              setCurrentEditedId(null);
-              setFormData(initialFormData);
-            }}
-          >
-            Add New Hadith
-          </Button>
         </div>
 
-        <HadithDisplay bookName={bookName} language={language} />
+        {/* Hadith List Display */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <HadithDisplay 
+            bookName={bookName} 
+            language={language} 
+            onHadithClick={handleHadithClick}
+          />
+        </div>
+
+        {/* Hadith Details Dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold">
+                Hadith #{selectedHadith?.hadithNumber}
+              </DialogTitle>
+              <DialogDescription>
+                Hadith Details and Information
+              </DialogDescription>
+            </DialogHeader>
+            {selectedHadith && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      International Number
+                    </label>
+                    <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+                      {selectedHadith.internationalNumber || "N/A"}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Reference Book
+                    </label>
+                    <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+                      {selectedHadith.referenceBook || "N/A"}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Narrator
+                    </label>
+                    <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+                      {selectedHadith.narrator || "N/A"}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Similarities
+                    </label>
+                    <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+                      {selectedHadith.similarities || "N/A"}
+                    </p>
+                  </div>
+                </div>
+                
+                {selectedHadith.hadithArabic && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Arabic Text
+                    </label>
+                    <div className="text-lg text-gray-900 bg-gray-50 p-4 rounded text-right rtl">
+                      {selectedHadith.hadithArabic}
+                    </div>
+                  </div>
+                )}
+
+                {selectedHadith.translation && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Translation
+                    </label>
+                    <div className="text-sm text-gray-900 bg-gray-50 p-4 rounded">
+                      {selectedHadith.translation}
+                    </div>
+                  </div>
+                )}
+
+                {selectedHadith.transliteration && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Transliteration
+                    </label>
+                    <div className="text-sm text-gray-900 bg-gray-50 p-4 rounded italic">
+                      {selectedHadith.transliteration}
+                    </div>
+                  </div>
+                )}
+
+                {selectedHadith.note && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Note
+                    </label>
+                    <div className="text-sm text-gray-900 bg-gray-50 p-4 rounded">
+                      {selectedHadith.note}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    onClick={closeDialog}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
+
       <Sheet
         open={openAddHadithForm}
         onOpenChange={(isOpen) => setOpenAddHadithForm(isOpen)}
@@ -318,6 +454,6 @@ export default function Hadith() {
           />
         </SheetContent>
       </Sheet>
-    </>
+    </div>
   );
 }
