@@ -208,6 +208,7 @@ export default function Header() {
                   Islamics.com
                 </h1>
               </div>
+              
               <Sheet open={openMenu} onOpenChange={setOpenMenu}>
                 <SheetContent side="left" className="w-[300px] px-0">
                   <SheetHeader className="pl-4 -mt-4 pb-[25px]">

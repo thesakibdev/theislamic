@@ -125,7 +125,7 @@ const Search = () => {
         return <Book className="w-4 h-4 text-green-600" />;
       case 'hadith':
         return <BookOpen className="w-4 h-4 text-blue-600" />;
-      case 'verse':
+      case 'verseOther':
         return <FileText className="w-4 h-4 text-purple-600" />;
       case 'tafsir':
         return <BookOpen className="w-4 h-4 text-orange-600" />;
@@ -141,7 +141,7 @@ const Search = () => {
         return 'Surah';
       case 'hadith':
         return 'Hadith';
-      case 'verse':
+      case 'verseOther':
         return 'Verse';
       case 'tafsir':
         return 'Tafsir';
